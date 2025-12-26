@@ -15,6 +15,7 @@ public interface IUserService {
     Optional<User> getUserByEmail(String email);
     List<UserSummaryDTO> getAllUsers();
     UserDetailDTO getUserById(UUID id);
+    User getUserEntityById(UUID id); // Internal use for security filters
     void updatePassword(UUID userId, String currentPassword, String newPassword);
     void updateProfileImage(UUID userId, String imageUrl);
     List<User> getUsersByRole(UserRole role);

@@ -68,9 +68,15 @@ public class ExceptionsHandler {
         return new ErrorDTO(ex.getMessage(), LocalDateTime.now());
     }
 
+    @ExceptionHandler(ForbiddenException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN) // 403
+    public ErrorDTO handleForbidden(ForbiddenException ex) {
+        return new ErrorDTO(ex.getMessage(), LocalDateTime.now());
+    }
+
     @ExceptionHandler(AuthorizationDeniedException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN) // 403
-    public ErrorDTO handleForbidden(AuthorizationDeniedException ex) {
+    public ErrorDTO handleAuthorizationDenied(AuthorizationDeniedException ex) {
         return new ErrorDTO("Non hai i permessi per accedere alla risorsa", LocalDateTime.now());
     }
 

@@ -1,3 +1,12 @@
+# attenzione:
+userRole (USER, ADMIN e OWNER) è diverso da UeserType:
+UserRole è dato dall'enum,
+UserType è basato sulla gerarchia,
+
+un utente tecnico può essere USER, ADMIN o OWNER, e cosi anche venditori e amministrazione,
+il role classifica il loro livello di "potere" sulla piattaforma,
+il type il loro tipo di dipendente in azienda
+
 # endpoint necessari:
 - auth:
   - register user

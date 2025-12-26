@@ -99,6 +99,12 @@ public class UserService implements IUserService {
     }
 
     @Override
+    public User getUserEntityById(UUID id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("User not found with id: " + id));
+    }
+
+    @Override
     @Transactional
     public void updatePassword(UUID userId, String currentPassword, String newPassword) {
         User user = userRepository.findById(userId)
