@@ -2,8 +2,10 @@ package marcomanfrin.softwareops.DTO.auth;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import marcomanfrin.softwareops.enums.UserRole;
+import marcomanfrin.softwareops.enums.UserType;
 
 public record RegisterRequest(
         @NotBlank(message = "First name is required")
@@ -22,6 +24,10 @@ public record RegisterRequest(
         @Size(min = 8, max = 100, message = "Password must be between 8 and 100 characters")
         String password,
 
-        UserRole role
+        @NotNull(message = "User role is required")
+        UserRole role,
+
+        @NotNull(message = "User type is required")
+        UserType type
 ) {
 }

@@ -2,6 +2,7 @@ package marcomanfrin.softwareops.entities.users;
 
 import jakarta.persistence.*;
 import marcomanfrin.softwareops.enums.UserRole;
+import marcomanfrin.softwareops.enums.UserType;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -119,5 +120,16 @@ public abstract class User implements UserDetails {
     }
     public void setRole(UserRole role) {
         this.role = role;
+    }
+
+    public UserType getUserType() {
+        if (this instanceof AdministrativeUser) {
+            return UserType.ADMINISTRATION;
+        } else if (this instanceof TechnicianUser) {
+            return UserType.TECHNICIAN;
+        } else if (this instanceof SellerUser) {
+            return UserType.SELLER;
+        }
+        throw new IllegalStateException("Unknown user type");
     }
 }

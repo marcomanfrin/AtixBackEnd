@@ -1,6 +1,7 @@
 package marcomanfrin.softwareops.security;
 
 import marcomanfrin.softwareops.entities.users.AdministrativeUser;
+import marcomanfrin.softwareops.entities.users.SellerUser;
 import marcomanfrin.softwareops.entities.users.TechnicianUser;
 import marcomanfrin.softwareops.entities.users.User;
 import marcomanfrin.softwareops.repositories.UserRepository;
@@ -31,5 +32,10 @@ public class SecurityService {
     public boolean isTechnician(Authentication authentication) {
         User principal = (User) authentication.getPrincipal();
         return principal instanceof TechnicianUser;
+    }
+
+    public boolean isSeller(Authentication authentication) {
+        User principal = (User) authentication.getPrincipal();
+        return principal instanceof SellerUser;
     }
 }

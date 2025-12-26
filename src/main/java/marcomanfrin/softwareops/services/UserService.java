@@ -9,6 +9,7 @@ import marcomanfrin.softwareops.entities.users.SellerUser;
 import marcomanfrin.softwareops.entities.users.TechnicianUser;
 import marcomanfrin.softwareops.entities.users.User;
 import marcomanfrin.softwareops.enums.UserRole;
+import marcomanfrin.softwareops.enums.UserType;
 import marcomanfrin.softwareops.exceptions.NotFoundException;
 import marcomanfrin.softwareops.exceptions.UnauthorizedException;
 import marcomanfrin.softwareops.exceptions.ValidationException;
@@ -41,42 +42,26 @@ public class UserService implements IUserService {
 
         String hashedPassword = passwordEncoder.encode(request.password());
 
-        User user = createUserByRole(request, hashedPassword);
+        User user = createUserByType(request, hashedPassword);
 
         User savedUser = userRepository.save(user);
         return toUserDetailDTO(savedUser);
     }
 
-    private User createUserByRole(RegisterRequest request, String hashedPassword) {
-        return switch (request.role()) {
-            case ADMIN -> {
-                AdministrativeUser admin = new AdministrativeUser();
-                admin.setEmail(request.email());
-                admin.setPasswordHash(hashedPassword);
-                admin.setFirstName(request.firstName());
-                admin.setLastName(request.lastName());
-                admin.setRole(UserRole.ADMIN);
-                yield admin;
-            }
-            case USER -> {
-                TechnicianUser technician = new TechnicianUser();
-                technician.setEmail(request.email());
-                technician.setPasswordHash(hashedPassword);
-                technician.setFirstName(request.firstName());
-                technician.setLastName(request.lastName());
-                technician.setRole(UserRole.USER);
-                yield technician;
-            }
-            case OWNER -> {
-                SellerUser seller = new SellerUser();
-                seller.setEmail(request.email());
-                seller.setPasswordHash(hashedPassword);
-                seller.setFirstName(request.firstName());
-                seller.setLastName(request.lastName());
-                seller.setRole(UserRole.OWNER);
-                yield seller;
-            }
+    private User createUserByType(RegisterRequest request, String hashedPassword) {
+        User user = switch (request.type()) {
+            case ADMINISTRATION -> new AdministrativeUser();
+            case TECHNICIAN -> new TechnicianUser();
+            case SELLER -> new SellerUser();
         };
+
+        user.setEmail(request.email());
+        user.setPasswordHash(hashedPassword);
+        user.setFirstName(request.firstName());
+        user.setLastName(request.lastName());
+        user.setRole(request.role());
+
+        return user;
     }
 
     @Override
@@ -138,7 +123,8 @@ public class UserService implements IUserService {
                 user.getFirstName(),
                 user.getLastName(),
                 user.getEmail(),
-                user.getRole().name()
+                user.getRole().name(),
+                user.getUserType().name()
         );
     }
 
@@ -149,7 +135,8 @@ public class UserService implements IUserService {
                 user.getLastName(),
                 user.getEmail(),
                 user.getProfileImageUrl(),
-                user.getRole().name()
+                user.getRole().name(),
+                user.getUserType().name()
         );
     }
 }

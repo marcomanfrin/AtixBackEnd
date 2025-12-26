@@ -302,7 +302,8 @@ public class WorkService implements IWorkService {
                 user.getFirstName(),
                 user.getLastName(),
                 user.getEmail(),
-                user.getRole().name()
+                user.getRole().name(),
+                user.getUserType().name()
         );
     }
 
