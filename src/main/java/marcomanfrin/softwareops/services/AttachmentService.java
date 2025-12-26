@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -61,7 +60,7 @@ public class AttachmentService implements IAttachmentService {
                     : "raw";
 
             var options = ObjectUtils.asMap(
-                    "folder", "SoftwareOps/attachments" + targetType.name().toLowerCase(),
+                    "folder", "SoftwareOps/attachments/" + targetType.name().toLowerCase(),
                     "resource_type", resourceTypeIn
             );
 
@@ -77,7 +76,6 @@ public class AttachmentService implements IAttachmentService {
             attachment.setPublicId(publicId);
             attachment.setResourceType(resourceTypeOut);
             attachment.setType(type);
-            attachment.setUploadedAt(LocalDateTime.now());
             attachmentRepository.save(attachment);
 
             AttachmentLink link = new AttachmentLink();
@@ -116,7 +114,7 @@ public class AttachmentService implements IAttachmentService {
     @Transactional
     public void deleteAttachment(UUID attachmentId) {
         Attachment attachment = attachmentRepository.findById(attachmentId)
-                .orElseThrow(() -> new RuntimeException("Attachment not found: " + attachmentId));
+                .orElseThrow(() -> new NotFoundException("Attachment not found: " + attachmentId));
 
         if (attachment.getPublicId() != null && !attachment.getPublicId().isBlank()) {
             try {
@@ -133,11 +131,7 @@ public class AttachmentService implements IAttachmentService {
             }
         }
 
-        // elimina prima i link
-        List<AttachmentLink> links = attachmentLinkRepository.findByAttachment_Id(attachmentId);
-        attachmentLinkRepository.deleteAll(links);
-
-        // poi l’attachment
+        // I link vengono eliminati automaticamente grazie al cascade
         attachmentRepository.delete(attachment);
     }
 
@@ -168,12 +162,5 @@ public class AttachmentService implements IAttachmentService {
             return AttachmentType.DOC;
         }
         return AttachmentType.OTHER;
-    }
-
-    private String requireNotBlank(String value, String field) {
-        if (value == null || value.trim().isBlank()) {
-            throw new IllegalArgumentException(field + " cannot be blank");
-        }
-        return value.trim();
     }
 }

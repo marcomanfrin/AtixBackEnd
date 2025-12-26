@@ -1,10 +1,12 @@
 package marcomanfrin.softwareops.entities;
 
 import jakarta.persistence.*;
-        import marcomanfrin.softwareops.enums.AttachmentType;
+import marcomanfrin.softwareops.enums.AttachmentType;
 import org.hibernate.validator.constraints.URL;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -31,6 +33,9 @@ public class Attachment {
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime uploadedAt;
+
+    @OneToMany(mappedBy = "attachment", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AttachmentLink> links = new ArrayList<>();
 
     public Attachment() {}
 
@@ -81,7 +86,11 @@ public class Attachment {
     public LocalDateTime getUploadedAt() {
         return uploadedAt;
     }
-    public void setUploadedAt(LocalDateTime uploadedAt) {
-        this.uploadedAt = uploadedAt;
+
+    public List<AttachmentLink> getLinks() {
+        return links;
+    }
+    public void setLinks(List<AttachmentLink> links) {
+        this.links = links;
     }
 }
