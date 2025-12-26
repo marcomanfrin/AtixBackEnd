@@ -1,4 +1,4 @@
-package marcomanfrin.softwareops.entities;
+package marcomanfrin.softwareops.entities.users;
 
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;

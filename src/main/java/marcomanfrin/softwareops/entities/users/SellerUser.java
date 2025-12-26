@@ -1,10 +1,10 @@
-package marcomanfrin.softwareops.entities;
+package marcomanfrin.softwareops.entities.users;
 
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 
 @Entity
-@DiscriminatorValue("ADMIN")
-public class AdministrativeUser extends User {
+@DiscriminatorValue("SELLER")
+public class SellerUser extends User {
     // extendable with future new features
 }

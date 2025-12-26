@@ -15,76 +15,29 @@ public class Ticket {
     @GeneratedValue
     private UUID id;
 
-    @Column(nullable = false)
-    private String name;
+    private String senderEmail;
 
-    @Column(length = 4000)
-    private String description;
+    @OneToOne
+    @JoinColumn(name = "order_number_id")
+    private Work OrderNumber;
+
+    @Column(nullable = false)
+    private String Name;
+
+    @Column(nullable = false)
+    private String Description;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private TicketStatus status;
-
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @Column(nullable = false)
-    private LocalDateTime updatedAt;
-
-    private LocalDateTime resolvedAt;
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = true)
-    @JoinColumn(name = "client_id")
-    private Client client;
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = true)
-    @JoinColumn(name = "plant_id")
-    private Plant plant;
-
-    @OneToOne(mappedBy = "ticket", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    @JsonIgnore
-    private WorkFromTicket workFromTicket;
 
     public Ticket() {}
 
-    public Ticket(String name, String description, TicketStatus status, Client client, Plant plant) {
-        this.name = name;
-        this.description = description;
+    public Ticket(String senderEmail, Work orderNumber, String name, String description, TicketStatus status) {
+        this.senderEmail = senderEmail;
+        OrderNumber = orderNumber;
+        Name = name;
+        Description = description;
         this.status = status;
-        this.client = client;
-        this.plant = plant;
-    }
-
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = this.createdAt;
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
-
-    public UUID getId() {
-        return id;
-    }
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     public TicketStatus getStatus() {
@@ -94,46 +47,35 @@ public class Ticket {
         this.status = status;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
+    public String getDescription() {
+        return Description;
     }
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
+    public void setDescription(String description) {
+        Description = description;
     }
 
-    public LocalDateTime getResolvedAt() {
-        return resolvedAt;
+    public String getName() {
+        return Name;
     }
-    public void setResolvedAt(LocalDateTime resolvedAt) {
-        this.resolvedAt = resolvedAt;
-    }
-
-    public Client getClient() {
-        return client;
-    }
-    public void setClient(Client client) {
-        this.client = client;
+    public void setName(String name) {
+        Name = name;
     }
 
-    public Plant getPlant() {
-        return plant;
+    public Work getOrderNumber() {
+        return OrderNumber;
     }
-    public void setPlant(Plant plant) {
-        this.plant = plant;
-    }
-
-    public WorkFromTicket getWorkFromTicket() {
-        return workFromTicket;
-    }
-    public void setWorkFromTicket(WorkFromTicket workFromTicket) {
-        this.workFromTicket = workFromTicket;
+    public void setOrderNumber(Work orderNumber) {
+        OrderNumber = orderNumber;
     }
 
+    public String getSenderEmail() {
+        return senderEmail;
+    }
+    public void setSenderEmail(String senderEmail) {
+        this.senderEmail = senderEmail;
+    }
+
+    public UUID getId() {
+        return id;
+    }
 }

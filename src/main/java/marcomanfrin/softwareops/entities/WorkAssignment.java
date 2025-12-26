@@ -1,7 +1,7 @@
 package marcomanfrin.softwareops.entities;
 
 import jakarta.persistence.*;
-import marcomanfrin.softwareops.enums.AssignmentRole;
+import marcomanfrin.softwareops.entities.users.User;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -33,16 +33,12 @@ public class WorkAssignment {
     @Column(nullable = false, updatable = false)
     private LocalDateTime assignedAt;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private AssignmentRole assignmentRole;
 
     public WorkAssignment() {}
 
-    public WorkAssignment(Work work, User user, AssignmentRole assignmentRole) {
+    public WorkAssignment(Work work, User user) {
         this.work = work;
         this.user = user;
-        this.assignmentRole = assignmentRole;
     }
 
     @PrePersist
@@ -77,12 +73,5 @@ public class WorkAssignment {
     }
     public void setAssignedAt(LocalDateTime assignedAt) {
         this.assignedAt = assignedAt;
-    }
-
-    public AssignmentRole getAssignmentRole() {
-        return assignmentRole;
-    }
-    public void setAssignmentRole(AssignmentRole assignmentRole) {
-        this.assignmentRole = assignmentRole;
     }
 }

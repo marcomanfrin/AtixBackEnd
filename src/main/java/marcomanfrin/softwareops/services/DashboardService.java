@@ -4,8 +4,6 @@ import marcomanfrin.softwareops.DTO.dashboard.*;
 import marcomanfrin.softwareops.enums.TicketStatus;
 import marcomanfrin.softwareops.enums.WorkStatus;
 import marcomanfrin.softwareops.repositories.ClientRepository;
-import marcomanfrin.softwareops.repositories.PlantRepository;
-import marcomanfrin.softwareops.repositories.TicketRepository;
 import marcomanfrin.softwareops.repositories.WorkRepository;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;

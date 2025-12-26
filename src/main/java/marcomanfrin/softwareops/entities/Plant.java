@@ -20,54 +20,40 @@ public class Plant {
     @Column(nullable = false)
     private String name;
 
-    @Column(length = 2000)
+    @Column(nullable = false)
     private String notes;
 
-    @Column(nullable = false, name = "order_number")
-    private String orderNumber;
+    @Column(nullable = false)
+    private String nasDirectory;
 
     @Column(nullable = false)
-    private boolean invoiced;
+    private String pswPhrase;
 
-    private LocalDateTime invoicedAt;
+    @Column(nullable = false)
+    private String pswPlatform;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "primary_client_id")
-    private Client primaryClient;
+    @Column(nullable = false)
+    private String pswStation;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = true)
-    @JoinColumn(name = "final_client_id")
-    private Client finalClient;
-
-    @OneToMany(mappedBy = "plant")
-    @JsonIgnore
-    private List<WorkFromPlant> worksFromPlant = new ArrayList<>();
-
-    public List<WorkFromPlant> getWorksFromPlant() { return worksFromPlant; }
-
-    public void addWorkFromPlant(WorkFromPlant work) {
-        worksFromPlant.add(work);
-        work.setPlant(this);
+    public Plant() {
     }
 
-    public void removeWorkFromPlant(WorkFromPlant work) {
-        worksFromPlant.remove(work);
-        work.setPlant(null);
-    }
-
-    public Plant() {}
-
-    public Plant(String name, String notes, String orderNumber) {
+    public Plant(String name,
+                 String notes,
+                 String nasDirectory,
+                 String pswPhrase,
+                 String pswPlatform,
+                 String pswStation) {
         this.name = name;
         this.notes = notes;
-        this.orderNumber = orderNumber;
+        this.nasDirectory = nasDirectory;
+        this.pswPhrase = pswPhrase;
+        this.pswPlatform = pswPlatform;
+        this.pswStation = pswStation;
     }
 
     public UUID getId() {
         return id;
-    }
-    public void setId(UUID id) {
-        this.id = id;
     }
 
     public String getName() {
@@ -84,38 +70,31 @@ public class Plant {
         this.notes = notes;
     }
 
-    public String getOrderNumber() {
-        return orderNumber;
+    public String getNasDirectory() {
+        return nasDirectory;
     }
-    public void setOrderNumber(String orderNumber) {
-        this.orderNumber = orderNumber;
-    }
-
-    public boolean getInvoiced() {
-        return invoiced;
-    }
-    public void setInvoiced(boolean invoiced) {
-        this.invoiced = invoiced;
+    public void setNasDirectory(String nasDirectory) {
+        this.nasDirectory = nasDirectory;
     }
 
-    public LocalDateTime getInvoicedAt() {
-        return invoicedAt;
+    public String getPswPhrase() {
+        return pswPhrase;
     }
-    public void setInvoicedAt(LocalDateTime invoicedAt) {
-        this.invoicedAt = invoicedAt;
-    }
-
-    public Client getPrimaryClient() {
-        return primaryClient;
-    }
-    public void setPrimaryClient(Client primaryClient) {
-        this.primaryClient = primaryClient;
+    public void setPswPhrase(String pswPhrase) {
+        this.pswPhrase = pswPhrase;
     }
 
-    public Client getFinalClient() {
-        return finalClient;
+    public String getPswPlatform() {
+        return pswPlatform;
     }
-    public void setFinalClient(Client finalClient) {
-        this.finalClient = finalClient;
+    public void setPswPlatform(String pswPlatform) {
+        this.pswPlatform = pswPlatform;
+    }
+
+    public String getPswStation() {
+        return pswStation;
+    }
+    public void setPswStation(String pswStation) {
+        this.pswStation = pswStation;
     }
 }

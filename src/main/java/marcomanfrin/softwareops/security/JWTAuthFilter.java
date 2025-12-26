@@ -10,12 +10,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
-import marcomanfrin.softwareops.entities.User;
+import marcomanfrin.softwareops.entities.users.User;
 import marcomanfrin.softwareops.exceptions.UnauthorizedException;
 import marcomanfrin.softwareops.services.UserService;
 
 import java.io.IOException;
-import java.util.Optional;
 import java.util.UUID;
 
 @Component

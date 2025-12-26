@@ -1,6 +1,6 @@
 package marcomanfrin.softwareops.DTO.works;
 
-import marcomanfrin.softwareops.entities.*;
+import marcomanfrin.softwareops.entities.works.Work;
 import marcomanfrin.softwareops.enums.WorkStatus;
 
 import java.time.LocalDateTime;

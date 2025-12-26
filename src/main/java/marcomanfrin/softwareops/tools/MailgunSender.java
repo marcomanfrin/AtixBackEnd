@@ -3,7 +3,7 @@ package marcomanfrin.softwareops.tools;
 import kong.unirest.core.HttpResponse;
 import kong.unirest.core.JsonNode;
 import kong.unirest.core.Unirest;
-import marcomanfrin.softwareops.entities.User;
+import marcomanfrin.softwareops.entities.users.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 

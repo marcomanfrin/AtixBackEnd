@@ -4,7 +4,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import marcomanfrin.softwareops.entities.User;
+import marcomanfrin.softwareops.entities.users.User;
 
 import java.util.Date;
 import java.util.UUID;

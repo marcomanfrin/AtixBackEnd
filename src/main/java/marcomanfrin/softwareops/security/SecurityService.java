@@ -1,8 +1,8 @@
 package marcomanfrin.softwareops.security;
 
-import marcomanfrin.softwareops.entities.AdministrativeUser;
-import marcomanfrin.softwareops.entities.TechnicianUser;
-import marcomanfrin.softwareops.entities.User;
+import marcomanfrin.softwareops.entities.users.AdministrativeUser;
+import marcomanfrin.softwareops.entities.users.TechnicianUser;
+import marcomanfrin.softwareops.entities.users.User;
 import marcomanfrin.softwareops.repositories.UserRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;

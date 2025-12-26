@@ -1,6 +1,6 @@
 package marcomanfrin.softwareops.DTO.users;
 
-import marcomanfrin.softwareops.entities.User;
+import marcomanfrin.softwareops.entities.users.User;
 import marcomanfrin.softwareops.enums.UserRole;
 
 import java.util.UUID;

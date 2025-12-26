@@ -1,4 +1,4 @@
-package marcomanfrin.softwareops.entities;
+package marcomanfrin.softwareops.entities.users;
 
 import jakarta.persistence.*;
 import marcomanfrin.softwareops.enums.UserRole;
@@ -25,14 +25,9 @@ public abstract class User implements UserDetails {
     @GeneratedValue
     private UUID id;
 
-    @Column(nullable = false, unique = true)
-    private String username;
+    @Column(name = "profile_image_url")
+    private String profileImageUrl;
 
-    @Column(nullable = false, unique = true)
-    private String email;
-
-    @Column(name = "password_hash", nullable = false)
-    private String passwordHash;
 
     @Column(nullable = false)
     private String firstName;
@@ -40,8 +35,11 @@ public abstract class User implements UserDetails {
     @Column(nullable = false)
     private String lastName;
 
-    @Column(name = "profile_image_url")
-    private String profileImageUrl;
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    @Column(name = "password", nullable = false)
+    private String passwordHash;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -49,8 +47,7 @@ public abstract class User implements UserDetails {
 
     public User() {}
 
-    public User(String username, String email, String passwordHash, String firstName, String lastName, UserRole role) {
-        this.username = username;
+    public User(String email, String passwordHash, String firstName, String lastName, UserRole role) {
         this.email = email;
         this.passwordHash = passwordHash;
         this.firstName = firstName;
@@ -72,7 +69,7 @@ public abstract class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return username;
+        return email;
     }
 
     // Getters and Setters
@@ -80,26 +77,12 @@ public abstract class User implements UserDetails {
     public UUID getId() {
         return id;
     }
-    public void setId(UUID id) {
-        this.id = id;
-    }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public String getProfileImageUrl() {
+        return profileImageUrl;
     }
-
-    public String getEmail() {
-        return email;
-    }
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPasswordHash() {
-        return passwordHash;
-    }
-    public void setPasswordHash(String passwordHash) {
-        this.passwordHash = passwordHash;
+    public void setProfileImageUrl(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
     }
 
     public String getFirstName() {
@@ -116,11 +99,19 @@ public abstract class User implements UserDetails {
         this.lastName = lastName;
     }
 
-    public String getProfileImageUrl() {
-        return profileImageUrl;
+    public String getEmail() {
+        return email;
     }
-    public void setProfileImageUrl(String profileImageUrl) {
-        this.profileImageUrl = profileImageUrl;
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPasswordHash() {
+        return passwordHash;
+    }
+    public void setPasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
     }
 
     public UserRole getRole() {

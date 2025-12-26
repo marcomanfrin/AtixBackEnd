@@ -18,18 +18,17 @@ public class WorkReportEntry {
     @JsonIgnore
     private WorkReport report;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = true)
-    @JoinColumn(name = "task_id")
-    private Task task;
+    @Column(nullable = false)
+    private String description;
 
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal hours = BigDecimal.ZERO;
 
     public WorkReportEntry() {}
 
-    public WorkReportEntry(WorkReport report, Task task, BigDecimal hours) {
+    public WorkReportEntry(WorkReport report, String description, BigDecimal hours) {
         this.report = report;
-        this.task = task;
+        this.description = description;
         this.hours = hours;
     }
 
@@ -47,11 +46,11 @@ public class WorkReportEntry {
         this.report = report;
     }
 
-    public Task getTask() {
-        return task;
+    public String getDescription() {
+        return description;
     }
-    public void setTask(Task task) {
-        this.task = task;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public BigDecimal getHours() {

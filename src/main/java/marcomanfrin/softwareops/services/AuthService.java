@@ -1,10 +1,9 @@
 package marcomanfrin.softwareops.services;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import marcomanfrin.softwareops.DTO.login.LoginDTO;
-import marcomanfrin.softwareops.entities.User;
+import marcomanfrin.softwareops.entities.users.User;
 import marcomanfrin.softwareops.exceptions.UnauthorizedException;
 import marcomanfrin.softwareops.security.JWTTools;
 
