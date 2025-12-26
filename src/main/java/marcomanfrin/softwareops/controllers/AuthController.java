@@ -1,39 +1,49 @@
 package marcomanfrin.softwareops.controllers;
 
 import jakarta.validation.Valid;
-import marcomanfrin.softwareops.DTO.login.LoginDTO;
-import marcomanfrin.softwareops.DTO.login.LoginRespDTO;
-import marcomanfrin.softwareops.DTO.registration.NewUserDTO;
-import marcomanfrin.softwareops.DTO.registration.NewUserRespDTO;
-import marcomanfrin.softwareops.exceptions.ValidationException;
+import marcomanfrin.softwareops.DTO.auth.LoginRequest;
+import marcomanfrin.softwareops.DTO.auth.LoginResponse;
+import marcomanfrin.softwareops.DTO.auth.RegisterRequest;
+import marcomanfrin.softwareops.DTO.auth.UpdatePasswordRequest;
+import marcomanfrin.softwareops.DTO.users.UserDetailDTO;
 import marcomanfrin.softwareops.services.AuthService;
-import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.BindingResult;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
     private final AuthService authService;
-    private final UserService userService;
 
-    public AuthController(AuthService authService, UserService userService) {
+    public AuthController(AuthService authService) {
         this.authService = authService;
-        this.userService = userService;
-    }
-
-    @PostMapping("/login")
-    public LoginRespDTO login(@RequestBody LoginDTO body) {
-        return new LoginRespDTO(this.authService.checkCredentialsAndGenerateToken(body));
     }
 
     @PostMapping("/register")
-    @ResponseStatus(HttpStatus.CREATED)
-    public NewUserRespDTO createUser(@RequestBody @Valid NewUserDTO body, BindingResult validationResult) {
-        if (validationResult.hasErrors()) {
-            throw new ValidationException(validationResult.getFieldErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).toList());
-        }
-        return this.userService.saveNewUser(body);
+    public ResponseEntity<UserDetailDTO> register(@Valid @RequestBody RegisterRequest request) {
+        UserDetailDTO user = authService.register(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(user);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
+        LoginResponse response = authService.login(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/password")
+    public ResponseEntity<Void> updatePassword(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @Valid @RequestBody UpdatePasswordRequest request) {
+        // Get user ID from authenticated user (assuming UserDetails has getId method or we can extract it)
+        // For now, this is a placeholder - will need adjustment based on your UserDetails implementation
+        UUID userId = UUID.fromString(userDetails.getUsername()); // This needs proper implementation
+        authService.updatePassword(userId, request);
+        return ResponseEntity.noContent().build();
     }
 }

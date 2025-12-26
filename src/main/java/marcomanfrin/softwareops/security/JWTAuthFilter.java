@@ -4,6 +4,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import marcomanfrin.softwareops.services.UserService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -45,8 +46,7 @@ public class JWTAuthFilter extends OncePerRequestFilter {
 
             UUID userId = jwtTools.getIDFromToken(token);
 
-            User user = userService.getUserById(userId)
-                    .orElseThrow(() -> new UnauthorizedException("Utente non trovato"));
+            User user = userService.getUserById(userId);
 
             Authentication authentication = new UsernamePasswordAuthenticationToken(
                     user,
