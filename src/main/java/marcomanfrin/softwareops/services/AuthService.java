@@ -18,7 +18,6 @@ public class AuthService {
         this.jwtTools = jwtTools;
         this.bcrypt = bcrypt;
     }
-
     public String checkCredentialsAndGenerateToken(LoginDTO body) {
         User user = userService
                 .getUserByUsername(body.userName())

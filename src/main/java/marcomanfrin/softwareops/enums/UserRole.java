@@ -1,7 +1,7 @@
 package marcomanfrin.softwareops.enums;
 
 public enum UserRole {
-    ADMINISTRATION,
-    TECHNICIAN,
-    SELLER
+    USER,
+    ADMIN,
+    OWNER
 }

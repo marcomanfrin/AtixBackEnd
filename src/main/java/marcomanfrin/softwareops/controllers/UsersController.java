@@ -8,7 +8,6 @@ import marcomanfrin.softwareops.DTO.users.UserResponseDTO;
 import marcomanfrin.softwareops.DTO.users.UpdatedImageResp;
 import marcomanfrin.softwareops.entities.users.User;
 import marcomanfrin.softwareops.enums.UserRole;
-import marcomanfrin.softwareops.services.IUserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;

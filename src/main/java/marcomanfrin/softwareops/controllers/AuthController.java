@@ -7,11 +7,9 @@ import marcomanfrin.softwareops.DTO.registration.NewUserDTO;
 import marcomanfrin.softwareops.DTO.registration.NewUserRespDTO;
 import marcomanfrin.softwareops.exceptions.ValidationException;
 import marcomanfrin.softwareops.services.AuthService;
-import marcomanfrin.softwareops.services.UserService;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

@@ -3,7 +3,6 @@ package marcomanfrin.softwareops.controllers;
 import marcomanfrin.softwareops.entities.Attachment;
 import marcomanfrin.softwareops.entities.AttachmentLink;
 import marcomanfrin.softwareops.enums.AttachmentTargetType;
-import marcomanfrin.softwareops.services.IAttachmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,19 +23,19 @@ public class AttachmentsController {
             @PathVariable AttachmentTargetType targetType,
             @PathVariable UUID targetId,
             @RequestParam("file") MultipartFile file) {
-        return attachmentService.uploadAndLink(file, targetType, targetId);
+        return attachmentService.upload(file, targetType, targetId);
     }
 
     @GetMapping("/{targetType}/{targetId}")
     public List<Attachment> getAttachments(
             @PathVariable AttachmentTargetType targetType,
             @PathVariable UUID targetId) {
-        return attachmentService.getAttachments(targetType, targetId);
+        return attachmentService.get(targetType, targetId);
     }
 
     @DeleteMapping("/{attachmentId}")
     public ResponseEntity<Void> deleteAttachment(@PathVariable UUID attachmentId) {
-        attachmentService.deleteAttachment(attachmentId);
+        attachmentService.delete(attachmentId);
         return ResponseEntity.noContent().build();
     }
 }

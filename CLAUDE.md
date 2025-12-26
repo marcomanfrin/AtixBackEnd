@@ -1,3 +1,52 @@
+# endpoint necessari:
+- auth:
+  - register user
+  - login user
+  - update user password
+- users:
+  - get all users -> restituisce solo dati essenziali
+  - get user by id -> return all user details
+- clients:
+  - create new
+  - get all (pagable)
+  - get by id
+  - update by id
+  - delate by id
+- worksite reference:
+  - create new
+  - get all
+  - get by id
+  - update by id
+  - delate by id
+- plants:
+  - create new
+  - get all (pagable)
+  - get by id
+  - update by id
+  - delate by id
+- tickets:
+  - create new
+  - get all (pagable)
+  - get by id
+  - update by id
+  - delate by id
+- work report
+  - get by work id
+- work report entry
+  - create new (passing work id)
+  - update by id
+  - get all by work id
+  - remove by id
+- works:
+  - get all (pagable) (DTO with only few info)
+  - get by id (DTO with all the informations )
+  - update by id
+  - crate 
+  - close -> special update that modify only the closed var
+  - invoice -> special update that modify only the invoiced var
+  - assign technician -> new work assignament record passing a technician id and work id
+  - add work reference: new worksite reference by passing referent id and work id
+
 # tecnologie da utilizzare:
 1️⃣ Fondamenti di Backend & Spring
 

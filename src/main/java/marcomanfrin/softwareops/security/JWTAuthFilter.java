@@ -12,7 +12,6 @@ import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 import marcomanfrin.softwareops.entities.users.User;
 import marcomanfrin.softwareops.exceptions.UnauthorizedException;
-import marcomanfrin.softwareops.services.UserService;
 
 import java.io.IOException;
 import java.util.UUID;
