@@ -47,6 +47,14 @@ public class PlantsController {
     public ResponseEntity<PlantResponse> updatePlant(
             @PathVariable UUID id,
             @Valid @RequestBody PlantRequest request) {
+        //TODO: not all params are required ->
+        // "errorsList": [
+        //        "pswPlatform: Password platform is required",
+        //        "pswStation: Password station is required",
+        //        "pswPhrase: Password phrase is required",
+        //        "name: Plant name is required",
+        //        "nasDirectory: NAS directory is required"
+        //    ]
         PlantResponse plant = plantService.updatePlant(id, request);
         return ResponseEntity.ok(plant);
     }

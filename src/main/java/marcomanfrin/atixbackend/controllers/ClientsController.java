@@ -45,6 +45,7 @@ public class ClientsController {
     public ResponseEntity<ClientResponse> updateClient(
             @PathVariable UUID id,
             @Valid @RequestBody ClientRequest request) {
+        // TODO: "type: Client type is required"
         ClientResponse client = clientService.updateClient(id, request);
         return ResponseEntity.ok(client);
     }

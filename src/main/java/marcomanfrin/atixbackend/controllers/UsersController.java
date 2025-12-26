@@ -32,4 +32,6 @@ public class UsersController {
         UserDetailDTO user = userService.getUserById(id);
         return ResponseEntity.ok(user);
     }
+
+    // TODO: update user, upload profile image, delete
 }
