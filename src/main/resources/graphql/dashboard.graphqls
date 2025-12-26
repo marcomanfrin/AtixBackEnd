@@ -1,0 +1,44 @@
+type DashboardSummary {
+    clientsCount: Int!
+    plantsCount: Int!
+
+    worksByStatus: [WorkStatusCount!]!
+    ticketsByStatus: [TicketStatusCount!]!
+
+    lastWorks: [WorkPreview!]!
+    lastTickets: [TicketPreview!]!
+}
+
+type WorkStatusCount { status: WorkStatus! count: Int! }
+type TicketStatusCount { status: TicketStatus! count: Int! }
+
+enum WorkStatus {
+    DRAFT
+    SCHEDULED
+    IN_PROGRESS
+    COMPLETED
+    CANCELLED
+}
+
+enum TicketStatus {
+    OPEN
+    IN_PROGRESS
+    RESOLVED
+    CLOSED
+}
+
+type WorkPreview {
+    id: ID!
+    status: WorkStatus!
+    createdAt: String
+}
+
+type TicketPreview {
+    id: ID!
+    status: TicketStatus!
+    createdAt: String
+}
+
+type Query {
+    dashboardSummary(limit: Int = 5): DashboardSummary!
+}

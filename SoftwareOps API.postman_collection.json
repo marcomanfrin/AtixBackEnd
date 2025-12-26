@@ -1,0 +1,1562 @@
+{
+	"info": {
+		"_postman_id": "21d2125d-beb9-4170-9d44-3b60b9239f7c",
+		"name": "SoftwareOps API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "49984250",
+		"_collection_link": "https://marcomanfrin-1709038.postman.co/workspace/marco's-Workspace~5569ee71-1cf3-44c2-8fd7-2f130150440b/collection/49984250-21d2125d-beb9-4170-9d44-3b60b9239f7c?action=share&source=collection_link&creator=49984250"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userName\": \"pippobaudo\",\n    \"password\": \"1234\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseUrl}}/auth/login"
+					},
+					"response": []
+				},
+				{
+					"name": "Register",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"firstName\": \"{{$randomFirstName}}\",\n    \"lastName\": \"{{$randomLastName}}\",\n    \"userName\": \"{{$randomUserName}}\",\n    \"email\": \"{{$randomEmail}}\",\n    \"password\": \"password123\",\n    \"role\": \"OWNER\",  // USER, ADMIN or OWNER\n    \"userType\": \"ADMINISTRATIVE\" // TECHNICIAN or ADMINISTRATIVE\n}"
+						},
+						"url": "{{baseUrl}}/auth/register"
+					},
+					"response": []
+				},
+				{
+					"name": "Register Known User",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"firstName\": \"Marco\",\n    \"lastName\": \"Manfrin\",\n    \"userName\": \"marcomanfrin\",\n    \"email\": \"marco.manfrin04@gmail.com\",\n    \"password\": \"Marco2004\",\n    \"role\": \"OWNER\",  // USER, ADMIN or OWNER\n    \"userType\": \"ADMINISTRATIVE\" // TECHNICIAN or ADMINISTRATIVE\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseUrl}}/auth/register"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "Get All Users",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/users?page=0&size=20",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0",
+									"description": "Page number (default: 0)"
+								},
+								{
+									"key": "size",
+									"value": "20",
+									"description": "Page size (default: 20, max: 100)"
+								}
+							]
+						},
+						"description": "auth: autenticato"
+					},
+					"response": []
+				},
+				{
+					"name": "Get User By Id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/users/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "7a76d7ba-4dca-4f69-b107-50d3a0636cf7"
+								}
+							]
+						},
+						"description": "auth: admin, owner, me"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Technicians",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{baseUrl}}/users/technicians",
+						"description": "auth: autenticato"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Users By Role",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{baseUrl}}/users/role/ADMIN",
+						"description": "auth: autenticato"
+					},
+					"response": []
+				},
+				{
+					"name": "Update User",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"firstName\": \"{{$randomFirstName}}\",\n    \"lastName\": \"{{$randomLastName}}\",\n    \"email\": \"{{$randomEmail}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "e6da5b01-9a60-43e7-9e24-59290f646a10"
+								}
+							]
+						},
+						"description": "auth: admin, me"
+					},
+					"response": []
+				},
+				{
+					"name": "Update User Role",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"role\": \"ADMIN\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/:id/role",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								":id",
+								"role"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "e6da5b01-9a60-43e7-9e24-59290f646a10"
+								}
+							]
+						},
+						"description": "auth: admin"
+					},
+					"response": []
+				},
+				{
+					"name": "Upload Avatar",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "avatar",
+									"type": "file",
+									"src": "postman-cloud:///1f0de793-767e-4450-a57e-71146556f738"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/:id/avatar",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								":id",
+								"avatar"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "e6da5b01-9a60-43e7-9e24-59290f646a10",
+									"description": "user id"
+								}
+							]
+						},
+						"description": "auth: me, admin"
+					},
+					"response": []
+				},
+				{
+					"name": "Change Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"oldPassword\": \"arco2004\",\n    \"newPassword\": \"1234\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/:id/password",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								":id",
+								"password"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "70a35d93-71a3-4a57-ba84-7983b699ca5f"
+								}
+							]
+						},
+						"description": "auth: admin, me"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete User",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/users/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "e6da5b01-9a60-43e7-9e24-59290f646a10"
+								}
+							]
+						},
+						"description": "auth: owner"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Clients",
+			"item": [
+				{
+					"name": "Create Client",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{$randomCompanyName}}\",\n    \"type\": \"DIRECT\" //DIRECT or FINAL\n}"
+						},
+						"url": "{{baseUrl}}/clients",
+						"description": "auth: autenticato"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Clients",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/clients?page=0&size=20",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"clients"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0",
+									"description": "Page number (default: 0)"
+								},
+								{
+									"key": "size",
+									"value": "20",
+									"description": "Page size (default: 20, max: 100)"
+								}
+							]
+						},
+						"description": "auth: autenticato"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Client By Id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{baseUrl}}/clients/01b8f0f6-f858-415e-8710-aa3d9b650486",
+						"description": "auth: autenticato"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Client",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Updated pippo\",\n    \"type\": \"DIRECT\" //DIRECT(Atix client) or FINAL\n}"
+						},
+						"url": "{{baseUrl}}/clients/c203748a-ba1b-43e1-b2c9-f3e462ea51db",
+						"description": "auth: autenticato"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Client",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": "{{baseUrl}}/clients/c203748a-ba1b-43e1-b2c9-f3e462ea51db",
+						"description": "auth: ADMIN or OWNER"
+					},
+					"response": []
+				},
+				{
+					"name": "Search Clients",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/clients/search?query=Updated",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"clients",
+								"search"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "Updated"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Tickets",
+			"item": [
+				{
+					"name": "Create Ticket",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{$randomProductName}}\",\n    \"description\": \"{{$randomLoremSentence}}\",\n    \"clientId\": null,  // Optional: UUID of client\n    \"plantId\": null    // Optional: UUID of plant\n}"
+						},
+						"url": "{{baseUrl}}/tickets"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Tickets",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/tickets",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tickets"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0",
+									"disabled": true
+								},
+								{
+									"key": "size",
+									"value": "3",
+									"disabled": true
+								},
+								{
+									"key": "status",
+									"value": "CLOSED",
+									"disabled": true
+								},
+								{
+									"key": "clientId",
+									"value": "",
+									"disabled": true
+								},
+								{
+									"key": "plantId",
+									"value": "",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Ticket By Id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/tickets/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tickets",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "f0aa7b8d-d1a5-4655-965e-7737b315ab3b"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Ticket",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Updated Ticket Name\",\n    \"description\": \"Updated description\",\n    \"status\": \"IN_PROGRESS\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/tickets/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tickets",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "8e551942-e5e4-4684-b502-bb299e068f54"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Close Ticket",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/tickets/:id/close",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tickets",
+								":id",
+								"close"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "73f4ed38-0de4-43c6-92d9-429debe20d4c"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Work From Ticket",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/tickets/:ticketId/works",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tickets",
+								":ticketId",
+								"works"
+							],
+							"variable": [
+								{
+									"key": "ticketId",
+									"value": "f427caa1-86a5-4eb8-a2d6-ff7bdd3675d6"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get ticket with filters",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/tickets?status=CLOSED",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tickets"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "CLOSED"
+								},
+								{
+									"key": "clientId",
+									"value": "4237b99b-3d92-4e3e-b6d5-25aa68bcafd9",
+									"disabled": true
+								},
+								{
+									"key": "plantId",
+									"value": "",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Ticket",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/tickets/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tickets",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "d79a9a2c-eb48-499c-a471-cebcfd7ee462"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Plants",
+			"item": [
+				{
+					"name": "Create Plant",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{$randomDomainName}}\",\n    \"notes\": \"{{$randomLoremSentence}}\",\n    \"orderNumber\": \"12345\",\n    \"primaryClientId\": \"b91e9f2e-70f5-4852-b2b5-524fd68c1f38\", // insert a valid client created before\n    \"finalClientId\": \"cfd93bd1-9c33-4da5-9dd3-546e5e819838\" // insert a valid client created before\n}"
+						},
+						"url": "{{baseUrl}}/plants"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Plants",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/plants",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"plants"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "2",
+									"disabled": true
+								},
+								{
+									"key": "size",
+									"value": "3",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Plant By Id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/plants/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"plants",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "2f393b9b-0215-4e76-a36d-7d0e74286fdc"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Plant",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Updated Plant Name\",\n    \"notes\": \"Updated notes\",\n    \"orderNumber\": \"54321\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/plants/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"plants",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "2f393b9b-0215-4e76-a36d-7d0e74286fdc"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Invoice Plant",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/plants/:id/invoice",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"plants",
+								":id",
+								"invoice"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "2f393b9b-0215-4e76-a36d-7d0e74286fdc"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Plants By Client",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/plants/client/:clientId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"plants",
+								"client",
+								":clientId"
+							],
+							"variable": [
+								{
+									"key": "clientId",
+									"value": "7f5f05f4-79b7-4846-a521-03a98c8723e9"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search Plants",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/plants/search?query=Updated",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"plants",
+								"search"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "Updated"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Work From Plant",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/plants/:plantId/works",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"plants",
+								":plantId",
+								"works"
+							],
+							"variable": [
+								{
+									"key": "plantId",
+									"value": "c1c5877a-9843-4fa3-a1c4-d3d0e661fb11"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Plant",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/plants/:plantId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"plants",
+								":plantId"
+							],
+							"variable": [
+								{
+									"key": "plantId",
+									"value": "f580eb72-9d95-4711-8b60-a654b8d8e043"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Works",
+			"item": [
+				{
+					"name": "Get Works",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/works",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"works"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "size",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "status",
+									"value": "SCHEDULED",
+									"description": "DRAFT,SCHEDULED,IN_PROGRESS,COMPLETED,CANCELLED",
+									"disabled": true
+								},
+								{
+									"key": "technicianId",
+									"value": "f57ac10b-58cc-4372-a567-0e02b2c3d479",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Work By Id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/works/:workId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"works",
+								":workId"
+							],
+							"variable": [
+								{
+									"key": "workId",
+									"value": "230de84c-30ad-4b54-8ca5-31b6803fe206"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Work",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"IN_PROGRESS\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/works/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"works",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "230de84c-30ad-4b54-8ca5-31b6803fe206"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Assign Technician",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"technicianId\": \"960a4e8a-9ff9-432b-b141-f3f8d0d25f20\",\n    \"role\": \"LEAD\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/works/:workId/assignments",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"works",
+								":workId",
+								"assignments"
+							],
+							"variable": [
+								{
+									"key": "workId",
+									"value": "d9daa570-219e-490b-9d4c-2ca9198e959f"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Complete Work",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/works/:workId/complete",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"works",
+								":workId",
+								"complete"
+							],
+							"variable": [
+								{
+									"key": "workId",
+									"value": "230de84c-30ad-4b54-8ca5-31b6803fe206"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Work",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/works/:WorkId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"works",
+								":WorkId"
+							],
+							"variable": [
+								{
+									"key": "WorkId",
+									"value": "230de84c-30ad-4b54-8ca5-31b6803fe206"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Tasks",
+			"item": [
+				{
+					"name": "Create Task",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"text\": \"New task 3\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/works/:workId/tasks",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"works",
+								":workId",
+								"tasks"
+							],
+							"variable": [
+								{
+									"key": "workId",
+									"value": "d9daa570-219e-490b-9d4c-2ca9198e959f"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Tasks By Work Id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/works/:workId/tasks",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"works",
+								":workId",
+								"tasks"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "TODO",
+									"disabled": true
+								}
+							],
+							"variable": [
+								{
+									"key": "workId",
+									"value": "d9daa570-219e-490b-9d4c-2ca9198e959f"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Task",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"text\": \"pippo\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/works/:workId/tasks/:taskId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"works",
+								":workId",
+								"tasks",
+								":taskId"
+							],
+							"variable": [
+								{
+									"key": "workId",
+									"value": "d9daa570-219e-490b-9d4c-2ca9198e959f"
+								},
+								{
+									"key": "taskId",
+									"value": "2b32147e-b442-4cb4-881b-587f2942d1f2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Task Status",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"DOING\" // TODO, DOING, DONE\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/works/:workId/tasks/:taskId/status",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"works",
+								":workId",
+								"tasks",
+								":taskId",
+								"status"
+							],
+							"variable": [
+								{
+									"key": "workId",
+									"value": "d9daa570-219e-490b-9d4c-2ca9198e959f"
+								},
+								{
+									"key": "taskId",
+									"value": "2b32147e-b442-4cb4-881b-587f2942d1f2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Completion Rate",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/works/:workId/tasks/completion-rate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"works",
+								":workId",
+								"tasks",
+								"completion-rate"
+							],
+							"variable": [
+								{
+									"key": "workId",
+									"value": "d9daa570-219e-490b-9d4c-2ca9198e959f"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Task",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/works/:workId/tasks/:taskId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"works",
+								":workId",
+								"tasks",
+								":taskId"
+							],
+							"variable": [
+								{
+									"key": "workId",
+									"value": "d9daa570-219e-490b-9d4c-2ca9198e959f"
+								},
+								{
+									"key": "taskId",
+									"value": "2b32147e-b442-4cb4-881b-587f2942d1f2"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Reports",
+			"item": [
+				{
+					"name": "Create Work Report",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/works/:workId/reports",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"works",
+								":workId",
+								"reports"
+							],
+							"variable": [
+								{
+									"key": "workId",
+									"value": "d9daa570-219e-490b-9d4c-2ca9198e959f"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Work Report By Work Id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{baseUrl}}/works/c47ac10b-58cc-4372-a567-0e02b2c3d479/report"
+					},
+					"response": []
+				},
+				{
+					"name": "Add Work Report Entry",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"taskId\": \"d47ac10b-58cc-4372-a567-0e02b2c3d479\",\n    \"hours\": 2.5\n}"
+						},
+						"url": "{{baseUrl}}/works/c47ac10b-58cc-4372-a567-0e02b2c3d479/report/rows"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Work Report Entry",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"hours\": 3.0\n}"
+						},
+						"url": "{{baseUrl}}/works/c47ac10b-58cc-4372-a567-0e02b2c3d479/report/rows/c57ac10b-58cc-4372-a567-0e02b2c3d479"
+					},
+					"response": []
+				},
+				{
+					"name": "Remove Work Report Entry",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": "{{baseUrl}}/works/c47ac10b-58cc-4372-a567-0e02b2c3d479/report/rows/c57ac10b-58cc-4372-a567-0e02b2c3d479"
+					},
+					"response": []
+				},
+				{
+					"name": "Finalize Work Report",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": "{{baseUrl}}/works/c47ac10b-58cc-4372-a567-0e02b2c3d479/report/finalize"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Attachments",
+			"item": [
+				{
+					"name": "Create and Link Attachment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "postman-cloud:///1f0de825-1110-44f0-bb8c-f2bd42254435"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/attachments/:targetType/:targetId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"attachments",
+								":targetType",
+								":targetId"
+							],
+							"variable": [
+								{
+									"key": "targetType",
+									"value": "WORK",
+									"description": "Could be: WORK, PLANT, TICKET, REPORT"
+								},
+								{
+									"key": "targetId",
+									"value": "d9daa570-219e-490b-9d4c-2ca9198e959f",
+									"description": "id of the target"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Attachments",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/attachments/:TargetType/:TergetId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"attachments",
+								":TargetType",
+								":TergetId"
+							],
+							"variable": [
+								{
+									"key": "TargetType",
+									"value": "WORK",
+									"description": "Could be: WORK, PLANT, TICKET, REPORT"
+								},
+								{
+									"key": "TergetId",
+									"value": "d9daa570-219e-490b-9d4c-2ca9198e959f",
+									"description": "id of the attachment target"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Attachment",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/attachments/:Id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"attachments",
+								":Id"
+							],
+							"variable": [
+								{
+									"key": "Id",
+									"value": "f38f0774-6c2c-4038-b565-33572e99afd9",
+									"description": "id of the attachment to delate"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": {
+			"token": "{{token}}"
+		}
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3001"
+		},
+		{
+			"key": "token",
+			"value": ""
+		},
+		{
+			"key": "mail",
+			"value": ""
+		},
+		{
+			"key": "password",
+			"value": ""
+		},
+		{
+			"key": "username",
+			"value": ""
+		}
+	]
+}
