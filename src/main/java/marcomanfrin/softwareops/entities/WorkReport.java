@@ -58,6 +58,21 @@ public class WorkReport {
         this.work = work;
     }
 
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public BigDecimal getTotalHours() {
+        return totalHours;
+    }
+
+    public void setTotalHours(BigDecimal totalHours) {
+        this.totalHours = totalHours;
+    }
 
     public List<WorkReportEntry> getEntries() {
         return entries;

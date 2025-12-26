@@ -1,34 +1,55 @@
 package marcomanfrin.softwareops.services;
 
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import marcomanfrin.softwareops.DTO.login.LoginDTO;
+import marcomanfrin.softwareops.DTO.auth.LoginRequest;
+import marcomanfrin.softwareops.DTO.auth.LoginResponse;
+import marcomanfrin.softwareops.DTO.auth.RegisterRequest;
+import marcomanfrin.softwareops.DTO.auth.UpdatePasswordRequest;
+import marcomanfrin.softwareops.DTO.users.UserDetailDTO;
 import marcomanfrin.softwareops.entities.users.User;
 import marcomanfrin.softwareops.exceptions.UnauthorizedException;
 import marcomanfrin.softwareops.security.JWTTools;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 @Service
 public class AuthService {
-	private final UserService userService;
-	private final JWTTools jwtTools;
-	private final PasswordEncoder bcrypt;
+    private final UserService userService;
+    private final JWTTools jwtTools;
+    private final PasswordEncoder passwordEncoder;
 
-    public AuthService(UserService userService, JWTTools jwtTools, PasswordEncoder bcrypt) {
+    public AuthService(UserService userService, JWTTools jwtTools, PasswordEncoder passwordEncoder) {
         this.userService = userService;
         this.jwtTools = jwtTools;
-        this.bcrypt = bcrypt;
+        this.passwordEncoder = passwordEncoder;
     }
-    public String checkCredentialsAndGenerateToken(LoginDTO body) {
+
+    public UserDetailDTO register(RegisterRequest request) {
+        return userService.registerUser(request);
+    }
+
+    public LoginResponse login(LoginRequest request) {
         User user = userService
-                .getUserByUsername(body.userName())
-                .orElseThrow(() -> new UnauthorizedException("Utente non trovato"));
+                .getUserByEmail(request.email())
+                .orElseThrow(() -> new UnauthorizedException("Invalid credentials"));
 
+        if (!passwordEncoder.matches(request.password(), user.getPassword())) {
+            throw new UnauthorizedException("Invalid credentials");
+        }
 
-        if (bcrypt.matches(body.password(), user.getPassword())) {
-			return jwtTools.createToken(user);
-		}
-        else {
-			throw new UnauthorizedException("Credenziali errate");
-		}
-	}
+        String token = jwtTools.createToken(user);
+
+        return new LoginResponse(
+                token,
+                user.getEmail(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getRole().name()
+        );
+    }
+
+    public void updatePassword(UUID userId, UpdatePasswordRequest request) {
+        userService.updatePassword(userId, request.currentPassword(), request.newPassword());
+    }
 }
