@@ -62,7 +62,7 @@ public class WorkService implements IWorkService {
         work.setProgrammingProgression(request.programmingProgression() != null ? request.programmingProgression() : 0);
         work.setExpectedStartDate(request.expectedStartDate());
         work.setNasSubDirectory(request.nasSubDirectory());
-        work.setExpectedOfficeHOurs(request.expectedOfficeHours() != null ? request.expectedOfficeHours() : 0);
+        work.setExpectedOfficeHours(request.expectedOfficeHours() != null ? request.expectedOfficeHours() : 0);
         work.setExpectedPlantHours(request.expectedPlantHours() != null ? request.expectedPlantHours() : 0);
 
         // Set seller
@@ -150,7 +150,7 @@ public class WorkService implements IWorkService {
             work.setNasSubDirectory(request.nasSubDirectory());
         }
         if (request.expectedOfficeHours() != null) {
-            work.setExpectedOfficeHOurs(request.expectedOfficeHours());
+            work.setExpectedOfficeHours(request.expectedOfficeHours());
         }
         if (request.expectedPlantHours() != null) {
             work.setExpectedPlantHours(request.expectedPlantHours());
@@ -290,7 +290,7 @@ public class WorkService implements IWorkService {
                         .map(this::toWorksiteReferenceResponse)
                         .collect(Collectors.toList()),
                 work.getNasSubDirectory(),
-                work.getExpectedOfficeHOurs(),
+                work.getExpectedOfficeHours(),
                 work.getExpectedPlantHours(),
                 work.getTicket() != null ? toTicketResponse(work.getTicket()) : null
         );

@@ -19,13 +19,13 @@ public class Ticket {
 
     @OneToOne
     @JoinColumn(name = "order_number_id")
-    private Work OrderNumber;
+    private Work orderNumber;
 
     @Column(nullable = false)
-    private String Name;
+    private String name;
 
     @Column(nullable = false)
-    private String Description;
+    private String description;
 
     @Enumerated(EnumType.STRING)
     private TicketStatus status;
@@ -34,9 +34,9 @@ public class Ticket {
 
     public Ticket(String senderEmail, Work orderNumber, String name, String description, TicketStatus status) {
         this.senderEmail = senderEmail;
-        OrderNumber = orderNumber;
-        Name = name;
-        Description = description;
+        this.orderNumber = orderNumber;
+        this.name = name;
+        this.description = description;
         this.status = status;
     }
 
@@ -48,24 +48,24 @@ public class Ticket {
     }
 
     public String getDescription() {
-        return Description;
+        return description;
     }
     public void setDescription(String description) {
-        Description = description;
+        this.description = description;
     }
 
     public String getName() {
-        return Name;
+        return name;
     }
     public void setName(String name) {
-        Name = name;
+        this.name = name;
     }
 
     public Work getOrderNumber() {
-        return OrderNumber;
+        return orderNumber;
     }
     public void setOrderNumber(Work orderNumber) {
-        OrderNumber = orderNumber;
+        this.orderNumber = orderNumber;
     }
 
     public String getSenderEmail() {

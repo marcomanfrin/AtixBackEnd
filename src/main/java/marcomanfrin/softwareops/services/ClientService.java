@@ -38,7 +38,7 @@ public class ClientService implements IClientService {
     @Override
     public ClientResponse getClientById(UUID id) {
         Client client = clientRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Client not found with id: " + id));
+                .orElseThrow(() -> new NotFoundException("Client not found with id: " + id));
         return toClientResponse(client);
     }
 

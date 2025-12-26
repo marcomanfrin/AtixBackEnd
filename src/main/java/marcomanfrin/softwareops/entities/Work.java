@@ -1,7 +1,8 @@
 package marcomanfrin.softwareops.entities;
 
 import jakarta.persistence.*;
-import jdk.jfr.Percentage;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import marcomanfrin.softwareops.entities.users.SellerUser;
 
 import java.time.LocalDate;
@@ -19,7 +20,7 @@ public class Work {
     private UUID id;
 
     @Column(nullable = false)
-    private String Name;
+    private String name;
 
     @Column(nullable = false)
     private String bidNumber;
@@ -28,20 +29,21 @@ public class Work {
     @JoinColumn(name = "seller_id")
     private SellerUser seller;
 
+    @Column(nullable = false)
+    private String orderNumber;
 
     @Column(nullable = false)
-    private String OrderNumber;
+    private LocalDate orderDate;
 
     @Column(nullable = false)
-    private LocalDate OrderDate;
+    @Min(0)
+    @Max(100)
+    private int electricalSchemaProgression = 0;
 
     @Column(nullable = false)
-    @Percentage
-    private int ElectricalSchemaProgression = 0;
-
-    @Column(nullable = false)
-    @Percentage
-    private int ProgrammingProgression = 0;
+    @Min(0)
+    @Max(100)
+    private int programmingProgression = 0;
 
     @Column(nullable = true)
     private LocalDate expectedStartDate;
@@ -60,11 +62,11 @@ public class Work {
     @JoinColumn(name = "plant_id")
     private Plant plant;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "atix_client_id", nullable = false)
-    private Client AtixClient;
+    @ManyToOne
+    @JoinColumn(name = "atix_client_id")
+    private Client atixClient;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "final_client_id")
     private Client finalClient;
 
@@ -77,15 +79,20 @@ public class Work {
     private List<WorksiteReference> worksiteReferences = new ArrayList<>();
 
     @Column(nullable = false)
-    private String NasSubDirectory;
+    private String nasSubDirectory;
 
-    private int ExpectedOfficeHOurs;
+    private int expectedOfficeHours;
 
-    private int ExpectedPlantHours;
+    private int expectedPlantHours;
 
-    @OneToOne
-    @JoinColumn(name = "ticket_id")
+    @OneToOne(mappedBy = "orderNumber")
     private Ticket ticket;
+
+    @OneToOne(mappedBy = "work", cascade = CascadeType.ALL, orphanRemoval = true)
+    private WorkReport workReport;
+
+    @OneToMany(mappedBy = "work", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<WorkAssignment> assignments = new ArrayList<>();
 
     public Work() {}
 
@@ -105,26 +112,26 @@ public class Work {
                  Client atixClient,
                  Client finalClient,
                  String nasSubDirectory,
-                 int expectedOfficeHOurs,
+                 int expectedOfficeHours,
                  int expectedPlantHours) {
-        Name = name;
+        this.name = name;
         this.bidNumber = bidNumber;
         this.seller = seller;
-        OrderNumber = orderNumber;
-        OrderDate = orderDate;
-        ElectricalSchemaProgression = electricalSchemaProgression;
-        ProgrammingProgression = programmingProgression;
+        this.orderNumber = orderNumber;
+        this.orderDate = orderDate;
+        this.electricalSchemaProgression = electricalSchemaProgression;
+        this.programmingProgression = programmingProgression;
         this.expectedStartDate = expectedStartDate;
         this.completed = completed;
         this.completedAt = completedAt;
         this.invoiced = invoiced;
         this.invoicedAt = invoicedAt;
         this.plant = plant;
-        AtixClient = atixClient;
+        this.atixClient = atixClient;
         this.finalClient = finalClient;
-        NasSubDirectory = nasSubDirectory;
-        ExpectedOfficeHOurs = expectedOfficeHOurs;
-        ExpectedPlantHours = expectedPlantHours;
+        this.nasSubDirectory = nasSubDirectory;
+        this.expectedOfficeHours = expectedOfficeHours;
+        this.expectedPlantHours = expectedPlantHours;
     }
 
     public UUID getId() {
@@ -132,10 +139,10 @@ public class Work {
     }
 
     public String getName() {
-        return Name;
+        return name;
     }
     public void setName(String name) {
-        Name = name;
+        this.name = name;
     }
 
     public String getBidNumber() {
@@ -153,31 +160,31 @@ public class Work {
     }
 
     public String getOrderNumber() {
-        return OrderNumber;
+        return orderNumber;
     }
     public void setOrderNumber(String orderNumber) {
-        OrderNumber = orderNumber;
+        this.orderNumber = orderNumber;
     }
 
     public LocalDate getOrderDate() {
-        return OrderDate;
+        return orderDate;
     }
     public void setOrderDate(LocalDate orderDate) {
-        OrderDate = orderDate;
+        this.orderDate = orderDate;
     }
 
     public int getElectricalSchemaProgression() {
-        return ElectricalSchemaProgression;
+        return electricalSchemaProgression;
     }
     public void setElectricalSchemaProgression(int electricalSchemaProgression) {
-        ElectricalSchemaProgression = electricalSchemaProgression;
+        this.electricalSchemaProgression = electricalSchemaProgression;
     }
 
     public int getProgrammingProgression() {
-        return ProgrammingProgression;
+        return programmingProgression;
     }
     public void setProgrammingProgression(int programmingProgression) {
-        ProgrammingProgression = programmingProgression;
+        this.programmingProgression = programmingProgression;
     }
 
     public LocalDate getExpectedStartDate() {
@@ -223,10 +230,10 @@ public class Work {
     }
 
     public Client getAtixClient() {
-        return AtixClient;
+        return atixClient;
     }
     public void setAtixClient(Client atixClient) {
-        AtixClient = atixClient;
+        this.atixClient = atixClient;
     }
 
     public Client getFinalClient() {
@@ -244,24 +251,24 @@ public class Work {
     }
 
     public String getNasSubDirectory() {
-        return NasSubDirectory;
+        return nasSubDirectory;
     }
     public void setNasSubDirectory(String nasSubDirectory) {
-        NasSubDirectory = nasSubDirectory;
+        this.nasSubDirectory = nasSubDirectory;
     }
 
-    public int getExpectedOfficeHOurs() {
-        return ExpectedOfficeHOurs;
+    public int getExpectedOfficeHours() {
+        return expectedOfficeHours;
     }
-    public void setExpectedOfficeHOurs(int expectedOfficeHOurs) {
-        ExpectedOfficeHOurs = expectedOfficeHOurs;
+    public void setExpectedOfficeHours(int expectedOfficeHours) {
+        this.expectedOfficeHours = expectedOfficeHours;
     }
 
     public int getExpectedPlantHours() {
-        return ExpectedPlantHours;
+        return expectedPlantHours;
     }
     public void setExpectedPlantHours(int expectedPlantHours) {
-        ExpectedPlantHours = expectedPlantHours;
+        this.expectedPlantHours = expectedPlantHours;
     }
 
     public Ticket getTicket() {
@@ -269,5 +276,19 @@ public class Work {
     }
     public void setTicket(Ticket ticket) {
         this.ticket = ticket;
+    }
+
+    public WorkReport getWorkReport() {
+        return workReport;
+    }
+    public void setWorkReport(WorkReport workReport) {
+        this.workReport = workReport;
+    }
+
+    public List<WorkAssignment> getAssignments() {
+        return assignments;
+    }
+    public void setAssignments(List<WorkAssignment> assignments) {
+        this.assignments = assignments;
     }
 }

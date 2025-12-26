@@ -62,10 +62,6 @@ public class WorkReport {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
     public BigDecimal getTotalHours() {
         return totalHours;
     }

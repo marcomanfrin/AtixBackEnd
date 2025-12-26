@@ -1,11 +1,14 @@
 package marcomanfrin.softwareops.entities.users;
 
 import jakarta.persistence.*;
+import marcomanfrin.softwareops.entities.WorkAssignment;
+import marcomanfrin.softwareops.entities.WorksiteReferenceAssignment;
 import marcomanfrin.softwareops.enums.UserRole;
 import marcomanfrin.softwareops.enums.UserType;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -45,6 +48,12 @@ public abstract class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UserRole role;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<WorkAssignment> workAssignments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<WorksiteReferenceAssignment> worksiteReferenceAssignments = new ArrayList<>();
 
     public User() {}
 
@@ -120,6 +129,20 @@ public abstract class User implements UserDetails {
     }
     public void setRole(UserRole role) {
         this.role = role;
+    }
+
+    public List<WorkAssignment> getWorkAssignments() {
+        return workAssignments;
+    }
+    public void setWorkAssignments(List<WorkAssignment> workAssignments) {
+        this.workAssignments = workAssignments;
+    }
+
+    public List<WorksiteReferenceAssignment> getWorksiteReferenceAssignments() {
+        return worksiteReferenceAssignments;
+    }
+    public void setWorksiteReferenceAssignments(List<WorksiteReferenceAssignment> worksiteReferenceAssignments) {
+        this.worksiteReferenceAssignments = worksiteReferenceAssignments;
     }
 
     public UserType getUserType() {

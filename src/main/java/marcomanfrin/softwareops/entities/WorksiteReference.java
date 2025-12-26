@@ -3,7 +3,9 @@ package marcomanfrin.softwareops.entities;
 import jakarta.persistence.*;
 import marcomanfrin.softwareops.enums.WorksiteReferenceRole;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -16,6 +18,9 @@ public class WorksiteReference {
 
     @Column(nullable = false)
     private String name;
+
+    @OneToMany(mappedBy = "worksiteReference", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<WorksiteReferenceAssignment> assignments = new ArrayList<>();
 
     public WorksiteReference() {
     }
@@ -35,14 +40,10 @@ public class WorksiteReference {
         this.name = name;
     }
 
-    @OneToMany(mappedBy = "worksiteReferences")
-    private Collection<Work> work;
-
-    public Collection<Work> getWork() {
-        return work;
+    public List<WorksiteReferenceAssignment> getAssignments() {
+        return assignments;
     }
-
-    public void setWork(Collection<Work> work) {
-        this.work = work;
+    public void setAssignments(List<WorksiteReferenceAssignment> assignments) {
+        this.assignments = assignments;
     }
 }

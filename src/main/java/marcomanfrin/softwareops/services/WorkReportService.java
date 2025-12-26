@@ -129,8 +129,7 @@ public class WorkReportService implements IWorkReportService {
                 .map(WorkReportEntry::getHours)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        // Note: WorkReport doesn't have setTotalHours, you might need to add it
-        // For now, this is a placeholder
+        workReport.setTotalHours(totalHours);
         workReportRepository.save(workReport);
     }
 
