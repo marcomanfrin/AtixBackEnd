@@ -14,6 +14,7 @@ import marcomanfrin.softwareops.exceptions.NotFoundException;
 import marcomanfrin.softwareops.exceptions.UnauthorizedException;
 import marcomanfrin.softwareops.exceptions.ValidationException;
 import marcomanfrin.softwareops.repositories.UserRepository;
+import marcomanfrin.softwareops.tools.MailgunSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,10 +28,12 @@ import java.util.stream.Collectors;
 public class UserService implements IUserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final MailgunSender mailgunSender;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, MailgunSender mailgunSender) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.mailgunSender = mailgunSender;
     }
 
     @Override
@@ -45,6 +48,7 @@ public class UserService implements IUserService {
         User user = createUserByType(request, hashedPassword);
 
         User savedUser = userRepository.save(user);
+        this.mailgunSender.sendRegistrationEmail(savedUser);
         return toUserDetailDTO(savedUser);
     }
 
