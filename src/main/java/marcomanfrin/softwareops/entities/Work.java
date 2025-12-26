@@ -53,6 +53,9 @@ public class Work {
     @Column(nullable = true)
     private LocalDateTime completedAt;
 
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
     @Column(nullable = true)
     private boolean invoiced = false;
     @Column(nullable = true)
@@ -95,6 +98,11 @@ public class Work {
     private List<WorkAssignment> assignments = new ArrayList<>();
 
     public Work() {}
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
 
     private Work(String name,
                  String bidNumber,
@@ -206,6 +214,10 @@ public class Work {
     }
     public void setCompletedAt(LocalDateTime completedAt) {
         this.completedAt = completedAt;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
     public boolean isInvoiced() {

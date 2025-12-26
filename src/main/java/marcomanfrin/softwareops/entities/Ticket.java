@@ -30,7 +30,15 @@ public class Ticket {
     @Enumerated(EnumType.STRING)
     private TicketStatus status;
 
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
     public Ticket() {}
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
 
     public Ticket(String senderEmail, Work orderNumber, String name, String description, TicketStatus status) {
         this.senderEmail = senderEmail;
@@ -77,5 +85,9 @@ public class Ticket {
 
     public UUID getId() {
         return id;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 }

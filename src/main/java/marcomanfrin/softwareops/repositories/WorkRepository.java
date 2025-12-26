@@ -30,4 +30,7 @@ public interface WorkRepository extends JpaRepository<Work, UUID> {
 
     @Query("SELECT w FROM Work w WHERE w.completed = false AND w.expectedStartDate < :date")
     List<Work> findOverdueWorks(@Param("date") LocalDate date);
+
+    long countByCompleted(boolean completed);
+    Page<Work> findAllByOrderByCreatedAtDesc(Pageable pageable);
 }

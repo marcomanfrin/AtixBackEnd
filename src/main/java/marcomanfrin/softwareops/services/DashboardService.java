@@ -1,8 +1,8 @@
 package marcomanfrin.softwareops.services;
 
 import marcomanfrin.softwareops.DTO.dashboard.*;
+import marcomanfrin.softwareops.ServiceInterfaces.IDashboardService;
 import marcomanfrin.softwareops.enums.TicketStatus;
-import marcomanfrin.softwareops.enums.WorkStatus;
 import marcomanfrin.softwareops.repositories.ClientRepository;
 import marcomanfrin.softwareops.repositories.PlantRepository;
 import marcomanfrin.softwareops.repositories.TicketRepository;
@@ -14,7 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Service
-public class DashboardService {
+public class DashboardService implements IDashboardService {
 
     private final WorkRepository workRepository;
     private final TicketRepository ticketRepository;
@@ -33,34 +33,33 @@ public class DashboardService {
         this.clientRepository = clientRepository;
     }
 
+    @Override
     public DashboardSummaryDTO getSummary(int limit) {
-        int safeLimit = (limit < 1 || limit > 50) ? 5 : limit;
-
         int clientsCount = (int) clientRepository.count();
         int plantsCount = (int) plantRepository.count();
 
-        List<WorkStatusCountDTO> worksByStatus = Arrays.stream(WorkStatus.values())
-                .map(s -> new WorkStatusCountDTO(s, (int) workRepository.countByStatus(s)))
-                .toList();
+        int completedWorksCount = (int) workRepository.countByCompleted(true);
+        int pendingWorksCount = (int) workRepository.countByCompleted(false);
 
         List<TicketStatusCountDTO> ticketsByStatus = Arrays.stream(TicketStatus.values())
                 .map(s -> new TicketStatusCountDTO(s, (int) ticketRepository.countByStatus(s)))
                 .toList();
 
-        var page = PageRequest.of(0, safeLimit);
+        var page = PageRequest.of(0, limit);
 
         List<WorkPreviewDTO> lastWorks = workRepository.findAllByOrderByCreatedAtDesc(page).stream()
-                .map(w -> new WorkPreviewDTO(w.getId(), w.getStatus(), w.getCreatedAt()))
+                .map(w -> new WorkPreviewDTO(w.getId(), w.getName(), w.isCompleted(), w.getCreatedAt()))
                 .toList();
 
         List<TicketPreviewDTO> lastTickets = ticketRepository.findAllByOrderByCreatedAtDesc(page).stream()
-                .map(t -> new TicketPreviewDTO(t.getId(), t.getStatus(), t.getCreatedAt()))
+                .map(t -> new TicketPreviewDTO(t.getId(), t.getName(), t.getStatus(), t.getCreatedAt()))
                 .toList();
 
         return new DashboardSummaryDTO(
                 clientsCount,
                 plantsCount,
-                worksByStatus,
+                completedWorksCount,
+                pendingWorksCount,
                 ticketsByStatus,
                 lastWorks,
                 lastTickets

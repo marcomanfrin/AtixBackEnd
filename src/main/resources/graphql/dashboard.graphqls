@@ -2,23 +2,15 @@ type DashboardSummary {
     clientsCount: Int!
     plantsCount: Int!
 
-    worksByStatus: [WorkStatusCount!]!
+    completedWorksCount: Int!
+    pendingWorksCount: Int!
     ticketsByStatus: [TicketStatusCount!]!
 
     lastWorks: [WorkPreview!]!
     lastTickets: [TicketPreview!]!
 }
 
-type WorkStatusCount { status: WorkStatus! count: Int! }
 type TicketStatusCount { status: TicketStatus! count: Int! }
-
-enum WorkStatus {
-    DRAFT
-    SCHEDULED
-    IN_PROGRESS
-    COMPLETED
-    CANCELLED
-}
 
 enum TicketStatus {
     OPEN
@@ -29,14 +21,16 @@ enum TicketStatus {
 
 type WorkPreview {
     id: ID!
-    status: WorkStatus!
-    createdAt: String
+    name: String!
+    completed: Boolean!
+    createdAt: String!
 }
 
 type TicketPreview {
     id: ID!
+    name: String!
     status: TicketStatus!
-    createdAt: String
+    createdAt: String!
 }
 
 type Query {
