@@ -1,5 +1,8 @@
 package marcomanfrin.atixbackend.services;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
+import jakarta.persistence.EntityNotFoundException;
 import marcomanfrin.atixbackend.DTO.auth.RegisterRequest;
 import marcomanfrin.atixbackend.DTO.users.UserDetailDTO;
 import marcomanfrin.atixbackend.DTO.users.UserSummaryDTO;
@@ -18,8 +21,11 @@ import marcomanfrin.atixbackend.tools.MailgunSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -28,11 +34,13 @@ import java.util.stream.Collectors;
 public class UserService implements IUserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final Cloudinary imageUploader;
     private final MailgunSender mailgunSender;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, MailgunSender mailgunSender) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, Cloudinary imageUploader, MailgunSender mailgunSender) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.imageUploader = imageUploader;
         this.mailgunSender = mailgunSender;
     }
 
@@ -64,6 +72,7 @@ public class UserService implements IUserService {
         user.setFirstName(request.firstName());
         user.setLastName(request.lastName());
         user.setRole(request.role());
+        user.setProfileImageUrl("https://ui-avatars.com/api/?name=" + request.firstName() + "+" + request.lastName());
 
         return user;
     }
@@ -109,11 +118,40 @@ public class UserService implements IUserService {
 
     @Override
     @Transactional
-    public void updateProfileImage(UUID userId, String imageUrl) {
+    public String uploadProfileImage(UUID userId, MultipartFile file) {
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User not found"));
-        user.setProfileImageUrl(imageUrl);
-        userRepository.save(user);
+
+        if (file.isEmpty()) {
+            throw new IllegalArgumentException("File is empty");
+        }
+
+        if (!file.getContentType().startsWith("image/")) {
+            throw new IllegalArgumentException("Only image files are allowed");
+        }
+
+        Map<String, Object> options = ObjectUtils.asMap(
+                "folder", "SoftwareOps/avatars",
+                "public_id", userId.toString()
+        );
+
+        try {
+            Map<?, ?> result = imageUploader.uploader().upload(
+                    file.getBytes(),
+                    options
+            );
+
+            String imageUrl = result.get("secure_url").toString();
+
+            user.setProfileImageUrl(imageUrl);
+            userRepository.save(user);
+
+            return imageUrl;
+
+        } catch (IOException e) {
+            throw new RuntimeException("Error uploading image", e);
+        }
     }
 
     @Override

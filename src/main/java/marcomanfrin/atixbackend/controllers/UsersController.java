@@ -1,11 +1,13 @@
 package marcomanfrin.atixbackend.controllers;
 
+import marcomanfrin.atixbackend.DTO.users.UpdatedImageResp;
 import marcomanfrin.atixbackend.DTO.users.UserDetailDTO;
 import marcomanfrin.atixbackend.DTO.users.UserSummaryDTO;
 import marcomanfrin.atixbackend.services.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -33,5 +35,15 @@ public class UsersController {
         return ResponseEntity.ok(user);
     }
 
-    // TODO: update user, upload profile image, delete
+    // TODO: update user, delete
+
+    @PatchMapping(path = "/{id}/avatar", consumes = "multipart/form-data")
+    @PreAuthorize("#id == authentication.principal.id or hasRole('ADMIN')")
+    public ResponseEntity<UpdatedImageResp> uploadProfileImage(
+            @PathVariable UUID id,
+            @RequestParam("avatar") MultipartFile file
+    ) {
+        String imageUrl = userService.uploadProfileImage(id, file);
+        return ResponseEntity.ok(new UpdatedImageResp(imageUrl));
+    }
 }

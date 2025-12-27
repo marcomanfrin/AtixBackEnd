@@ -5,6 +5,7 @@ import marcomanfrin.atixbackend.DTO.users.UserDetailDTO;
 import marcomanfrin.atixbackend.DTO.users.UserSummaryDTO;
 import marcomanfrin.atixbackend.entities.users.User;
 import marcomanfrin.atixbackend.enums.UserRole;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,6 +18,6 @@ public interface IUserService {
     UserDetailDTO getUserById(UUID id);
     User getUserEntityById(UUID id); // Internal use for security filters
     void updatePassword(UUID userId, String currentPassword, String newPassword);
-    void updateProfileImage(UUID userId, String imageUrl);
+    public String uploadProfileImage(UUID userId, MultipartFile file);
     List<User> getUsersByRole(UserRole role);
 }
