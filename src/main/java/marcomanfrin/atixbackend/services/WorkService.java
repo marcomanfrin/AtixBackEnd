@@ -8,11 +8,13 @@ import marcomanfrin.atixbackend.DTO.works.WorkDetailResponse;
 import marcomanfrin.atixbackend.DTO.works.WorkRequest;
 import marcomanfrin.atixbackend.DTO.works.WorkSummaryResponse;
 import marcomanfrin.atixbackend.DTO.works.WorkUpdateRequest;
+import marcomanfrin.atixbackend.DTO.worksiteReferences.WorksiteReferenceAssignmentResponse;
 import marcomanfrin.atixbackend.DTO.worksiteReferences.WorksiteReferenceResponse;
 import marcomanfrin.atixbackend.ServiceInterfaces.IWorkService;
 import marcomanfrin.atixbackend.entities.*;
 import marcomanfrin.atixbackend.entities.users.SellerUser;
 import marcomanfrin.atixbackend.entities.users.User;
+import marcomanfrin.atixbackend.enums.WorksiteReferenceRole;
 import marcomanfrin.atixbackend.exceptions.NotFoundException;
 import marcomanfrin.atixbackend.exceptions.ValidationException;
 import marcomanfrin.atixbackend.repositories.*;
@@ -37,6 +39,7 @@ public class WorkService implements IWorkService {
     private final TicketRepository ticketRepository;
     private final WorksiteReferenceRepository worksiteReferenceRepository;
     private final WorkAssignmentRepository workAssignmentRepository;
+    private final WorksiteReferenceAssignmentRepository worksiteReferenceAssignmentRepository;
 
     public WorkService(WorkRepository workRepository,
                       UserRepository userRepository,
@@ -44,7 +47,8 @@ public class WorkService implements IWorkService {
                       PlantRepository plantRepository,
                       TicketRepository ticketRepository,
                       WorksiteReferenceRepository worksiteReferenceRepository,
-                      WorkAssignmentRepository workAssignmentRepository) {
+                      WorkAssignmentRepository workAssignmentRepository,
+                      WorksiteReferenceAssignmentRepository worksiteReferenceAssignmentRepository) {
         this.workRepository = workRepository;
         this.userRepository = userRepository;
         this.clientRepository = clientRepository;
@@ -52,6 +56,7 @@ public class WorkService implements IWorkService {
         this.ticketRepository = ticketRepository;
         this.worksiteReferenceRepository = worksiteReferenceRepository;
         this.workAssignmentRepository = workAssignmentRepository;
+        this.worksiteReferenceAssignmentRepository = worksiteReferenceAssignmentRepository;
     }
 
     @Override
@@ -296,20 +301,21 @@ public class WorkService implements IWorkService {
 
     @Override
     @Transactional
-    public void addWorksiteReference(UUID workId, UUID worksiteReferenceId) {
+    public void addWorksiteReference(UUID workId, UUID worksiteReferenceId, WorksiteReferenceRole role) {
         Work work = workRepository.findById(workId)
                 .orElseThrow(() -> new NotFoundException("Work not found with id: " + workId));
 
         WorksiteReference worksiteReference = worksiteReferenceRepository.findById(worksiteReferenceId)
                 .orElseThrow(() -> new NotFoundException("Worksite reference not found with id: " + worksiteReferenceId));
 
-        // Check if already added
-        if (work.getWorksiteReferences().contains(worksiteReference)) {
-            throw new IllegalArgumentException("Worksite reference already added to this work");
+        // Check if already assigned
+        if (worksiteReferenceAssignmentRepository.existsByWorkAndWorksiteReference(work, worksiteReference)) {
+            throw new IllegalArgumentException("Worksite reference already assigned to this work");
         }
 
-        work.getWorksiteReferences().add(worksiteReference);
-        workRepository.save(work);
+        // Create assignment with role
+        WorksiteReferenceAssignment assignment = new WorksiteReferenceAssignment(work, worksiteReference, role);
+        worksiteReferenceAssignmentRepository.save(assignment);
     }
 
     private WorkSummaryResponse toWorkSummaryResponse(Work work) {
@@ -344,8 +350,8 @@ public class WorkService implements IWorkService {
                 work.getPlant() != null ? toPlantResponse(work.getPlant()) : null,
                 toClientResponse(work.getAtixClient()),
                 work.getFinalClient() != null ? toClientResponse(work.getFinalClient()) : null,
-                work.getWorksiteReferences().stream()
-                        .map(this::toWorksiteReferenceResponse)
+                work.getWorksiteReferenceAssignments().stream()
+                        .map(this::toWorksiteReferenceAssignmentResponse)
                         .collect(Collectors.toList()),
                 work.getNasSubDirectory(),
                 work.getExpectedOfficeHours(),
@@ -389,6 +395,15 @@ public class WorkService implements IWorkService {
         return new WorksiteReferenceResponse(
                 worksiteReference.getId(),
                 worksiteReference.getName()
+        );
+    }
+
+    private WorksiteReferenceAssignmentResponse toWorksiteReferenceAssignmentResponse(WorksiteReferenceAssignment assignment) {
+        return new WorksiteReferenceAssignmentResponse(
+                assignment.getId(),
+                assignment.getWorksiteReference().getId(),
+                assignment.getWorksiteReference().getName(),
+                assignment.getRole()
         );
     }
 

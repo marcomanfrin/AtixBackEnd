@@ -50,9 +50,6 @@ public class WorkAssignment {
     public UUID getId() {
         return id;
     }
-    public void setId(UUID id) {
-        this.id = id;
-    }
 
     public Work getWork() {
         return work;
@@ -70,8 +67,5 @@ public class WorkAssignment {
 
     public LocalDateTime getAssignedAt() {
         return assignedAt;
-    }
-    public void setAssignedAt(LocalDateTime assignedAt) {
-        this.assignedAt = assignedAt;
     }
 }

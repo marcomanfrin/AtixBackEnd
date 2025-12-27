@@ -1,8 +1,8 @@
 package marcomanfrin.atixbackend.repositories;
 
+import marcomanfrin.atixbackend.entities.Work;
 import marcomanfrin.atixbackend.entities.WorksiteReference;
 import marcomanfrin.atixbackend.entities.WorksiteReferenceAssignment;
-import marcomanfrin.atixbackend.entities.users.User;
 import marcomanfrin.atixbackend.enums.WorksiteReferenceRole;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -15,17 +15,17 @@ import java.util.UUID;
 
 @Repository
 public interface WorksiteReferenceAssignmentRepository extends JpaRepository<WorksiteReferenceAssignment, UUID> {
+    List<WorksiteReferenceAssignment> findByWork(Work work);
     List<WorksiteReferenceAssignment> findByWorksiteReference(WorksiteReference worksiteReference);
-    List<WorksiteReferenceAssignment> findByUser(User user);
     List<WorksiteReferenceAssignment> findByRole(WorksiteReferenceRole role);
 
-    Optional<WorksiteReferenceAssignment> findByWorksiteReferenceAndUser(WorksiteReference worksiteReference, User user);
+    Optional<WorksiteReferenceAssignment> findByWorkAndWorksiteReference(Work work, WorksiteReference worksiteReference);
+
+    @Query("SELECT wra FROM WorksiteReferenceAssignment wra WHERE wra.work.id = :workId")
+    List<WorksiteReferenceAssignment> findByWorkId(@Param("workId") UUID workId);
 
     @Query("SELECT wra FROM WorksiteReferenceAssignment wra WHERE wra.worksiteReference.id = :worksiteReferenceId")
     List<WorksiteReferenceAssignment> findByWorksiteReferenceId(@Param("worksiteReferenceId") UUID worksiteReferenceId);
 
-    @Query("SELECT wra FROM WorksiteReferenceAssignment wra WHERE wra.user.id = :userId")
-    List<WorksiteReferenceAssignment> findByUserId(@Param("userId") UUID userId);
-
-    boolean existsByWorksiteReferenceAndUser(WorksiteReference worksiteReference, User user);
+    boolean existsByWorkAndWorksiteReference(Work work, WorksiteReference worksiteReference);
 }

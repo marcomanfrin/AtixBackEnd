@@ -2,7 +2,6 @@ package marcomanfrin.atixbackend.entities.users;
 
 import jakarta.persistence.*;
 import marcomanfrin.atixbackend.entities.WorkAssignment;
-import marcomanfrin.atixbackend.entities.WorksiteReferenceAssignment;
 import marcomanfrin.atixbackend.enums.UserRole;
 import marcomanfrin.atixbackend.enums.UserType;
 import org.springframework.security.core.GrantedAuthority;
@@ -51,9 +50,6 @@ public abstract class User implements UserDetails {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<WorkAssignment> workAssignments = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<WorksiteReferenceAssignment> worksiteReferenceAssignments = new ArrayList<>();
 
     public User() {}
 
@@ -136,13 +132,6 @@ public abstract class User implements UserDetails {
     }
     public void setWorkAssignments(List<WorkAssignment> workAssignments) {
         this.workAssignments = workAssignments;
-    }
-
-    public List<WorksiteReferenceAssignment> getWorksiteReferenceAssignments() {
-        return worksiteReferenceAssignments;
-    }
-    public void setWorksiteReferenceAssignments(List<WorksiteReferenceAssignment> worksiteReferenceAssignments) {
-        this.worksiteReferenceAssignments = worksiteReferenceAssignments;
     }
 
     public UserType getUserType() {

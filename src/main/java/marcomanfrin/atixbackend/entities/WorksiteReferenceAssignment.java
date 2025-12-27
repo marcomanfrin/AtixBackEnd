@@ -1,7 +1,6 @@
 package marcomanfrin.atixbackend.entities;
 
 import jakarta.persistence.*;
-import marcomanfrin.atixbackend.entities.users.User;
 import marcomanfrin.atixbackend.enums.WorksiteReferenceRole;
 
 import java.util.UUID;
@@ -11,8 +10,8 @@ import java.util.UUID;
     name = "worksite_reference_assignments",
     uniqueConstraints = {
         @UniqueConstraint(
-            name = "uk_worksite_reference_user",
-            columnNames = {"worksite_reference_id", "user_id"}
+            name = "uk_work_worksite_reference",
+            columnNames = {"work_id", "worksite_reference_id"}
         )
     }
 )
@@ -23,12 +22,12 @@ public class WorksiteReferenceAssignment {
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "worksite_reference_id", nullable = false)
-    private WorksiteReference worksiteReference;
+    @JoinColumn(name = "work_id", nullable = false)
+    private Work work;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "worksite_reference_id", nullable = false)
+    private WorksiteReference worksiteReference;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -36,9 +35,9 @@ public class WorksiteReferenceAssignment {
 
     public WorksiteReferenceAssignment() {}
 
-    public WorksiteReferenceAssignment(WorksiteReference worksiteReference, User user, WorksiteReferenceRole role) {
+    public WorksiteReferenceAssignment(Work work, WorksiteReference worksiteReference, WorksiteReferenceRole role) {
+        this.work = work;
         this.worksiteReference = worksiteReference;
-        this.user = user;
         this.role = role;
     }
 
@@ -46,18 +45,18 @@ public class WorksiteReferenceAssignment {
         return id;
     }
 
+    public Work getWork() {
+        return work;
+    }
+    public void setWork(Work work) {
+        this.work = work;
+    }
+
     public WorksiteReference getWorksiteReference() {
         return worksiteReference;
     }
     public void setWorksiteReference(WorksiteReference worksiteReference) {
         this.worksiteReference = worksiteReference;
-    }
-
-    public User getUser() {
-        return user;
-    }
-    public void setUser(User user) {
-        this.user = user;
     }
 
     public WorksiteReferenceRole getRole() {

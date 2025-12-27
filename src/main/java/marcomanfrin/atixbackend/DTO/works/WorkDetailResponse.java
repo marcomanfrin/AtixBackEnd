@@ -4,7 +4,7 @@ import marcomanfrin.atixbackend.DTO.clients.ClientResponse;
 import marcomanfrin.atixbackend.DTO.plants.PlantResponse;
 import marcomanfrin.atixbackend.DTO.tickets.TicketResponse;
 import marcomanfrin.atixbackend.DTO.users.UserSummaryDTO;
-import marcomanfrin.atixbackend.DTO.worksiteReferences.WorksiteReferenceResponse;
+import marcomanfrin.atixbackend.DTO.worksiteReferences.WorksiteReferenceAssignmentResponse;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -28,7 +28,7 @@ public record WorkDetailResponse(
         PlantResponse plant,
         ClientResponse atixClient,
         ClientResponse finalClient,
-        List<WorksiteReferenceResponse> worksiteReferences,
+        List<WorksiteReferenceAssignmentResponse> worksiteReferenceAssignments,
         String nasSubDirectory,
         Integer expectedOfficeHours,
         Integer expectedPlantHours,

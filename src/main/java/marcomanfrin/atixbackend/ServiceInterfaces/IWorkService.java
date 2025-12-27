@@ -4,6 +4,7 @@ import marcomanfrin.atixbackend.DTO.works.WorkDetailResponse;
 import marcomanfrin.atixbackend.DTO.works.WorkRequest;
 import marcomanfrin.atixbackend.DTO.works.WorkSummaryResponse;
 import marcomanfrin.atixbackend.DTO.works.WorkUpdateRequest;
+import marcomanfrin.atixbackend.enums.WorksiteReferenceRole;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -37,5 +38,5 @@ public interface IWorkService {
     void closeWork(UUID id);
     void invoiceWork(UUID id);
     void assignTechnician(UUID workId, UUID technicianId);
-    void addWorksiteReference(UUID workId, UUID worksiteReferenceId);
+    void addWorksiteReference(UUID workId, UUID worksiteReferenceId, WorksiteReferenceRole role);
 }

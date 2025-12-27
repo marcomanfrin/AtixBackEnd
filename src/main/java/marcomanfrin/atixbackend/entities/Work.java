@@ -73,13 +73,8 @@ public class Work {
     @JoinColumn(name = "final_client_id")
     private Client finalClient;
 
-    @ManyToMany
-    @JoinTable(
-        name = "work_worksite_references",
-        joinColumns = @JoinColumn(name = "work_id"),
-        inverseJoinColumns = @JoinColumn(name = "worksite_reference_id")
-    )
-    private List<WorksiteReference> worksiteReferences = new ArrayList<>();
+    @OneToMany(mappedBy = "work", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<WorksiteReferenceAssignment> worksiteReferenceAssignments = new ArrayList<>();
 
     @Column(nullable = false)
     private String nasSubDirectory;
@@ -255,11 +250,11 @@ public class Work {
         this.finalClient = finalClient;
     }
 
-    public List<WorksiteReference> getWorksiteReferences() {
-        return worksiteReferences;
+    public List<WorksiteReferenceAssignment> getWorksiteReferenceAssignments() {
+        return worksiteReferenceAssignments;
     }
-    public void setWorksiteReferences(List<WorksiteReference> worksiteReferences) {
-        this.worksiteReferences = worksiteReferences;
+    public void setWorksiteReferenceAssignments(List<WorksiteReferenceAssignment> worksiteReferenceAssignments) {
+        this.worksiteReferenceAssignments = worksiteReferenceAssignments;
     }
 
     public String getNasSubDirectory() {

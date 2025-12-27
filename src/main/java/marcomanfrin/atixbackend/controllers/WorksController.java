@@ -121,7 +121,7 @@ public class WorksController {
     public ResponseEntity<Void> addWorksiteReference(
             @PathVariable UUID id,
             @Valid @RequestBody AddWorksiteReferenceRequest request) {
-        workService.addWorksiteReference(id, request.worksiteReferenceId());
+        workService.addWorksiteReference(id, request.worksiteReferenceId(), request.role());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }
