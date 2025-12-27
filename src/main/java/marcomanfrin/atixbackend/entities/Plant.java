@@ -35,6 +35,9 @@ public class Plant {
     @Column(nullable = false)
     private String pswStation;
 
+    @OneToMany(mappedBy = "plant")
+    private List<Work> works = new ArrayList<>();
+
     public Plant() {
     }
 
@@ -96,5 +99,12 @@ public class Plant {
     }
     public void setPswStation(String pswStation) {
         this.pswStation = pswStation;
+    }
+
+    public List<Work> getWorks() {
+        return works;
+    }
+    public void setWorks(List<Work> works) {
+        this.works = works;
     }
 }
