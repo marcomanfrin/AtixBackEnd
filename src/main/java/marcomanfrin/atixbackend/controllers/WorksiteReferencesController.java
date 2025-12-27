@@ -3,6 +3,7 @@ package marcomanfrin.atixbackend.controllers;
 import jakarta.validation.Valid;
 import marcomanfrin.atixbackend.DTO.worksiteReferences.WorksiteReferenceRequest;
 import marcomanfrin.atixbackend.DTO.worksiteReferences.WorksiteReferenceResponse;
+import marcomanfrin.atixbackend.DTO.worksiteReferences.WorksiteReferenceUpdateRequest;
 import marcomanfrin.atixbackend.services.WorksiteReferenceService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -46,7 +47,7 @@ public class WorksiteReferencesController {
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public ResponseEntity<WorksiteReferenceResponse> updateWorksiteReference(
             @PathVariable UUID id,
-            @Valid @RequestBody WorksiteReferenceRequest request) {
+            @Valid @RequestBody WorksiteReferenceUpdateRequest request) {
         WorksiteReferenceResponse worksiteReference = worksiteReferenceService.updateWorksiteReference(id, request);
         return ResponseEntity.ok(worksiteReference);
     }

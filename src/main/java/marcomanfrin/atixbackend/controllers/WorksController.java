@@ -6,6 +6,7 @@ import marcomanfrin.atixbackend.DTO.works.AssignTechnicianRequest;
 import marcomanfrin.atixbackend.DTO.works.WorkDetailResponse;
 import marcomanfrin.atixbackend.DTO.works.WorkRequest;
 import marcomanfrin.atixbackend.DTO.works.WorkSummaryResponse;
+import marcomanfrin.atixbackend.DTO.works.WorkUpdateRequest;
 import marcomanfrin.atixbackend.services.WorkService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -49,7 +50,7 @@ public class WorksController {
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public ResponseEntity<WorkDetailResponse> updateWork(
             @PathVariable UUID id,
-            @Valid @RequestBody WorkRequest request) {
+            @Valid @RequestBody WorkUpdateRequest request) {
         WorkDetailResponse work = workService.updateWork(id, request);
         return ResponseEntity.ok(work);
     }

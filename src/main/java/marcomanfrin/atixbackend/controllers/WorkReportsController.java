@@ -3,6 +3,7 @@ package marcomanfrin.atixbackend.controllers;
 import jakarta.validation.Valid;
 import marcomanfrin.atixbackend.DTO.workReports.WorkReportEntryRequest;
 import marcomanfrin.atixbackend.DTO.workReports.WorkReportEntryResponse;
+import marcomanfrin.atixbackend.DTO.workReports.WorkReportEntryUpdateRequest;
 import marcomanfrin.atixbackend.DTO.workReports.WorkReportResponse;
 import marcomanfrin.atixbackend.services.WorkReportService;
 import org.springframework.http.HttpStatus;
@@ -41,7 +42,7 @@ public class WorkReportsController {
     @PatchMapping("/entries/{id}")
     public ResponseEntity<WorkReportEntryResponse> updateWorkReportEntry(
             @PathVariable UUID id,
-            @Valid @RequestBody WorkReportEntryRequest request) {
+            @Valid @RequestBody WorkReportEntryUpdateRequest request) {
         WorkReportEntryResponse entry = workReportService.updateWorkReportEntry(id, request);
         return ResponseEntity.ok(entry);
     }

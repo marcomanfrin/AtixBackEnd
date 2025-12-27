@@ -2,6 +2,7 @@ package marcomanfrin.atixbackend.services;
 
 import marcomanfrin.atixbackend.DTO.workReports.WorkReportEntryRequest;
 import marcomanfrin.atixbackend.DTO.workReports.WorkReportEntryResponse;
+import marcomanfrin.atixbackend.DTO.workReports.WorkReportEntryUpdateRequest;
 import marcomanfrin.atixbackend.DTO.workReports.WorkReportResponse;
 import marcomanfrin.atixbackend.ServiceInterfaces.IWorkReportService;
 import marcomanfrin.atixbackend.entities.Work;
@@ -71,7 +72,7 @@ public class WorkReportService implements IWorkReportService {
 
     @Override
     @Transactional
-    public WorkReportEntryResponse updateWorkReportEntry(UUID entryId, WorkReportEntryRequest request) {
+    public WorkReportEntryResponse updateWorkReportEntry(UUID entryId, WorkReportEntryUpdateRequest request) {
         WorkReportEntry entry = workReportEntryRepository.findById(entryId)
                 .orElseThrow(() -> new NotFoundException("Work report entry not found with id: " + entryId));
 

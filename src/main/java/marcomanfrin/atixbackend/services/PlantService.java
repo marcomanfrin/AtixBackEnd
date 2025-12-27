@@ -2,6 +2,7 @@ package marcomanfrin.atixbackend.services;
 
 import marcomanfrin.atixbackend.DTO.plants.PlantRequest;
 import marcomanfrin.atixbackend.DTO.plants.PlantResponse;
+import marcomanfrin.atixbackend.DTO.plants.PlantUpdateRequest;
 import marcomanfrin.atixbackend.ServiceInterfaces.IPlantService;
 import marcomanfrin.atixbackend.entities.Plant;
 import marcomanfrin.atixbackend.exceptions.NotFoundException;
@@ -51,7 +52,7 @@ public class PlantService implements IPlantService {
 
     @Override
     @Transactional
-    public PlantResponse updatePlant(UUID id, PlantRequest request) {
+    public PlantResponse updatePlant(UUID id, PlantUpdateRequest request) {
         Plant plant = plantRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Plant not found with id: " + id));
 

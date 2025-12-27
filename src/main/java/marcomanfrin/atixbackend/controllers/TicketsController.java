@@ -3,6 +3,7 @@ package marcomanfrin.atixbackend.controllers;
 import jakarta.validation.Valid;
 import marcomanfrin.atixbackend.DTO.tickets.TicketRequest;
 import marcomanfrin.atixbackend.DTO.tickets.TicketResponse;
+import marcomanfrin.atixbackend.DTO.tickets.TicketUpdateRequest;
 import marcomanfrin.atixbackend.services.TicketService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -44,7 +45,7 @@ public class TicketsController {
     @PatchMapping("/{id}")
     public ResponseEntity<TicketResponse> updateTicket(
             @PathVariable UUID id,
-            @Valid @RequestBody TicketRequest request) {
+            @Valid @RequestBody TicketUpdateRequest request) {
         TicketResponse ticket = ticketService.updateTicket(id, request);
         return ResponseEntity.ok(ticket);
     }

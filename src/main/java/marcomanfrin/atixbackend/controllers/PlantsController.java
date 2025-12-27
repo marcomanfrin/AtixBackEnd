@@ -3,6 +3,7 @@ package marcomanfrin.atixbackend.controllers;
 import jakarta.validation.Valid;
 import marcomanfrin.atixbackend.DTO.plants.PlantRequest;
 import marcomanfrin.atixbackend.DTO.plants.PlantResponse;
+import marcomanfrin.atixbackend.DTO.plants.PlantUpdateRequest;
 import marcomanfrin.atixbackend.services.PlantService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -46,15 +47,7 @@ public class PlantsController {
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public ResponseEntity<PlantResponse> updatePlant(
             @PathVariable UUID id,
-            @Valid @RequestBody PlantRequest request) {
-        //TODO: not all params are required ->
-        // "errorsList": [
-        //        "pswPlatform: Password platform is required",
-        //        "pswStation: Password station is required",
-        //        "pswPhrase: Password phrase is required",
-        //        "name: Plant name is required",
-        //        "nasDirectory: NAS directory is required"
-        //    ]
+            @Valid @RequestBody PlantUpdateRequest request) {
         PlantResponse plant = plantService.updatePlant(id, request);
         return ResponseEntity.ok(plant);
     }

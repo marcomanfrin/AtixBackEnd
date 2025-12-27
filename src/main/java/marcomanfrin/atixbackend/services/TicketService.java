@@ -2,6 +2,7 @@ package marcomanfrin.atixbackend.services;
 
 import marcomanfrin.atixbackend.DTO.tickets.TicketRequest;
 import marcomanfrin.atixbackend.DTO.tickets.TicketResponse;
+import marcomanfrin.atixbackend.DTO.tickets.TicketUpdateRequest;
 import marcomanfrin.atixbackend.ServiceInterfaces.ITicketService;
 import marcomanfrin.atixbackend.entities.Ticket;
 import marcomanfrin.atixbackend.entities.Work;
@@ -61,7 +62,7 @@ public class TicketService implements ITicketService {
 
     @Override
     @Transactional
-    public TicketResponse updateTicket(UUID id, TicketRequest request) {
+    public TicketResponse updateTicket(UUID id, TicketUpdateRequest request) {
         Ticket ticket = ticketRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Ticket not found with id: " + id));
 

@@ -2,6 +2,7 @@ package marcomanfrin.atixbackend.ServiceInterfaces;
 
 import marcomanfrin.atixbackend.DTO.plants.PlantRequest;
 import marcomanfrin.atixbackend.DTO.plants.PlantResponse;
+import marcomanfrin.atixbackend.DTO.plants.PlantUpdateRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -11,6 +12,6 @@ public interface IPlantService {
     PlantResponse createPlant(PlantRequest request);
     Page<PlantResponse> getAllPlants(Pageable pageable);
     PlantResponse getPlantById(UUID id);
-    PlantResponse updatePlant(UUID id, PlantRequest request);
+    PlantResponse updatePlant(UUID id, PlantUpdateRequest request);
     void deletePlant(UUID id);
 }

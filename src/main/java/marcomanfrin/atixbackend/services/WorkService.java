@@ -7,6 +7,7 @@ import marcomanfrin.atixbackend.DTO.users.UserSummaryDTO;
 import marcomanfrin.atixbackend.DTO.works.WorkDetailResponse;
 import marcomanfrin.atixbackend.DTO.works.WorkRequest;
 import marcomanfrin.atixbackend.DTO.works.WorkSummaryResponse;
+import marcomanfrin.atixbackend.DTO.works.WorkUpdateRequest;
 import marcomanfrin.atixbackend.DTO.worksiteReferences.WorksiteReferenceResponse;
 import marcomanfrin.atixbackend.ServiceInterfaces.IWorkService;
 import marcomanfrin.atixbackend.entities.*;
@@ -120,7 +121,7 @@ public class WorkService implements IWorkService {
 
     @Override
     @Transactional
-    public WorkDetailResponse updateWork(UUID id, WorkRequest request) {
+    public WorkDetailResponse updateWork(UUID id, WorkUpdateRequest request) {
         Work work = workRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Work not found with id: " + id));
 

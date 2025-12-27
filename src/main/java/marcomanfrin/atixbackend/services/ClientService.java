@@ -2,6 +2,7 @@ package marcomanfrin.atixbackend.services;
 
 import marcomanfrin.atixbackend.DTO.clients.ClientRequest;
 import marcomanfrin.atixbackend.DTO.clients.ClientResponse;
+import marcomanfrin.atixbackend.DTO.clients.ClientUpdateRequest;
 import marcomanfrin.atixbackend.ServiceInterfaces.IClientService;
 import marcomanfrin.atixbackend.entities.Client;
 import marcomanfrin.atixbackend.exceptions.NotFoundException;
@@ -44,7 +45,7 @@ public class ClientService implements IClientService {
 
     @Override
     @Transactional
-    public ClientResponse updateClient(UUID id, ClientRequest request) {
+    public ClientResponse updateClient(UUID id, ClientUpdateRequest request) {
         Client client = clientRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Client not found with id: " + id));
 

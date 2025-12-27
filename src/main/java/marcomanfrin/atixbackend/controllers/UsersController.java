@@ -35,8 +35,6 @@ public class UsersController {
         return ResponseEntity.ok(user);
     }
 
-    // TODO: update user, delete
-
     @PatchMapping(path = "/{id}/avatar", consumes = "multipart/form-data")
     @PreAuthorize("#id == authentication.principal.id or hasRole('ADMIN')")
     public ResponseEntity<UpdatedImageResp> uploadProfileImage(

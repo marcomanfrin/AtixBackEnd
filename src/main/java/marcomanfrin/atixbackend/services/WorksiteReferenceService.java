@@ -2,6 +2,7 @@ package marcomanfrin.atixbackend.services;
 
 import marcomanfrin.atixbackend.DTO.worksiteReferences.WorksiteReferenceRequest;
 import marcomanfrin.atixbackend.DTO.worksiteReferences.WorksiteReferenceResponse;
+import marcomanfrin.atixbackend.DTO.worksiteReferences.WorksiteReferenceUpdateRequest;
 import marcomanfrin.atixbackend.ServiceInterfaces.IWorksiteReferenceService;
 import marcomanfrin.atixbackend.entities.WorksiteReference;
 import marcomanfrin.atixbackend.exceptions.NotFoundException;
@@ -45,7 +46,7 @@ public class WorksiteReferenceService implements IWorksiteReferenceService {
 
     @Override
     @Transactional
-    public WorksiteReferenceResponse updateWorksiteReference(UUID id, WorksiteReferenceRequest request) {
+    public WorksiteReferenceResponse updateWorksiteReference(UUID id, WorksiteReferenceUpdateRequest request) {
         WorksiteReference worksiteReference = worksiteReferenceRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Worksite reference not found with id: " + id));
 
