@@ -6,14 +6,18 @@ import marcomanfrin.atixbackend.DTO.tickets.TicketUpdateRequest;
 import marcomanfrin.atixbackend.ServiceInterfaces.ITicketService;
 import marcomanfrin.atixbackend.entities.Ticket;
 import marcomanfrin.atixbackend.entities.Work;
+import marcomanfrin.atixbackend.enums.TicketStatus;
 import marcomanfrin.atixbackend.exceptions.NotFoundException;
 import marcomanfrin.atixbackend.repositories.TicketRepository;
 import marcomanfrin.atixbackend.repositories.WorkRepository;
+import marcomanfrin.atixbackend.specifications.TicketSpecification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
@@ -50,6 +54,32 @@ public class TicketService implements ITicketService {
     @Override
     public Page<TicketResponse> getAllTickets(Pageable pageable) {
         return ticketRepository.findAll(pageable)
+                .map(this::toTicketResponse);
+    }
+
+    @Override
+    public Page<TicketResponse> getFilteredTickets(
+            String senderEmail,
+            UUID orderNumberId,
+            String name,
+            String description,
+            TicketStatus status,
+            LocalDateTime createdAtFrom,
+            LocalDateTime createdAtTo,
+            Pageable pageable) {
+
+        // Build specification by combining all filters
+        Specification<Ticket> spec = (root, query, criteriaBuilder) -> criteriaBuilder.conjunction();
+
+        spec = spec.and(TicketSpecification.hasSenderEmail(senderEmail));
+        spec = spec.and(TicketSpecification.hasOrderNumber(orderNumberId));
+        spec = spec.and(TicketSpecification.hasNameContaining(name));
+        spec = spec.and(TicketSpecification.hasDescriptionContaining(description));
+        spec = spec.and(TicketSpecification.hasStatus(status));
+        spec = spec.and(TicketSpecification.hasCreatedAtAfter(createdAtFrom));
+        spec = spec.and(TicketSpecification.hasCreatedAtBefore(createdAtTo));
+
+        return ticketRepository.findAll(spec, pageable)
                 .map(this::toTicketResponse);
     }
 

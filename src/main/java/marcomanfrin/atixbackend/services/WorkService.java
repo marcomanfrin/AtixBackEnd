@@ -16,11 +16,14 @@ import marcomanfrin.atixbackend.entities.users.User;
 import marcomanfrin.atixbackend.exceptions.NotFoundException;
 import marcomanfrin.atixbackend.exceptions.ValidationException;
 import marcomanfrin.atixbackend.repositories.*;
+import marcomanfrin.atixbackend.specifications.WorkSpecification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -109,6 +112,60 @@ public class WorkService implements IWorkService {
     @Override
     public Page<WorkSummaryResponse> getAllWorks(Pageable pageable) {
         return workRepository.findAll(pageable)
+                .map(this::toWorkSummaryResponse);
+    }
+
+    @Override
+    public Page<WorkSummaryResponse> getFilteredWorks(
+            UUID clientId,
+            UUID atixClientId,
+            UUID finalClientId,
+            UUID sellerId,
+            UUID plantId,
+            UUID ticketId,
+            UUID technicianId,
+            Boolean completed,
+            Boolean invoiced,
+            LocalDate orderDateFrom,
+            LocalDate orderDateTo,
+            LocalDate expectedStartDateFrom,
+            LocalDate expectedStartDateTo,
+            String name,
+            String bidNumber,
+            String orderNumber,
+            Pageable pageable) {
+
+        // Build specification by combining all filters
+        Specification<Work> spec = (root, query, criteriaBuilder) -> criteriaBuilder.conjunction();
+
+        // Client filters - prioritize specific client filters over general clientId
+        if (atixClientId != null) {
+            spec = spec.and(WorkSpecification.hasAtixClient(atixClientId));
+        }
+        if (finalClientId != null) {
+            spec = spec.and(WorkSpecification.hasFinalClient(finalClientId));
+        }
+        // Use clientId to search in both atixClient and finalClient if no specific filter is provided
+        if (clientId != null && atixClientId == null && finalClientId == null) {
+            spec = spec.and(WorkSpecification.hasAnyClient(clientId));
+        }
+
+        // Other filters
+        spec = spec.and(WorkSpecification.hasSeller(sellerId));
+        spec = spec.and(WorkSpecification.hasPlant(plantId));
+        spec = spec.and(WorkSpecification.hasTicket(ticketId));
+        spec = spec.and(WorkSpecification.hasAssignedTechnician(technicianId));
+        spec = spec.and(WorkSpecification.isCompleted(completed));
+        spec = spec.and(WorkSpecification.isInvoiced(invoiced));
+        spec = spec.and(WorkSpecification.hasOrderDateAfter(orderDateFrom));
+        spec = spec.and(WorkSpecification.hasOrderDateBefore(orderDateTo));
+        spec = spec.and(WorkSpecification.hasExpectedStartDateAfter(expectedStartDateFrom));
+        spec = spec.and(WorkSpecification.hasExpectedStartDateBefore(expectedStartDateTo));
+        spec = spec.and(WorkSpecification.hasNameContaining(name));
+        spec = spec.and(WorkSpecification.hasBidNumber(bidNumber));
+        spec = spec.and(WorkSpecification.hasOrderNumber(orderNumber));
+
+        return workRepository.findAll(spec, pageable)
                 .map(this::toWorkSummaryResponse);
     }
 
