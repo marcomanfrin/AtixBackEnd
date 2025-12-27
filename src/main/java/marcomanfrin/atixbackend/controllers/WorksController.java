@@ -108,7 +108,7 @@ public class WorksController {
     }
 
     @PostMapping("/{id}/assign-technician")
-    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER') or @securityService.isTechnician(authentication)")
     public ResponseEntity<Void> assignTechnician(
             @PathVariable UUID id,
             @Valid @RequestBody AssignTechnicianRequest request) {

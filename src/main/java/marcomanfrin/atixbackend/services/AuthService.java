@@ -2,9 +2,7 @@ package marcomanfrin.atixbackend.services;
 
 import marcomanfrin.atixbackend.DTO.auth.LoginRequest;
 import marcomanfrin.atixbackend.DTO.auth.LoginResponse;
-import marcomanfrin.atixbackend.DTO.auth.RegisterRequest;
 import marcomanfrin.atixbackend.DTO.auth.UpdatePasswordRequest;
-import marcomanfrin.atixbackend.DTO.users.UserDetailDTO;
 import marcomanfrin.atixbackend.entities.users.User;
 import marcomanfrin.atixbackend.exceptions.UnauthorizedException;
 import marcomanfrin.atixbackend.security.JWTTools;
@@ -23,10 +21,6 @@ public class AuthService {
         this.userService = userService;
         this.jwtTools = jwtTools;
         this.passwordEncoder = passwordEncoder;
-    }
-
-    public UserDetailDTO register(RegisterRequest request) {
-        return userService.registerUser(request);
     }
 
     public LoginResponse login(LoginRequest request) {

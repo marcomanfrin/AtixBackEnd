@@ -3,12 +3,9 @@ package marcomanfrin.atixbackend.controllers;
 import jakarta.validation.Valid;
 import marcomanfrin.atixbackend.DTO.auth.LoginRequest;
 import marcomanfrin.atixbackend.DTO.auth.LoginResponse;
-import marcomanfrin.atixbackend.DTO.auth.RegisterRequest;
 import marcomanfrin.atixbackend.DTO.auth.UpdatePasswordRequest;
-import marcomanfrin.atixbackend.DTO.users.UserDetailDTO;
 import marcomanfrin.atixbackend.entities.users.User;
 import marcomanfrin.atixbackend.services.AuthService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -20,12 +17,6 @@ public class AuthController {
 
     public AuthController(AuthService authService) {
         this.authService = authService;
-    }
-
-    @PostMapping("/register")
-    public ResponseEntity<UserDetailDTO> register(@Valid @RequestBody RegisterRequest request) {
-        UserDetailDTO user = authService.register(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(user);
     }
 
     @PostMapping("/login")

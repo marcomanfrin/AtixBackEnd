@@ -6,6 +6,7 @@ import jakarta.persistence.EntityNotFoundException;
 import marcomanfrin.atixbackend.DTO.auth.RegisterRequest;
 import marcomanfrin.atixbackend.DTO.users.UserDetailDTO;
 import marcomanfrin.atixbackend.DTO.users.UserSummaryDTO;
+import marcomanfrin.atixbackend.DTO.users.UserUpdateRequest;
 import marcomanfrin.atixbackend.ServiceInterfaces.IUserService;
 import marcomanfrin.atixbackend.entities.users.AdministrativeUser;
 import marcomanfrin.atixbackend.entities.users.SellerUser;
@@ -18,6 +19,7 @@ import marcomanfrin.atixbackend.exceptions.UnauthorizedException;
 import marcomanfrin.atixbackend.exceptions.ValidationException;
 import marcomanfrin.atixbackend.repositories.UserRepository;
 import marcomanfrin.atixbackend.tools.MailgunSender;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -90,6 +92,15 @@ public class UserService implements IUserService {
     }
 
     @Override
+    public List<UserSummaryDTO> getUsersByType(UserType type) {
+        return userRepository.findAll().stream()
+                .filter(user -> user.getUserType() == type)
+                .map(this::toUserSummaryDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @PreAuthorize("@securityService.isSelf(#id, authentication)")
     public UserDetailDTO getUserById(UUID id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("User not found with id: " + id));
@@ -100,6 +111,43 @@ public class UserService implements IUserService {
     public User getUserEntityById(UUID id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("User not found with id: " + id));
+    }
+
+    @Override
+    @Transactional
+    public UserDetailDTO updateUser(UUID id, UserUpdateRequest request) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("User not found with id: " + id));
+
+        // PATCH logic: update only non-null fields
+        if (request.firstName() != null) {
+            user.setFirstName(request.firstName());
+        }
+        if (request.lastName() != null) {
+            user.setLastName(request.lastName());
+        }
+        if (request.email() != null) {
+            // Check if email is already taken by another user
+            if (userRepository.existsByEmailIgnoreCase(request.email()) &&
+                !user.getEmail().equalsIgnoreCase(request.email())) {
+                throw new ValidationException("Email already exists");
+            }
+            user.setEmail(request.email());
+        }
+        if (request.role() != null) {
+            user.setRole(request.role());
+        }
+
+        User updatedUser = userRepository.save(user);
+        return toUserDetailDTO(updatedUser);
+    }
+
+    @Override
+    @Transactional
+    public void deleteUser(UUID id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("User not found with id: " + id));
+        userRepository.delete(user);
     }
 
     @Override
