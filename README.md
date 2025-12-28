@@ -54,7 +54,6 @@ AtixBackEnd is an enterprise-grade backend system designed to manage technical o
 ### Third-Party Integrations
 - **Cloudinary**: Cloud-based image and file storage
 - **Mailgun**: Transactional email service
-- **Unirest**: HTTP client for API integrations
 
 ### Additional Libraries
 - **Bean Validation**: Request validation with Jakarta Validation
