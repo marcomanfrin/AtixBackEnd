@@ -24,7 +24,7 @@ public class ClientsController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    @PreAuthorize("@securityService.isSeller(authentication)")
     public ResponseEntity<ClientResponse> createClient(@Valid @RequestBody ClientRequest request) {
         ClientResponse client = clientService.createClient(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(client);

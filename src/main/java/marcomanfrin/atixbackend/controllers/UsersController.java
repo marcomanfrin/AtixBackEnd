@@ -7,13 +7,11 @@ import marcomanfrin.atixbackend.DTO.users.UpdatedImageResp;
 import marcomanfrin.atixbackend.DTO.users.UserDetailDTO;
 import marcomanfrin.atixbackend.DTO.users.UserSummaryDTO;
 import marcomanfrin.atixbackend.DTO.users.UserUpdateRequest;
-import marcomanfrin.atixbackend.entities.users.User;
 import marcomanfrin.atixbackend.enums.UserType;
 import marcomanfrin.atixbackend.services.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
