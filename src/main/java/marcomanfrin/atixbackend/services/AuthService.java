@@ -2,14 +2,11 @@ package marcomanfrin.atixbackend.services;
 
 import marcomanfrin.atixbackend.DTO.auth.LoginRequest;
 import marcomanfrin.atixbackend.DTO.auth.LoginResponse;
-import marcomanfrin.atixbackend.DTO.auth.UpdatePasswordRequest;
 import marcomanfrin.atixbackend.entities.users.User;
 import marcomanfrin.atixbackend.exceptions.UnauthorizedException;
 import marcomanfrin.atixbackend.security.JWTTools;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.UUID;
 
 @Service
 public class AuthService {
@@ -41,9 +38,5 @@ public class AuthService {
                 user.getLastName(),
                 user.getRole().name()
         );
-    }
-
-    public void updatePassword(UUID userId, UpdatePasswordRequest request) {
-        userService.updatePassword(userId, request.currentPassword(), request.newPassword());
     }
 }
