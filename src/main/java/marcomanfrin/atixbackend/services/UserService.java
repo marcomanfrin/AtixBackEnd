@@ -62,6 +62,17 @@ public class UserService implements IUserService {
         return toUserDetailDTO(savedUser);
     }
 
+    @Transactional
+    public User createUserWithoutEmail(RegisterRequest request) {
+        if (userRepository.existsByEmailIgnoreCase(request.email())) {
+            throw new ValidationException("Email already exists");
+        }
+
+        String hashedPassword = passwordEncoder.encode(request.password());
+        User user = createUserByType(request, hashedPassword);
+        return userRepository.save(user);
+    }
+
     private User createUserByType(RegisterRequest request, String hashedPassword) {
         User user = switch (request.type()) {
             case ADMINISTRATION -> new AdministrativeUser();

@@ -295,6 +295,30 @@ You should see in the console:
 Started AtixBackEndApplication in X.XXX seconds
 ```
 
+### First Launch - Default Admin User
+
+**IMPORTANT**: On the first launch, if the database is empty, the application will automatically create a default OWNER user with the following credentials:
+
+- **Email**: `admin@atixbackend.com`
+- **Password**: `Admin123!`
+- **Role**: OWNER
+- **Type**: ADMINISTRATION
+
+You will see this message in the console logs:
+```
+Default OWNER user created successfully!
+Email: admin@atixbackend.com
+Password: Admin123!
+IMPORTANT: Please change these credentials after first login!
+```
+
+**Security Warning**: For security reasons, you should:
+1. Log in with these credentials immediately after first launch
+2. Change the password using the `PATCH /users/{id}/password` endpoint
+3. Optionally update the email address using the `PATCH /users/{id}` endpoint
+
+This default user is only created if no users exist in the database. On subsequent launches, this step will be skipped.
+
 ---
 
 ## API Documentation
@@ -401,6 +425,10 @@ A complete Postman collection is included in the repository:
 ---
 
 ## Authentication & Authorization
+
+### Bootstrap Process
+
+On the first launch, the application automatically creates a default OWNER user (see [First Launch](#first-launch---default-admin-user) section). This solves the "chicken-and-egg" problem where only ADMIN/OWNER users can register new users.
 
 ### Authentication Flow
 
