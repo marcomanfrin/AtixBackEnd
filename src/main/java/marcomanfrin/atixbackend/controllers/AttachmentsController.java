@@ -24,7 +24,6 @@ public class AttachmentsController {
     }
 
     @PostMapping("/{targetType}/{targetId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'USER')")
     public ResponseEntity<AttachmentLink> uploadAndLinkAttachment(
             @PathVariable AttachmentTargetType targetType,
             @PathVariable UUID targetId,
@@ -34,7 +33,6 @@ public class AttachmentsController {
     }
 
     @GetMapping("/{targetType}/{targetId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'USER')")
     public ResponseEntity<List<Attachment>> getAttachments(
             @PathVariable AttachmentTargetType targetType,
             @PathVariable UUID targetId) {
@@ -43,7 +41,6 @@ public class AttachmentsController {
     }
 
     @DeleteMapping("/{attachmentId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public ResponseEntity<Void> deleteAttachment(@PathVariable UUID attachmentId) {
         attachmentService.deleteAttachment(attachmentId);
         return ResponseEntity.noContent().build();

@@ -5,6 +5,7 @@ import marcomanfrin.atixbackend.DTO.tickets.TicketRequest;
 import marcomanfrin.atixbackend.DTO.tickets.TicketResponse;
 import marcomanfrin.atixbackend.DTO.tickets.TicketUpdateRequest;
 import marcomanfrin.atixbackend.enums.TicketStatus;
+import marcomanfrin.atixbackend.security.SecurityService;
 import marcomanfrin.atixbackend.services.TicketService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,15 +20,15 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/tickets")
-@PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'USER')")
 public class TicketsController {
     private final TicketService ticketService;
 
-    public TicketsController(TicketService ticketService) {
+    public TicketsController(TicketService ticketService, SecurityService securityService) {
         this.ticketService = ticketService;
     }
 
     @PostMapping
+    @PreAuthorize("@securityService.isAdministrative(authentication)")
     public ResponseEntity<TicketResponse> createTicket(@Valid @RequestBody TicketRequest request) {
         TicketResponse ticket = ticketService.createTicket(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(ticket);
@@ -76,7 +77,7 @@ public class TicketsController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    @PreAuthorize("hasRole('OWNER')")
     public ResponseEntity<Void> deleteTicket(@PathVariable UUID id) {
         ticketService.deleteTicket(id);
         return ResponseEntity.noContent().build();

@@ -16,7 +16,6 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/plants")
-@PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'USER')")
 public class PlantsController {
     private final PlantService plantService;
 
@@ -44,7 +43,6 @@ public class PlantsController {
     }
 
     @PatchMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public ResponseEntity<PlantResponse> updatePlant(
             @PathVariable UUID id,
             @Valid @RequestBody PlantUpdateRequest request) {
@@ -53,7 +51,7 @@ public class PlantsController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('OWNER')")
     public ResponseEntity<Void> deletePlant(@PathVariable UUID id) {
         plantService.deletePlant(id);
         return ResponseEntity.noContent().build();

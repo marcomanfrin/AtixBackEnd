@@ -15,7 +15,6 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/worksite-references")
-@PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'USER')")
 public class WorksiteReferencesController {
     private final WorksiteReferenceService worksiteReferenceService;
 
@@ -24,7 +23,6 @@ public class WorksiteReferencesController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public ResponseEntity<WorksiteReferenceResponse> createWorksiteReference(
             @Valid @RequestBody WorksiteReferenceRequest request) {
         WorksiteReferenceResponse worksiteReference = worksiteReferenceService.createWorksiteReference(request);
@@ -44,7 +42,6 @@ public class WorksiteReferencesController {
     }
 
     @PatchMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public ResponseEntity<WorksiteReferenceResponse> updateWorksiteReference(
             @PathVariable UUID id,
             @Valid @RequestBody WorksiteReferenceUpdateRequest request) {
@@ -53,7 +50,7 @@ public class WorksiteReferencesController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('OWNER')")
     public ResponseEntity<Void> deleteWorksiteReference(@PathVariable UUID id) {
         worksiteReferenceService.deleteWorksiteReference(id);
         return ResponseEntity.noContent().build();

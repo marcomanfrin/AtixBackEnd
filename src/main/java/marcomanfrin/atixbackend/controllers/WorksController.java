@@ -21,7 +21,6 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/works")
-@PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'USER')")
 public class WorksController {
     private final WorkService workService;
 
@@ -30,7 +29,6 @@ public class WorksController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public ResponseEntity<WorkDetailResponse> createWork(@Valid @RequestBody WorkRequest request) {
         WorkDetailResponse work = workService.createWork(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(work);
@@ -94,14 +92,14 @@ public class WorksController {
     }
 
     @PatchMapping("/{id}/close")
-    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'USER')")
+    @PreAuthorize("@securityService.isTechnician(authentication)")
     public ResponseEntity<Void> closeWork(@PathVariable UUID id) {
         workService.closeWork(id);
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{id}/invoice")
-    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    @PreAuthorize("@securityService.isAdministrative(authentication)")
     public ResponseEntity<Void> invoiceWork(@PathVariable UUID id) {
         workService.invoiceWork(id);
         return ResponseEntity.noContent().build();
@@ -117,7 +115,6 @@ public class WorksController {
     }
 
     @PostMapping("/{id}/add-reference")
-    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'USER')")
     public ResponseEntity<Void> addWorksiteReference(
             @PathVariable UUID id,
             @Valid @RequestBody AddWorksiteReferenceRequest request) {

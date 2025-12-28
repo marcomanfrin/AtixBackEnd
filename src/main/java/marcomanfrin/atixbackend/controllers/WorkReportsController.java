@@ -16,7 +16,6 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/work-reports")
-@PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'USER')")
 public class WorkReportsController {
     private final WorkReportService workReportService;
 
@@ -33,6 +32,7 @@ public class WorkReportsController {
 
     // Work Report Entry endpoints
     @PostMapping("/entries")
+    @PreAuthorize("@securityService.isTechnician(authentication)")
     public ResponseEntity<WorkReportEntryResponse> createWorkReportEntry(
             @Valid @RequestBody WorkReportEntryRequest request) {
         WorkReportEntryResponse entry = workReportService.createWorkReportEntry(request);
@@ -40,6 +40,7 @@ public class WorkReportsController {
     }
 
     @PatchMapping("/entries/{id}")
+    @PreAuthorize("@securityService.isTechnician(authentication)")
     public ResponseEntity<WorkReportEntryResponse> updateWorkReportEntry(
             @PathVariable UUID id,
             @Valid @RequestBody WorkReportEntryUpdateRequest request) {
@@ -54,7 +55,7 @@ public class WorkReportsController {
     }
 
     @DeleteMapping("/entries/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    @PreAuthorize("hasRole('OWNER')")
     public ResponseEntity<Void> deleteWorkReportEntry(@PathVariable UUID id) {
         workReportService.deleteWorkReportEntry(id);
         return ResponseEntity.noContent().build();

@@ -37,28 +37,26 @@ public class UsersController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public ResponseEntity<List<UserSummaryDTO>> getAllUsers() {
         List<UserSummaryDTO> users = userService.getAllUsers();
         return ResponseEntity.ok(users);
     }
 
     @GetMapping("/type/{type}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public ResponseEntity<List<UserSummaryDTO>> getUsersByType(@PathVariable UserType type) {
         List<UserSummaryDTO> users = userService.getUsersByType(type);
         return ResponseEntity.ok(users);
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER') or #id == authentication.principal.id")
+    @PreAuthorize("hasRole('OWNER') or @securityService.isSelf(#id, authentication)")
     public ResponseEntity<UserDetailDTO> getUserById(@PathVariable UUID id) {
         UserDetailDTO user = userService.getUserById(id);
         return ResponseEntity.ok(user);
     }
 
     @PatchMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    @PreAuthorize("hasRole('OWNER') or @securityService.isSelf(#id, authentication)")
     public ResponseEntity<UserDetailDTO> updateUser(
             @PathVariable UUID id,
             @Valid @RequestBody UserUpdateRequest request) {
@@ -67,14 +65,14 @@ public class UsersController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    @PreAuthorize("hasRole('OWNER')")
     public ResponseEntity<Void> deleteUser(@PathVariable UUID id) {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping(path = "/{id}/avatar", consumes = "multipart/form-data")
-    @PreAuthorize("#id == authentication.principal.id or hasRole('ADMIN')")
+    @PreAuthorize("@securityService.isSelf(#id, authentication)")
     public ResponseEntity<UpdatedImageResp> uploadProfileImage(
             @PathVariable UUID id,
             @RequestParam("avatar") MultipartFile file
@@ -84,7 +82,7 @@ public class UsersController {
     }
 
     @PatchMapping("/{id}/password")
-    @PreAuthorize("#id == authentication.principal.id")
+    @PreAuthorize("@securityService.isSelf(#id, authentication)")
     public ResponseEntity<Void> updatePassword(
             @PathVariable UUID id,
             @Valid @RequestBody UpdatePasswordRequest request) {
