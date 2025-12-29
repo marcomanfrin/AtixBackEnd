@@ -1,49 +1,16 @@
 {
 	"info": {
-		"_postman_id": "atixbackend-api-collection",
+		"_postman_id": "fb4c9bb8-28bc-4286-b14d-cfec40ac3f72",
 		"name": "AtixBackEnd API",
-		"description": "Complete REST API collection for AtixBackEnd - Work and Ticket Management System\n\nThis collection includes all endpoints for:\n- Authentication (JWT-based)\n- User Management\n- Client Management\n- Plant Management\n- Ticket Management\n- Work Management\n- Work Reports\n- Worksite References\n- File Attachments (Cloudinary)\n- Dashboard (GraphQL)\n\nAuthentication:\n- Public endpoints: /auth/register, /auth/login\n- Protected endpoints: Require Bearer token from login response\n\nRoles:\n- USER: Basic access\n- ADMIN: Administrative access\n- OWNER: Full access",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+		"description": "Complete REST API collection for AtixBackEnd - Work and Ticket Management System\n\nThis collection includes all endpoints for:\n\n- Authentication (JWT-based)\n    \n- User Management\n    \n- Client Management\n    \n- Plant Management\n    \n- Ticket Management\n    \n- Work Management\n    \n- Work Reports\n    \n- Worksite References\n    \n- File Attachments (Cloudinary)\n    \n- Dashboard (GraphQL)\n    \n\nAuthentication:\n\n- Public endpoints: /auth/register, /auth/login\n    \n- Protected endpoints: Require Bearer token from login response\n    \n\nRoles:\n\n- USER: Basic access\n    \n- ADMIN: Administrative access\n    \n- OWNER: Full access",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "49984250",
+		"_collection_link": "https://marcomanfrin-1709038.postman.co/workspace/marco's-Workspace~5569ee71-1cf3-44c2-8fd7-2f130150440b/collection/49984250-fb4c9bb8-28bc-4286-b14d-cfec40ac3f72?action=share&source=collection_link&creator=49984250"
 	},
-	"variable": [
-		{
-			"key": "baseUrl",
-			"value": "http://localhost:3001/api",
-			"type": "string"
-		},
-		{
-			"key": "token",
-			"value": "",
-			"type": "string"
-		}
-	],
 	"item": [
 		{
 			"name": "Auth",
-			"description": "Authentication endpoints - public access",
 			"item": [
-				{
-					"name": "Register",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/auth/register",
-							"host": ["{{baseUrl}}"],
-							"path": ["auth", "register"]
-						},
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"firstName\": \"Mario\",\n  \"lastName\": \"Rossi\",\n  \"email\": \"mario.rossi@example.com\",\n  \"password\": \"Password123!\",\n  \"role\": \"USER\",\n  \"type\": \"TECHNICIAN\"\n}"
-						}
-					},
-					"response": []
-				},
 				{
 					"name": "Login",
 					"event": [
@@ -56,7 +23,9 @@
 									"    pm.collectionVariables.set('token', response.token);",
 									"}"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -68,15 +37,314 @@
 								"value": "application/json"
 							}
 						],
-						"url": {
-							"raw": "{{baseUrl}}/auth/login",
-							"host": ["{{baseUrl}}"],
-							"path": ["auth", "login"]
-						},
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"email\": \"mario.rossi@example.com\",\n  \"password\": \"Password123!\"\n}"
+							"raw": "{\n  \"email\": \"marco.manfrin04@gmail.com\",\n  \"password\": \"marco2004\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
 						}
+					},
+					"response": []
+				}
+			],
+			"description": "Authentication endpoints - public access"
+		},
+		{
+			"name": "Dashboard (GraphQL)",
+			"item": [
+				{
+					"name": "Dashboard Summary Query",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"query { dashboardSummary(limit: 10) { clientsCount plantsCount completedWorksCount pendingWorksCount ticketsByStatus { status count } lastWorks { id name completed createdAt } lastTickets { id name status createdAt } } }\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Dashboard Summary (GraphiQL format)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"query DashboardSummary($limit: Int) {\\n  dashboardSummary(limit: $limit) {\\n    clientsCount\\n    plantsCount\\n    completedWorksCount\\n    pendingWorksCount\\n    ticketsByStatus {\\n      status\\n      count\\n    }\\n    lastWorks {\\n      id\\n      name\\n      completed\\n      createdAt\\n    }\\n    lastTickets {\\n      id\\n      name\\n      status\\n      createdAt\\n    }\\n  }\\n}\",\n  \"variables\": {\n    \"limit\": 5\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/graphql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"graphql"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "GraphQL endpoint for dashboard summary"
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"firstName\": \"{{$randomFirstName}}\",\n  \"lastName\": \"{{$randomLastName}}\",\n  \"email\": \"{{$randomEmail}}\",\n  \"password\": \"{{$randomPassword}}\",\n  \"role\": \"OWNER\", // USER, ADMIN or OWNER\n  \"type\": \"TECHNICIAN\" //TECHNICIAN, ADMINISTRATION or SELLER\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users"
+							]
+						},
+						"description": "### Register User\n\nCreates a new user in the system.\n\n**Method:** `POST`  \n**URL:** `{{baseUrl}}/users`\n\n---\n\n> **Permissions / Access Control**  \n> Only users with the role `ADMIN` or `OWNER` are allowed to register a new user.\n\n---\n\n### Request Body (JSON)\n\n``` json\n{\n  \"firstName\": \"{{$randomFirstName}}\",\n  \"lastName\": \"{{$randomLastName}}\",\n  \"email\": \"{{$randomEmail}}\",\n  \"password\": \"{{$randomPassword}}\",\n  \"role\": \"OWNER\",\n  \"type\": \"TECHNICIAN\"\n}\n\n ```\n\n#### Fields\n\n- `firstName` (string, required)\n    \n    - User's first name.\n        \n    - In this request it is auto-generated using `{{$randomFirstName}}`.\n        \n- `lastName` (string, required)\n    \n    - User's last name.\n        \n    - Auto-generated using `{{$randomLastName}}`.\n        \n- `email` (string, required)\n    \n    - User's email address.\n        \n    - Auto-generated using `{{$randomEmail}}`.\n        \n- `password` (string, required)\n    \n    - User's password.\n        \n    - Auto-generated using `{{$randomPassword}}`.\n        \n- `role` (string, required)\n    \n    - High-level role of the user.\n        \n    - Allowed values: `USER`, `ADMIN`, `OWNER`.\n        \n- `type` (string, required)\n    \n    - Functional type / department of the user.\n        \n    - Allowed values: `TECHNICIAN`, `ADMINISTRATION`, `SELLER`.\n        \n\n---\n\n### Variables Used\n\n- `{{baseUrl}}` – Base URL of the API.\n    \n- `{{$randomFirstName}}` – Dynamic variable used to generate a random first name.\n    \n- `{{$randomLastName}}` – Dynamic variable used to generate a random last name.\n    \n- `{{$randomEmail}}` – Dynamic variable used to generate a random email.\n    \n- `{{$randomPassword}}` – Dynamic variable used to generate a random password.\n    \n\n> Note: Only the description of this request is documented here. The HTTP method, URL, headers, and body remain unchanged.."
+					},
+					"response": []
+				},
+				{
+					"name": "Register Known User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"firstName\": \"Marco\",\n  \"lastName\": \"Manfrin\",\n  \"email\": \"marco.manfrin04@gmail.com\",\n  \"password\": \"marco2004\",\n  \"role\": \"OWNER\",\n  \"type\": \"TECHNICIAN\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Users",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users"
+							]
+						},
+						"description": "Retrieves the complete list of users from the backend.\n\n## HTTP Request\n- **Method:** `GET`\n- **URL:** `{{baseUrl}}/users`\n\n## Authentication\nThis endpoint requires Bearer token authentication.\n\nSet the `Authorization` header:\n```http\nAuthorization: Bearer {{token}}\n```\n\nWhere:\n- `{{token}}` is a valid access token for the authenticated user/session.\n\n## Path & Query Parameters\n- **Path parameters:** None\n- **Query parameters:** None (the endpoint currently returns all users without filtering or pagination).\n\n## Successful Response (200 OK)\nOn success, the endpoint returns:\n- **Status:** `200 OK`\n- **Body:** JSON array of user objects.\n\n### User object fields\nEach item in the array has (at least) the following fields:\n\n```json\n[\n  {\n    \"id\": \"dd8fdc42-fa5f-4010-8e38-57e521030423\",\n    \"firstName\": \"Marco\",\n    \"lastName\": \"Manfrin\",\n    \"email\": \"marco.manfrin04@gmail.com\",\n    \"role\": \"OWNER\",\n    \"type\": \"TECHNICIAN\"\n  }\n]\n```\n\n- `id` (string): Unique identifier of the user.\n- `firstName` (string): User's first name.\n- `lastName` (string): User's last name.\n- `email` (string): User's email address.\n- `role` (string): High-level role of the user in the system (for example, `OWNER`, `ADMIN`, `USER`).\n- `type` (string): Functional type/category of the user (for example, `TECHNICIAN`, `SELLER`, `ADMINISTRATION`).\n\nThe response body will contain an array with zero or more user objects following this structure."
+					},
+					"response": []
+				},
+				{
+					"name": "Get User by ID",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/:userId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								":userId"
+							],
+							"variable": [
+								{
+									"key": "userId",
+									"value": "dd8fdc42-fa5f-4010-8e38-57e521030423"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Users By Type",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/users/type/:typeOfUser",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"type",
+								":typeOfUser"
+							],
+							"variable": [
+								{
+									"key": "typeOfUser",
+									"value": "TECHNICIAN",
+									"description": "ADMINISTRATION, TECHNICIAN, SELLER"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update User",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"firstName\": \"{{$randomFirstName}}\",\n  \"lastName\": \"{{$randomLastName}}\",\n  \"email\": \"{{$randomEmail}}\",\n  \"password\": \"{{$randomPassword}}\",\n  \"role\": \"OWNER\", // USER, ADMIN or OWNER\n  \"type\": \"SELLER\" //TECHNICIAN, ADMINISTRATION or SELLER\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/:userId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								":userId"
+							],
+							"variable": [
+								{
+									"key": "userId",
+									"value": "dd8fdc42-fa5f-4010-8e38-57e521030423"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload Avatar",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "avatar",
+									"type": "file",
+									"src": "postman-cloud:///1f0de793-767e-4450-a57e-71146556f738"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/:userId/avatar",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								":userId",
+								"avatar"
+							],
+							"variable": [
+								{
+									"key": "userId",
+									"value": "dd8fdc42-fa5f-4010-8e38-57e521030423"
+								}
+							]
+						},
+						"description": "auth: me, admin"
 					},
 					"response": []
 				},
@@ -94,72 +362,59 @@
 								"value": "Bearer {{token}}"
 							}
 						],
-						"url": {
-							"raw": "{{baseUrl}}/auth/password",
-							"host": ["{{baseUrl}}"],
-							"path": ["auth", "password"]
-						},
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"currentPassword\": \"Password123!\",\n  \"newPassword\": \"NewPassword456!\"\n}"
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Users",
-			"description": "User management endpoints",
-			"item": [
-				{
-					"name": "Get All Users",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
+							"raw": "{\n  \"currentPassword\": \"marco2004\",\n  \"newPassword\": \"NewPassword456!\"\n}"
+						},
 						"url": {
-							"raw": "{{baseUrl}}/users",
-							"host": ["{{baseUrl}}"],
-							"path": ["users"]
+							"raw": "{{baseUrl}}/users/:userId/password",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								":userId",
+								"password"
+							],
+							"variable": [
+								{
+									"key": "userId",
+									"value": ""
+								}
+							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "Get User by ID",
+					"name": "Delete User",
 					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
+						"method": "DELETE",
+						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/users/:id",
-							"host": ["{{baseUrl}}"],
-							"path": ["users", ":id"],
+							"raw": "{{baseUrl}}/users/:userId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								":userId"
+							],
 							"variable": [
 								{
-									"key": "id",
-									"value": "{{userId}}",
-									"description": "User UUID"
+									"key": "userId",
+									"value": "671d5908-eb87-4593-b8b2-ca3452a54558"
 								}
 							]
 						}
 					},
 					"response": []
 				}
-			]
+			],
+			"description": "User management endpoints"
 		},
 		{
 			"name": "Clients",
-			"description": "Client management endpoints - ADMIN/OWNER only",
 			"item": [
 				{
 					"name": "Create Client",
@@ -175,20 +430,24 @@
 								"value": "Bearer {{token}}"
 							}
 						],
-						"url": {
-							"raw": "{{baseUrl}}/clients",
-							"host": ["{{baseUrl}}"],
-							"path": ["clients"]
-						},
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"name\": \"Acme Corporation\",\n  \"type\": \"BUSINESS\"\n}"
+							"raw": "{\n  \"name\": \"{{$randomCompanyName}}\",\n  \"type\": \"ATIX\" // ATIX or FINAL\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/clients",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"clients"
+							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "Get All Clients (Paginated)",
+					"name": "Get All Clients",
 					"request": {
 						"method": "GET",
 						"header": [
@@ -198,21 +457,28 @@
 							}
 						],
 						"url": {
-							"raw": "{{baseUrl}}/clients?page=0&size=20&sort=name,asc",
-							"host": ["{{baseUrl}}"],
-							"path": ["clients"],
+							"raw": "{{baseUrl}}/clients",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"clients"
+							],
 							"query": [
 								{
 									"key": "page",
-									"value": "0"
+									"value": "4",
+									"disabled": true
 								},
 								{
 									"key": "size",
-									"value": "20"
+									"value": "3",
+									"disabled": true
 								},
 								{
 									"key": "sort",
-									"value": "name,asc"
+									"value": "name,asc",
+									"disabled": true
 								}
 							]
 						}
@@ -231,12 +497,17 @@
 						],
 						"url": {
 							"raw": "{{baseUrl}}/clients/:id",
-							"host": ["{{baseUrl}}"],
-							"path": ["clients", ":id"],
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"clients",
+								":id"
+							],
 							"variable": [
 								{
 									"key": "id",
-									"value": "{{clientId}}",
+									"value": "f4fbff4c-a9e4-4d29-9198-0085085304e0",
 									"description": "Client UUID"
 								}
 							]
@@ -258,21 +529,26 @@
 								"value": "Bearer {{token}}"
 							}
 						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Updated Client Name\"\n}"
+						},
 						"url": {
 							"raw": "{{baseUrl}}/clients/:id",
-							"host": ["{{baseUrl}}"],
-							"path": ["clients", ":id"],
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"clients",
+								":id"
+							],
 							"variable": [
 								{
 									"key": "id",
-									"value": "{{clientId}}",
+									"value": "f4fbff4c-a9e4-4d29-9198-0085085304e0",
 									"description": "Client UUID"
 								}
 							]
-						},
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"name\": \"Acme Corporation Updated\"\n}"
 						}
 					},
 					"response": []
@@ -289,12 +565,17 @@
 						],
 						"url": {
 							"raw": "{{baseUrl}}/clients/:id",
-							"host": ["{{baseUrl}}"],
-							"path": ["clients", ":id"],
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"clients",
+								":id"
+							],
 							"variable": [
 								{
 									"key": "id",
-									"value": "{{clientId}}",
+									"value": "3fc7a8eb-4728-4f5b-a157-aa0aa6fd37ba",
 									"description": "Client UUID"
 								}
 							]
@@ -302,11 +583,11 @@
 					},
 					"response": []
 				}
-			]
+			],
+			"description": "Client management endpoints - ADMIN/OWNER only"
 		},
 		{
 			"name": "Plants",
-			"description": "Plant management endpoints",
 			"item": [
 				{
 					"name": "Create Plant",
@@ -322,20 +603,24 @@
 								"value": "Bearer {{token}}"
 							}
 						],
-						"url": {
-							"raw": "{{baseUrl}}/plants",
-							"host": ["{{baseUrl}}"],
-							"path": ["plants"]
-						},
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"name\": \"Plant Milano Centro\",\n  \"notes\": \"Impianto principale\",\n  \"nasDirectory\": \"/storage/plant001\",\n  \"pswPhrase\": \"secure-phrase\",\n  \"pswPlatform\": \"platform-password\",\n  \"pswStation\": \"station-password\"\n}"
+							"raw": "{\n  \"name\": \"Plant {{$randomNameSuffix}}\",\n  \"notes\": \"{{$randomLoremParagraph}}\",\n  \"nasDirectory\": \"{{$randomFilePath}}\",\n  \"pswPhrase\": \"{{$randomPassword}}\",\n  \"pswPlatform\": \"{{$randomPassword}}\",\n  \"pswStation\": \"{{$randomPassword}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/plants",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"plants"
+							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "Get All Plants (Paginated)",
+					"name": "Get All Plants",
 					"request": {
 						"method": "GET",
 						"header": [
@@ -346,8 +631,12 @@
 						],
 						"url": {
 							"raw": "{{baseUrl}}/plants?page=0&size=20&sort=name,asc",
-							"host": ["{{baseUrl}}"],
-							"path": ["plants"],
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"plants"
+							],
 							"query": [
 								{
 									"key": "page",
@@ -377,14 +666,18 @@
 							}
 						],
 						"url": {
-							"raw": "{{baseUrl}}/plants/:id",
-							"host": ["{{baseUrl}}"],
-							"path": ["plants", ":id"],
+							"raw": "{{baseUrl}}/plants/:plantId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"plants",
+								":plantId"
+							],
 							"variable": [
 								{
-									"key": "id",
-									"value": "{{plantId}}",
-									"description": "Plant UUID"
+									"key": "plantId",
+									"value": "a43c48ca-3939-4289-91f1-13a19be49086"
 								}
 							]
 						}
@@ -405,21 +698,25 @@
 								"value": "Bearer {{token}}"
 							}
 						],
-						"url": {
-							"raw": "{{baseUrl}}/plants/:id",
-							"host": ["{{baseUrl}}"],
-							"path": ["plants", ":id"],
-							"variable": [
-								{
-									"key": "id",
-									"value": "{{plantId}}",
-									"description": "Plant UUID"
-								}
-							]
-						},
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"notes\": \"Impianto aggiornato\"\n}"
+							"raw": "{\n    \"name\": \"Plant {{$randomNameSuffix}}\",\n    \"notes\": \"Impianto aggiornato\",\n    \"nasDirectory\": \"/rescue/grow.p10\",\n    \"pswPhrase\": \"DqLRImqXRcNvAf_\",\n    \"pswPlatform\": \"7bWxxxdba9PS49y\",\n    \"pswStation\": \"A_JCVLmoVnpp8FO\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/plants/:plantId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"plants",
+								":plantId"
+							],
+							"variable": [
+								{
+									"key": "plantId",
+									"value": "a43c48ca-3939-4289-91f1-13a19be49086"
+								}
+							]
 						}
 					},
 					"response": []
@@ -436,12 +733,17 @@
 						],
 						"url": {
 							"raw": "{{baseUrl}}/plants/:id",
-							"host": ["{{baseUrl}}"],
-							"path": ["plants", ":id"],
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"plants",
+								":id"
+							],
 							"variable": [
 								{
 									"key": "id",
-									"value": "{{plantId}}",
+									"value": "a43c48ca-3939-4289-91f1-13a19be49086",
 									"description": "Plant UUID"
 								}
 							]
@@ -449,11 +751,455 @@
 					},
 					"response": []
 				}
-			]
+			],
+			"description": "Plant management endpoints"
+		},
+		{
+			"name": "Worksite References",
+			"item": [
+				{
+					"name": "Create Worksite Reference",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Giovanni Bianchi\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/worksite-references",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"worksite-references"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Worksite References",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/worksite-references",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"worksite-references"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Worksite Reference by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/worksite-references/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"worksite-references",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{worksiteReferenceId}}",
+									"description": "Worksite Reference UUID"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Worksite Reference",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Giovanni Bianchi - Aggiornato\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/worksite-references/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"worksite-references",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{worksiteReferenceId}}",
+									"description": "Worksite Reference UUID"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Worksite Reference",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/worksite-references/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"worksite-references",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{worksiteReferenceId}}",
+									"description": "Worksite Reference UUID"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Worksite reference (contacts) management endpoints"
+		},
+		{
+			"name": "Works",
+			"item": [
+				{
+					"name": "Create Work",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"{{$randomJobDescriptor}}\",\n  \"bidNumber\": \"BID-{{$randomAlphaNumeric}}\",\n  \"sellerId\": \"{{sellerId}}\",\n  \"orderNumber\": \"ORD-{{$randomAlphaNumeric}}\",\n  \"orderDate\": \"2025-01-15\",\n  \"electricalSchemaProgression\": 0,\n  \"programmingProgression\": 0,\n  \"expectedStartDate\": \"2025-02-01\",\n  \"plantId\": \"{{plantId}}\",\n  \"atixClientId\": \"{{clientId}}\",\n  \"nasSubDirectory\": \"/projects/2025/001\",\n  \"expectedOfficeHours\": 40,\n  \"expectedPlantHours\": 80\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/works",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"works"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Works",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/works?ticket=null",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"works"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0",
+									"disabled": true
+								},
+								{
+									"key": "size",
+									"value": "20",
+									"disabled": true
+								},
+								{
+									"key": "sort",
+									"value": "orderDate,desc",
+									"disabled": true
+								},
+								{
+									"key": "status",
+									"value": "OPEN",
+									"disabled": true
+								},
+								{
+									"key": "ticket",
+									"value": "null"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Work by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/works/:workId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"works",
+								":workId"
+							],
+							"variable": [
+								{
+									"key": "workId",
+									"value": "{{workId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Work",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"electricalSchemaProgression\": 30,\n  \"programmingProgression\": 30\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/works/:workId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"works",
+								":workId"
+							],
+							"variable": [
+								{
+									"key": "workId",
+									"value": "0425f7fa-b27f-4eb9-9c5a-94b5118b0562"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Close Work",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/works/:id/close",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"works",
+								":id",
+								"close"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "0425f7fa-b27f-4eb9-9c5a-94b5118b0562",
+									"description": "Work UUID"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Invoice work",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/works/:id/invoice",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"works",
+								":id",
+								"invoice"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "0425f7fa-b27f-4eb9-9c5a-94b5118b0562",
+									"description": "Work UUID"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Assign Technician to Work",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"technicianId\": \"{{technicianId}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/works/:workId/assign-technician",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"works",
+								":workId",
+								"assign-technician"
+							],
+							"variable": [
+								{
+									"key": "workId",
+									"value": "0425f7fa-b27f-4eb9-9c5a-94b5118b0562"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Worksite Reference to Work",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"worksiteReferenceId\": \"{{worksiteReferenceId}}\",\n  \"role\": \"PLUMBER\" //PLUMBER or ELECTRICIAN\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/works/:workId/add-reference",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"works",
+								":workId",
+								"add-reference"
+							],
+							"variable": [
+								{
+									"key": "workId",
+									"value": "7fbe684d-f95e-4767-a28e-dae6f554da60"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Work order management endpoints"
 		},
 		{
 			"name": "Tickets",
-			"description": "Ticket management endpoints",
 			"item": [
 				{
 					"name": "Create Ticket",
@@ -469,20 +1215,24 @@
 								"value": "Bearer {{token}}"
 							}
 						],
-						"url": {
-							"raw": "{{baseUrl}}/tickets",
-							"host": ["{{baseUrl}}"],
-							"path": ["tickets"]
-						},
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"senderEmail\": \"client@example.com\",\n  \"orderNumberId\": \"{{workId}}\",\n  \"name\": \"Problema impianto elettrico\",\n  \"description\": \"Interruttore differenziale che scatta\",\n  \"status\": \"OPEN\"\n}"
+							"raw": "{\n  \"senderEmail\": \"{{$randomEmail}}\",\n  //\"orderNumberId\": \"{{$workId}}\", // this is an optional value\n  \"name\": \"Problema impianto elettrico\",\n  \"description\": \"Interruttore differenziale che scatta\",\n  \"status\": \"OPEN\" //OPEN, IN_PROGRESS, RESOLVED, CLOSED\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/tickets",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tickets"
+							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "Get All Tickets (Paginated)",
+					"name": "Get All Tickets",
 					"request": {
 						"method": "GET",
 						"header": [
@@ -493,8 +1243,12 @@
 						],
 						"url": {
 							"raw": "{{baseUrl}}/tickets?page=0&size=20&sort=createdAt,desc",
-							"host": ["{{baseUrl}}"],
-							"path": ["tickets"],
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tickets"
+							],
 							"query": [
 								{
 									"key": "page",
@@ -525,8 +1279,13 @@
 						],
 						"url": {
 							"raw": "{{baseUrl}}/tickets/:id",
-							"host": ["{{baseUrl}}"],
-							"path": ["tickets", ":id"],
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tickets",
+								":id"
+							],
 							"variable": [
 								{
 									"key": "id",
@@ -552,10 +1311,19 @@
 								"value": "Bearer {{token}}"
 							}
 						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": \"IN_PROGRESS\"\n}"
+						},
 						"url": {
 							"raw": "{{baseUrl}}/tickets/:id",
-							"host": ["{{baseUrl}}"],
-							"path": ["tickets", ":id"],
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tickets",
+								":id"
+							],
 							"variable": [
 								{
 									"key": "id",
@@ -563,10 +1331,6 @@
 									"description": "Ticket UUID"
 								}
 							]
-						},
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"status\": \"IN_PROGRESS\"\n}"
 						}
 					},
 					"response": []
@@ -583,8 +1347,13 @@
 						],
 						"url": {
 							"raw": "{{baseUrl}}/tickets/:id",
-							"host": ["{{baseUrl}}"],
-							"path": ["tickets", ":id"],
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tickets",
+								":id"
+							],
 							"variable": [
 								{
 									"key": "id",
@@ -596,249 +1365,11 @@
 					},
 					"response": []
 				}
-			]
-		},
-		{
-			"name": "Works",
-			"description": "Work order management endpoints",
-			"item": [
-				{
-					"name": "Create Work",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/works",
-							"host": ["{{baseUrl}}"],
-							"path": ["works"]
-						},
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"name\": \"Installazione nuovo impianto\",\n  \"bidNumber\": \"BID-2025-001\",\n  \"sellerId\": \"{{sellerId}}\",\n  \"orderNumber\": \"ORD-2025-001\",\n  \"orderDate\": \"2025-01-15\",\n  \"electricalSchemaProgression\": 0,\n  \"programmingProgression\": 0,\n  \"expectedStartDate\": \"2025-02-01\",\n  \"plantId\": \"{{plantId}}\",\n  \"atixClientId\": \"{{clientId}}\",\n  \"nasSubDirectory\": \"/projects/2025/001\",\n  \"expectedOfficeHours\": 40,\n  \"expectedPlantHours\": 80\n}"
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get All Works (Paginated)",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/works?page=0&size=20&sort=orderDate,desc",
-							"host": ["{{baseUrl}}"],
-							"path": ["works"],
-							"query": [
-								{
-									"key": "page",
-									"value": "0"
-								},
-								{
-									"key": "size",
-									"value": "20"
-								},
-								{
-									"key": "sort",
-									"value": "orderDate,desc"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Work by ID",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/works/:id",
-							"host": ["{{baseUrl}}"],
-							"path": ["works", ":id"],
-							"variable": [
-								{
-									"key": "id",
-									"value": "{{workId}}",
-									"description": "Work UUID"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Update Work",
-					"request": {
-						"method": "PATCH",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/works/:id",
-							"host": ["{{baseUrl}}"],
-							"path": ["works", ":id"],
-							"variable": [
-								{
-									"key": "id",
-									"value": "{{workId}}",
-									"description": "Work UUID"
-								}
-							]
-						},
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"electricalSchemaProgression\": 25,\n  \"programmingProgression\": 10\n}"
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Close Work",
-					"request": {
-						"method": "PATCH",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/works/:id/close",
-							"host": ["{{baseUrl}}"],
-							"path": ["works", ":id", "close"],
-							"variable": [
-								{
-									"key": "id",
-									"value": "{{workId}}",
-									"description": "Work UUID"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Mark Work as Invoiced",
-					"request": {
-						"method": "PATCH",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/works/:id/invoice",
-							"host": ["{{baseUrl}}"],
-							"path": ["works", ":id", "invoice"],
-							"variable": [
-								{
-									"key": "id",
-									"value": "{{workId}}",
-									"description": "Work UUID"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Assign Technician to Work",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/works/:id/assign-technician",
-							"host": ["{{baseUrl}}"],
-							"path": ["works", ":id", "assign-technician"],
-							"variable": [
-								{
-									"key": "id",
-									"value": "{{workId}}",
-									"description": "Work UUID"
-								}
-							]
-						},
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"technicianId\": \"{{technicianId}}\"\n}"
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Add Worksite Reference to Work",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/works/:id/add-reference",
-							"host": ["{{baseUrl}}"],
-							"path": ["works", ":id", "add-reference"],
-							"variable": [
-								{
-									"key": "id",
-									"value": "{{workId}}",
-									"description": "Work UUID"
-								}
-							]
-						},
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"worksiteReferenceId\": \"{{worksiteReferenceId}}\"\n}"
-						}
-					},
-					"response": []
-				}
-			]
+			],
+			"description": "Ticket management endpoints"
 		},
 		{
 			"name": "Work Reports",
-			"description": "Work report and entry management endpoints",
 			"item": [
 				{
 					"name": "Get Work Report by Work ID",
@@ -852,12 +1383,18 @@
 						],
 						"url": {
 							"raw": "{{baseUrl}}/work-reports/work/:workId",
-							"host": ["{{baseUrl}}"],
-							"path": ["work-reports", "work", ":workId"],
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"work-reports",
+								"work",
+								":workId"
+							],
 							"variable": [
 								{
 									"key": "workId",
-									"value": "{{workId}}",
+									"value": "7fbe684d-f95e-4767-a28e-dae6f554da60",
 									"description": "Work UUID"
 								}
 							]
@@ -879,14 +1416,19 @@
 								"value": "Bearer {{token}}"
 							}
 						],
-						"url": {
-							"raw": "{{baseUrl}}/work-reports/entries",
-							"host": ["{{baseUrl}}"],
-							"path": ["work-reports", "entries"]
-						},
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"workId\": \"{{workId}}\",\n  \"description\": \"Installazione quadro elettrico\",\n  \"hours\": 8.5\n}"
+							"raw": "{\n  \"workId\": \"7fbe684d-f95e-4767-a28e-dae6f554da60\",\n  \"description\": \"{{$randomJobDescriptor}}\",\n  \"hours\": 1\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/work-reports/entries",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"work-reports",
+								"entries"
+							]
 						}
 					},
 					"response": []
@@ -905,10 +1447,20 @@
 								"value": "Bearer {{token}}"
 							}
 						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"hours\": 9.0\n}"
+						},
 						"url": {
 							"raw": "{{baseUrl}}/work-reports/entries/:id",
-							"host": ["{{baseUrl}}"],
-							"path": ["work-reports", "entries", ":id"],
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"work-reports",
+								"entries",
+								":id"
+							],
 							"variable": [
 								{
 									"key": "id",
@@ -916,10 +1468,6 @@
 									"description": "Work Report Entry UUID"
 								}
 							]
-						},
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"hours\": 9.0\n}"
 						}
 					},
 					"response": []
@@ -936,8 +1484,15 @@
 						],
 						"url": {
 							"raw": "{{baseUrl}}/work-reports/entries/work/:workId",
-							"host": ["{{baseUrl}}"],
-							"path": ["work-reports", "entries", "work", ":workId"],
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"work-reports",
+								"entries",
+								"work",
+								":workId"
+							],
 							"variable": [
 								{
 									"key": "workId",
@@ -961,8 +1516,14 @@
 						],
 						"url": {
 							"raw": "{{baseUrl}}/work-reports/entries/:id",
-							"host": ["{{baseUrl}}"],
-							"path": ["work-reports", "entries", ":id"],
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"work-reports",
+								"entries",
+								":id"
+							],
 							"variable": [
 								{
 									"key": "id",
@@ -974,144 +1535,11 @@
 					},
 					"response": []
 				}
-			]
-		},
-		{
-			"name": "Worksite References",
-			"description": "Worksite reference (contacts) management endpoints",
-			"item": [
-				{
-					"name": "Create Worksite Reference",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/worksite-references",
-							"host": ["{{baseUrl}}"],
-							"path": ["worksite-references"]
-						},
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"name\": \"Giovanni Bianchi\"\n}"
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get All Worksite References",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/worksite-references",
-							"host": ["{{baseUrl}}"],
-							"path": ["worksite-references"]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Worksite Reference by ID",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/worksite-references/:id",
-							"host": ["{{baseUrl}}"],
-							"path": ["worksite-references", ":id"],
-							"variable": [
-								{
-									"key": "id",
-									"value": "{{worksiteReferenceId}}",
-									"description": "Worksite Reference UUID"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Update Worksite Reference",
-					"request": {
-						"method": "PATCH",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/worksite-references/:id",
-							"host": ["{{baseUrl}}"],
-							"path": ["worksite-references", ":id"],
-							"variable": [
-								{
-									"key": "id",
-									"value": "{{worksiteReferenceId}}",
-									"description": "Worksite Reference UUID"
-								}
-							]
-						},
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"name\": \"Giovanni Bianchi - Aggiornato\"\n}"
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Delete Worksite Reference",
-					"request": {
-						"method": "DELETE",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/worksite-references/:id",
-							"host": ["{{baseUrl}}"],
-							"path": ["worksite-references", ":id"],
-							"variable": [
-								{
-									"key": "id",
-									"value": "{{worksiteReferenceId}}",
-									"description": "Worksite Reference UUID"
-								}
-							]
-						}
-					},
-					"response": []
-				}
-			]
+			],
+			"description": "Work report and entry management endpoints"
 		},
 		{
 			"name": "Attachments",
-			"description": "File attachment endpoints (Cloudinary integration)",
 			"item": [
 				{
 					"name": "Upload Attachment",
@@ -1123,10 +1551,26 @@
 								"value": "Bearer {{token}}"
 							}
 						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "postman-cloud:///1f0de793-767e-4450-a57e-71146556f738"
+								}
+							]
+						},
 						"url": {
 							"raw": "{{baseUrl}}/attachments/:targetType/:targetId",
-							"host": ["{{baseUrl}}"],
-							"path": ["attachments", ":targetType", ":targetId"],
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"attachments",
+								":targetType",
+								":targetId"
+							],
 							"variable": [
 								{
 									"key": "targetType",
@@ -1135,18 +1579,8 @@
 								},
 								{
 									"key": "targetId",
-									"value": "{{workId}}",
+									"value": "{{targetId}}",
 									"description": "Target entity UUID"
-								}
-							]
-						},
-						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "file",
-									"type": "file",
-									"src": []
 								}
 							]
 						}
@@ -1165,8 +1599,14 @@
 						],
 						"url": {
 							"raw": "{{baseUrl}}/attachments/:targetType/:targetId",
-							"host": ["{{baseUrl}}"],
-							"path": ["attachments", ":targetType", ":targetId"],
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"attachments",
+								":targetType",
+								":targetId"
+							],
 							"variable": [
 								{
 									"key": "targetType",
@@ -1195,8 +1635,13 @@
 						],
 						"url": {
 							"raw": "{{baseUrl}}/attachments/:attachmentId",
-							"host": ["{{baseUrl}}"],
-							"path": ["attachments", ":attachmentId"],
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"attachments",
+								":attachmentId"
+							],
 							"variable": [
 								{
 									"key": "attachmentId",
@@ -1208,65 +1653,52 @@
 					},
 					"response": []
 				}
-			]
+			],
+			"description": "File attachment endpoints (Cloudinary integration)"
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
 		},
 		{
-			"name": "Dashboard (GraphQL)",
-			"description": "GraphQL endpoint for dashboard summary",
-			"item": [
-				{
-					"name": "Dashboard Summary Query",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/graphql",
-							"host": ["{{baseUrl}}"],
-							"path": ["graphql"]
-						},
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"query\": \"query { dashboardSummary(limit: 10) { clientsCount plantsCount completedWorksCount pendingWorksCount ticketsByStatus { status count } lastWorks { id name completed createdAt } lastTickets { id name status createdAt } } }\"\n}"
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Dashboard Summary (GraphiQL format)",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/graphql",
-							"host": ["{{baseUrl}}"],
-							"path": ["graphql"]
-						},
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"query\": \"query DashboardSummary($limit: Int) {\\n  dashboardSummary(limit: $limit) {\\n    clientsCount\\n    plantsCount\\n    completedWorksCount\\n    pendingWorksCount\\n    ticketsByStatus {\\n      status\\n      count\\n    }\\n    lastWorks {\\n      id\\n      name\\n      completed\\n      createdAt\\n    }\\n    lastTickets {\\n      id\\n      name\\n      status\\n      createdAt\\n    }\\n  }\\n}\",\n  \"variables\": {\n    \"limit\": 5\n  }\n}"
-						}
-					},
-					"response": []
-				}
-			]
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3001/api"
+		},
+		{
+			"key": "token",
+			"value": ""
 		}
 	]
 }

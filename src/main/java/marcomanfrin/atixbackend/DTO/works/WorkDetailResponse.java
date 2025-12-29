@@ -33,5 +33,6 @@ public record WorkDetailResponse(
         Integer expectedOfficeHours,
         Integer expectedPlantHours,
         TicketResponse ticket
+        //TODO: assigned technician
 ) {
 }

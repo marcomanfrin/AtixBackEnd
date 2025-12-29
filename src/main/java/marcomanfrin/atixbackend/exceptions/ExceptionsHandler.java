@@ -56,6 +56,12 @@ public class ExceptionsHandler {
         return new ErrorDTO("Parametro non valido: " + ex.getName(), LocalDateTime.now());
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorDTO handleTypeMismatch(IllegalArgumentException ex) {
+        return new ErrorDTO("Argomento non valido" + ex.getMessage(), LocalDateTime.now());
+    }
+
     @ExceptionHandler(IllegalStateException.class)
     @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
     public ErrorDTO handleNotPossible(IllegalStateException ex) {

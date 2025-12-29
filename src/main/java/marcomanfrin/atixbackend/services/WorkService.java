@@ -13,6 +13,7 @@ import marcomanfrin.atixbackend.DTO.worksiteReferences.WorksiteReferenceResponse
 import marcomanfrin.atixbackend.ServiceInterfaces.IWorkService;
 import marcomanfrin.atixbackend.entities.*;
 import marcomanfrin.atixbackend.entities.users.SellerUser;
+import marcomanfrin.atixbackend.entities.users.TechnicianUser;
 import marcomanfrin.atixbackend.entities.users.User;
 import marcomanfrin.atixbackend.enums.WorksiteReferenceRole;
 import marcomanfrin.atixbackend.exceptions.NotFoundException;
@@ -62,6 +63,7 @@ public class WorkService implements IWorkService {
     @Override
     @Transactional
     public WorkDetailResponse createWork(WorkRequest request) {
+        //TODO: remove type from client
         Work work = new Work();
         work.setName(request.name());
         work.setBidNumber(request.bidNumber());
@@ -289,6 +291,9 @@ public class WorkService implements IWorkService {
 
         User technician = userRepository.findById(technicianId)
                 .orElseThrow(() -> new NotFoundException("Technician not found with id: " + technicianId));
+        if (!(technician instanceof TechnicianUser)) {
+            throw new IllegalArgumentException("only TechnicianU users can be assigned to a work");
+        }
 
         // Check if already assigned
         if (workAssignmentRepository.existsByWorkAndUser(work, technician)) {
