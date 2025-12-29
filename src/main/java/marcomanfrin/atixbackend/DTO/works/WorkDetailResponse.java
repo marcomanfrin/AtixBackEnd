@@ -29,10 +29,10 @@ public record WorkDetailResponse(
         ClientResponse atixClient,
         ClientResponse finalClient,
         List<WorksiteReferenceAssignmentResponse> worksiteReferenceAssignments,
+        List<WorkAssignmentResponse> assignedTechnicians,
         String nasSubDirectory,
         Integer expectedOfficeHours,
         Integer expectedPlantHours,
         TicketResponse ticket
-        //TODO: assigned technician
 ) {
 }

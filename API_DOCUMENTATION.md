@@ -404,6 +404,7 @@ Crea un nuovo lavoro.
     "type": "FINAL"
   },
   "worksiteReferenceAssignments": [],
+  "assignedTechnicians": [],
   "nasSubDirectory": "/projects/office-a",
   "expectedOfficeHours": 40,
   "expectedPlantHours": 80,
@@ -1187,6 +1188,7 @@ Elimina un allegato.
   atixClient: Client
   finalClient?: Client
   worksiteReferenceAssignments: WorksiteReferenceAssignment[]
+  assignedTechnicians: WorkAssignment[]
   nasSubDirectory: string
   expectedOfficeHours?: number
   expectedPlantHours?: number
@@ -1254,6 +1256,18 @@ Elimina un allegato.
 {
   id: string (UUID)
   name: string
+}
+```
+
+### WorkAssignment
+```typescript
+{
+  id: string (UUID)
+  technicianId: string (UUID)
+  technicianFirstName: string
+  technicianLastName: string
+  technicianEmail: string
+  assignedAt: string (ISO datetime)
 }
 ```
 

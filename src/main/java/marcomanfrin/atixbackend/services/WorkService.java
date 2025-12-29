@@ -4,6 +4,7 @@ import marcomanfrin.atixbackend.DTO.clients.ClientResponse;
 import marcomanfrin.atixbackend.DTO.plants.PlantResponse;
 import marcomanfrin.atixbackend.DTO.tickets.TicketResponse;
 import marcomanfrin.atixbackend.DTO.users.UserSummaryDTO;
+import marcomanfrin.atixbackend.DTO.works.WorkAssignmentResponse;
 import marcomanfrin.atixbackend.DTO.works.WorkDetailResponse;
 import marcomanfrin.atixbackend.DTO.works.WorkRequest;
 import marcomanfrin.atixbackend.DTO.works.WorkSummaryResponse;
@@ -63,7 +64,6 @@ public class WorkService implements IWorkService {
     @Override
     @Transactional
     public WorkDetailResponse createWork(WorkRequest request) {
-        //TODO: remove type from client
         Work work = new Work();
         work.setName(request.name());
         work.setBidNumber(request.bidNumber());
@@ -358,6 +358,9 @@ public class WorkService implements IWorkService {
                 work.getWorksiteReferenceAssignments().stream()
                         .map(this::toWorksiteReferenceAssignmentResponse)
                         .collect(Collectors.toList()),
+                work.getAssignments().stream()
+                        .map(this::toWorkAssignmentResponse)
+                        .collect(Collectors.toList()),
                 work.getNasSubDirectory(),
                 work.getExpectedOfficeHours(),
                 work.getExpectedPlantHours(),
@@ -409,6 +412,18 @@ public class WorkService implements IWorkService {
                 assignment.getWorksiteReference().getId(),
                 assignment.getWorksiteReference().getName(),
                 assignment.getRole()
+        );
+    }
+
+    private WorkAssignmentResponse toWorkAssignmentResponse(WorkAssignment assignment) {
+        User technician = assignment.getUser();
+        return new WorkAssignmentResponse(
+                assignment.getId(),
+                technician.getId(),
+                technician.getFirstName(),
+                technician.getLastName(),
+                technician.getEmail(),
+                assignment.getAssignedAt()
         );
     }
 
