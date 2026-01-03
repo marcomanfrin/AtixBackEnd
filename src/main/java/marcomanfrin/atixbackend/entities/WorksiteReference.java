@@ -1,10 +1,7 @@
 package marcomanfrin.atixbackend.entities;
 
 import jakarta.persistence.*;
-import marcomanfrin.atixbackend.enums.WorksiteReferenceRole;
-
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -57,11 +54,4 @@ public class WorksiteReference {
         this.notes = notes;
     }
 
-
-    public List<WorksiteReferenceAssignment> getAssignments() {
-        return assignments;
-    }
-    public void setAssignments(List<WorksiteReferenceAssignment> assignments) {
-        this.assignments = assignments;
-    }
 }

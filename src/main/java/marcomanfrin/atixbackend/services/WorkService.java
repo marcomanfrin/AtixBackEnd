@@ -18,7 +18,6 @@ import marcomanfrin.atixbackend.entities.users.TechnicianUser;
 import marcomanfrin.atixbackend.entities.users.User;
 import marcomanfrin.atixbackend.enums.WorksiteReferenceRole;
 import marcomanfrin.atixbackend.exceptions.NotFoundException;
-import marcomanfrin.atixbackend.exceptions.ValidationException;
 import marcomanfrin.atixbackend.repositories.*;
 import marcomanfrin.atixbackend.specifications.WorkSpecification;
 import org.springframework.data.domain.Page;
