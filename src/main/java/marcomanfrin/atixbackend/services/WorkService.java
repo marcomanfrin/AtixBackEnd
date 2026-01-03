@@ -417,7 +417,8 @@ public class WorkService implements IWorkService {
     private WorksiteReferenceResponse toWorksiteReferenceResponse(WorksiteReference worksiteReference) {
         return new WorksiteReferenceResponse(
                 worksiteReference.getId(),
-                worksiteReference.getName()
+                worksiteReference.getName(),
+                worksiteReference.getTelephone()
         );
     }
 
@@ -426,6 +427,7 @@ public class WorkService implements IWorkService {
                 assignment.getId(),
                 assignment.getWorksiteReference().getId(),
                 assignment.getWorksiteReference().getName(),
+                assignment.getWorksiteReference().getTelephone(),
                 assignment.getRole()
         );
     }

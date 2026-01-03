@@ -25,7 +25,7 @@ public class WorksiteReferenceService implements IWorksiteReferenceService {
     @Override
     @Transactional
     public WorksiteReferenceResponse createWorksiteReference(WorksiteReferenceRequest request) {
-        WorksiteReference worksiteReference = new WorksiteReference(request.name());
+        WorksiteReference worksiteReference = new WorksiteReference(request.name(), request.telephone());
         WorksiteReference saved = worksiteReferenceRepository.save(worksiteReference);
         return toWorksiteReferenceResponse(saved);
     }
@@ -54,6 +54,9 @@ public class WorksiteReferenceService implements IWorksiteReferenceService {
         if (request.name() != null) {
             worksiteReference.setName(request.name());
         }
+        if (request.telephone() != null) {
+            worksiteReference.setTelephone(request.telephone());
+        }
 
         WorksiteReference updated = worksiteReferenceRepository.save(worksiteReference);
         return toWorksiteReferenceResponse(updated);
@@ -71,7 +74,8 @@ public class WorksiteReferenceService implements IWorksiteReferenceService {
     private WorksiteReferenceResponse toWorksiteReferenceResponse(WorksiteReference worksiteReference) {
         return new WorksiteReferenceResponse(
                 worksiteReference.getId(),
-                worksiteReference.getName()
+                worksiteReference.getName(),
+                worksiteReference.getTelephone()
         );
     }
 }
