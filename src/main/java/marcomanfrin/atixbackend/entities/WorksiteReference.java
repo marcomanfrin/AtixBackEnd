@@ -19,6 +19,7 @@ public class WorksiteReference {
     @Column(nullable = false)
     private String name;
     private String telephone;
+    private String notes;
 
     @OneToMany(mappedBy = "worksiteReference", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<WorksiteReferenceAssignment> assignments = new ArrayList<>();
@@ -26,9 +27,10 @@ public class WorksiteReference {
     public WorksiteReference() {
     }
 
-    public WorksiteReference(String name, String telephone) {
+    public WorksiteReference(String name, String telephone, String notes) {
         this.name = name;
         this.telephone = telephone;
+        this.notes = notes;
     }
 
     public UUID getId() {
@@ -47,6 +49,14 @@ public class WorksiteReference {
     public void setTelephone(String telephone) {
         this.telephone = telephone;
     }
+
+    public String getNotes() {
+        return notes;
+    }
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+
 
     public List<WorksiteReferenceAssignment> getAssignments() {
         return assignments;
