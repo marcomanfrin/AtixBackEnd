@@ -125,7 +125,7 @@ public class WorkReportService implements IWorkReportService {
     }
 
     @Transactional
-    private WorkReport createWorkReportForWork(UUID workId) {
+    protected WorkReport createWorkReportForWork(UUID workId) {
         Work work = workRepository.findById(workId)
                 .orElseThrow(() -> new NotFoundException("Work not found with id: " + workId));
 
