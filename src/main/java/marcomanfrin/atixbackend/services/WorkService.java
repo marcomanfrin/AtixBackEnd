@@ -337,7 +337,15 @@ public class WorkService implements IWorkService {
                 work.isCompleted(),
                 work.isInvoiced(),
                 work.getElectricalSchemaProgression(),
-                work.getProgrammingProgression()
+                work.getProgrammingProgression(),
+                work.getNasSubDirectory(),
+                work.getPlant() != null ? work.getPlant().getNasDirectory() : null,
+                work.getExpectedStartDate(),
+                work.getPlant() != null ? toPlantResponse(work.getPlant()) : null,
+                work.getFinalClient() != null ? toClientResponse(work.getFinalClient()) : null,
+                work.getAssignments().stream()
+                        .map(this::toWorkAssignmentResponse)
+                        .collect(Collectors.toList())
         );
     }
 
