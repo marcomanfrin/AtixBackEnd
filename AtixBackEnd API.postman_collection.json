@@ -773,7 +773,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"name\": \"Giovanni Bianchi\"\n}"
+							"raw": "{\n  \"name\": \"Giovanni Bianchi\",\n  \"telephone\": \"+39 02 1234567\"\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/worksite-references",
@@ -855,7 +855,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"name\": \"Giovanni Bianchi - Aggiornato\"\n}"
+							"raw": "{\n  \"name\": \"Giovanni Bianchi - Aggiornato\",\n  \"telephone\": \"+39 02 7654321\"\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/worksite-references/:id",
@@ -1189,6 +1189,105 @@
 								{
 									"key": "workId",
 									"value": "7fbe684d-f95e-4767-a28e-dae6f554da60"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Work",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/works/:workId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"works",
+								":workId"
+							],
+							"variable": [
+								{
+									"key": "workId",
+									"value": "7fbe684d-f95e-4767-a28e-dae6f554da60"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Remove Worksite Reference from Work",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/works/:workId/references/:referenceAssignmentId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"works",
+								":workId",
+								"references",
+								":referenceAssignmentId"
+							],
+							"variable": [
+								{
+									"key": "workId",
+									"value": "7fbe684d-f95e-4767-a28e-dae6f554da60"
+								},
+								{
+									"key": "referenceAssignmentId",
+									"value": "{{worksiteReferenceAssignmentId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Remove Technician from Work",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/works/:workId/technicians/:technicianId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"works",
+								":workId",
+								"technicians",
+								":technicianId"
+							],
+							"variable": [
+								{
+									"key": "workId",
+									"value": "7fbe684d-f95e-4767-a28e-dae6f554da60"
+								},
+								{
+									"key": "technicianId",
+									"value": "{{technicianId}}"
 								}
 							]
 						}
