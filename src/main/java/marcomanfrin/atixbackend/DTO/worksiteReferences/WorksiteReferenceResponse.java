@@ -5,6 +5,7 @@ import java.util.UUID;
 public record WorksiteReferenceResponse(
         UUID id,
         String name,
-        String telephone
+        String telephone,
+        String notes
 ) {
 }

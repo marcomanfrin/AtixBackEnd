@@ -7,6 +7,8 @@ public record WorkReportEntryResponse(
         UUID id,
         UUID reportId,
         String description,
-        BigDecimal hours
+        BigDecimal hours,
+        UUID technicianId,
+        String technicianName
 ) {
 }

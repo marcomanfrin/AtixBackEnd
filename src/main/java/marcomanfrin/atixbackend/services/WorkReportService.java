@@ -8,10 +8,14 @@ import marcomanfrin.atixbackend.ServiceInterfaces.IWorkReportService;
 import marcomanfrin.atixbackend.entities.Work;
 import marcomanfrin.atixbackend.entities.WorkReport;
 import marcomanfrin.atixbackend.entities.WorkReportEntry;
+import marcomanfrin.atixbackend.entities.users.TechnicianUser;
+import marcomanfrin.atixbackend.entities.users.User;
 import marcomanfrin.atixbackend.exceptions.NotFoundException;
 import marcomanfrin.atixbackend.repositories.WorkReportEntryRepository;
 import marcomanfrin.atixbackend.repositories.WorkReportRepository;
 import marcomanfrin.atixbackend.repositories.WorkRepository;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,6 +51,10 @@ public class WorkReportService implements IWorkReportService {
         Work work = workRepository.findById(request.workId())
                 .orElseThrow(() -> new NotFoundException("Work not found with id: " + request.workId()));
 
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User currentUser = (User) authentication.getPrincipal();
+        TechnicianUser technicianUser = (TechnicianUser) currentUser;
+
         // Get or create work report
         WorkReport workReport = workReportRepository.findByWork(work)
                 .orElseGet(() -> {
@@ -59,7 +67,8 @@ public class WorkReportService implements IWorkReportService {
         WorkReportEntry entry = new WorkReportEntry(
                 workReport,
                 request.description(),
-                request.hours()
+                request.hours(),
+                technicianUser
         );
 
         WorkReportEntry savedEntry = workReportEntryRepository.save(entry);
@@ -155,7 +164,9 @@ public class WorkReportService implements IWorkReportService {
                 entry.getId(),
                 entry.getReport().getId(),
                 entry.getDescription(),
-                entry.getHours()
+                entry.getHours(),
+                entry.getTechnician() != null ? entry.getTechnician().getId() : null,
+                entry.getTechnician() != null ? entry.getTechnician().getFirstName() + " " + entry.getTechnician().getLastName() : null
         );
     }
 }

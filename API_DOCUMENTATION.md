@@ -969,8 +969,11 @@ Ottiene il report di un lavoro specifico.
   "entries": [
     {
       "id": "770e8400-e29b-41d4-a716-446655440000",
+      "reportId": "550e8400-e29b-41d4-a716-446655440000",
       "description": "Installazione quadro elettrico",
-      "hours": 8.00
+      "hours": 8.00,
+      "technicianId": "123e4567-e89b-12d3-a456-426614174000",
+      "technicianName": "Mario Rossi"
     }
   ]
 }
@@ -996,8 +999,11 @@ Crea una nuova voce nel report di lavoro.
 ```json
 {
   "id": "770e8400-e29b-41d4-a716-446655440000",
+  "reportId": "550e8400-e29b-41d4-a716-446655440000",
   "description": "Installazione quadro elettrico",
-  "hours": 8.0
+  "hours": 8.0,
+  "technicianId": "123e4567-e89b-12d3-a456-426614174000",
+  "technicianName": "Mario Rossi"
 }
 ```
 
@@ -1019,7 +1025,17 @@ Aggiorna una voce del report.
 }
 ```
 
-**Response 200:** Dettagli della voce aggiornata
+**Response 200:**
+```json
+{
+  "id": "770e8400-e29b-41d4-a716-446655440000",
+  "reportId": "550e8400-e29b-41d4-a716-446655440000",
+  "description": "Descrizione aggiornata",
+  "hours": 10.5,
+  "technicianId": "123e4567-e89b-12d3-a456-426614174000",
+  "technicianName": "Mario Rossi"
+}
+```
 
 ---
 
@@ -1036,8 +1052,11 @@ Ottiene tutte le voci del report per un lavoro.
 [
   {
     "id": "770e8400-e29b-41d4-a716-446655440000",
+    "reportId": "550e8400-e29b-41d4-a716-446655440000",
     "description": "Installazione quadro elettrico",
-    "hours": 8.0
+    "hours": 8.0,
+    "technicianId": "123e4567-e89b-12d3-a456-426614174000",
+    "technicianName": "Mario Rossi"
   }
 ]
 ```
@@ -1068,7 +1087,8 @@ Crea un nuovo riferimento cantiere.
 ```json
 {
   "name": "Idraulico Rossi Mario",
-  "telephone": "+39 02 1234567"
+  "telephone": "+39 02 1234567",
+  "notes": "Note aggiuntive sul riferimento cantiere"
 }
 ```
 
@@ -1077,7 +1097,8 @@ Crea un nuovo riferimento cantiere.
 {
   "id": "550e8400-e29b-41d4-a716-446655440000",
   "name": "Idraulico Rossi Mario",
-  "telephone": "+39 02 1234567"
+  "telephone": "+39 02 1234567",
+  "notes": "Note aggiuntive sul riferimento cantiere"
 }
 ```
 
@@ -1094,7 +1115,8 @@ Ottiene la lista di tutti i riferimenti cantiere.
   {
     "id": "550e8400-e29b-41d4-a716-446655440000",
     "name": "Idraulico Rossi Mario",
-    "telephone": "+39 02 1234567"
+    "telephone": "+39 02 1234567",
+    "notes": "Note aggiuntive sul riferimento cantiere"
   }
 ]
 ```
@@ -1106,10 +1128,15 @@ Ottiene i dettagli di un riferimento cantiere.
 
 **Autenticazione richiesta:** ✅ Sì
 
-**Parametri URL:**
-- `id`: UUID del riferimento
-
-**Response 200:** Dettagli completi
+**Response 200:**
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "name": "Idraulico Rossi Mario",
+  "telephone": "+39 02 1234567",
+  "notes": "Note aggiuntive sul riferimento cantiere"
+}
+```
 
 ---
 
@@ -1125,11 +1152,20 @@ Aggiorna un riferimento cantiere.
 ```json
 {
   "name": "Nuovo nome",
-  "telephone": "+39 02 7654321"
+  "telephone": "+39 02 7654321",
+  "notes": "Note aggiornate"
 }
 ```
 
-**Response 200:** Dettagli aggiornati
+**Response 200:**
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "name": "Nuovo nome",
+  "telephone": "+39 02 7654321",
+  "notes": "Note aggiornate"
+}
+```
 
 ---
 
@@ -1333,18 +1369,21 @@ Elimina un allegato.
 ### WorkReportEntry
 ```typescript
 {
-  id: string (UUID)
-  description: string
-  hours: number (decimal)
+  id: string (UUID),
+  description: string,
+  hours: number (decimal),
+  technicianId: string (UUID),
+  technicianName: string
 }
 ```
 
 ### WorksiteReference
 ```typescript
 {
-  id: string (UUID)
+  id: string (UUID),
   name: string,
-  telephone: string
+  telephone: string,
+  notes: string
 }
 ```
 

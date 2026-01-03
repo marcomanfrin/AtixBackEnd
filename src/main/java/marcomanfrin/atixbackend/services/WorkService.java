@@ -468,7 +468,8 @@ public class WorkService implements IWorkService {
         return new WorksiteReferenceResponse(
                 worksiteReference.getId(),
                 worksiteReference.getName(),
-                worksiteReference.getTelephone()
+                worksiteReference.getTelephone(),
+                worksiteReference.getNotes()
         );
     }
 
