@@ -18,6 +18,7 @@ import marcomanfrin.atixbackend.exceptions.NotFoundException;
 import marcomanfrin.atixbackend.exceptions.UnauthorizedException;
 import marcomanfrin.atixbackend.exceptions.ValidationException;
 import marcomanfrin.atixbackend.repositories.UserRepository;
+import marcomanfrin.atixbackend.repositories.WorkRepository;
 import marcomanfrin.atixbackend.tools.MailgunSender;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -35,12 +36,14 @@ import java.util.stream.Collectors;
 @Service
 public class UserService implements IUserService {
     private final UserRepository userRepository;
+    private final WorkRepository workRepository;
     private final PasswordEncoder passwordEncoder;
     private final Cloudinary imageUploader;
     private final MailgunSender mailgunSender;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, Cloudinary imageUploader, MailgunSender mailgunSender) {
+    public UserService(UserRepository userRepository, WorkRepository workRepository, PasswordEncoder passwordEncoder, Cloudinary imageUploader, MailgunSender mailgunSender) {
         this.userRepository = userRepository;
+        this.workRepository = workRepository;
         this.passwordEncoder = passwordEncoder;
         this.imageUploader = imageUploader;
         this.mailgunSender = mailgunSender;
@@ -158,6 +161,17 @@ public class UserService implements IUserService {
     public void deleteUser(UUID id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("User not found with id: " + id));
+
+        // Clear seller references from Works if user is a seller
+        if (user instanceof SellerUser) {
+            workRepository.findAll().forEach(work -> {
+                if (work.getSeller() != null && work.getSeller().getId().equals(id)) {
+                    work.setSeller(null);
+                    workRepository.save(work);
+                }
+            });
+        }
+
         userRepository.delete(user);
     }
 

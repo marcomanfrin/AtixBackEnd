@@ -7,6 +7,7 @@ import marcomanfrin.atixbackend.ServiceInterfaces.IPlantService;
 import marcomanfrin.atixbackend.entities.Plant;
 import marcomanfrin.atixbackend.exceptions.NotFoundException;
 import marcomanfrin.atixbackend.repositories.PlantRepository;
+import marcomanfrin.atixbackend.repositories.WorkRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -17,9 +18,11 @@ import java.util.UUID;
 @Service
 public class PlantService implements IPlantService {
     private final PlantRepository plantRepository;
+    private final WorkRepository workRepository;
 
-    public PlantService(PlantRepository plantRepository) {
+    public PlantService(PlantRepository plantRepository, WorkRepository workRepository) {
         this.plantRepository = plantRepository;
+        this.workRepository = workRepository;
     }
 
     @Override
@@ -86,6 +89,15 @@ public class PlantService implements IPlantService {
         if (!plantRepository.existsById(id)) {
             throw new IllegalArgumentException("Plant not found with id: " + id);
         }
+
+        // Clear plant references from Works
+        workRepository.findAll().forEach(work -> {
+            if (work.getPlant() != null && work.getPlant().getId().equals(id)) {
+                work.setPlant(null);
+                workRepository.save(work);
+            }
+        });
+
         plantRepository.deleteById(id);
     }
 

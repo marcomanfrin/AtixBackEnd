@@ -14,6 +14,7 @@ import java.util.UUID;
 public record WorkDetailResponse(
         UUID id,
         String name,
+        String description,
         String bidNumber,
         UserSummaryDTO seller,
         String orderNumber,

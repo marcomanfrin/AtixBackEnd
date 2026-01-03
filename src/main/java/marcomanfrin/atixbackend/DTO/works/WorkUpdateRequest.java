@@ -9,6 +9,8 @@ public record WorkUpdateRequest(
         @Size(min = 2, max = 100, message = "Work name must be between 2 and 100 characters")
         String name,
 
+        String description,
+
         String bidNumber,
 
         UUID sellerId,

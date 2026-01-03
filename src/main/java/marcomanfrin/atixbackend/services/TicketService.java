@@ -122,10 +122,17 @@ public class TicketService implements ITicketService {
     @Override
     @Transactional
     public void deleteTicket(UUID id) {
-        if (!ticketRepository.existsById(id)) {
-            throw new NotFoundException("Ticket not found with id: " + id);
+        Ticket ticket = ticketRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Ticket not found with id: " + id));
+
+        // Clear the relationship from the Work side if it exists
+        if (ticket.getOrderNumber() != null) {
+            Work work = ticket.getOrderNumber();
+            work.setTicket(null);
+            workRepository.save(work);
         }
-        ticketRepository.deleteById(id);
+
+        ticketRepository.delete(ticket);
     }
 
     private TicketResponse toTicketResponse(Ticket ticket) {

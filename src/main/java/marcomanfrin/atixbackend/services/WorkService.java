@@ -66,6 +66,7 @@ public class WorkService implements IWorkService {
     public WorkDetailResponse createWork(WorkRequest request) {
         Work work = new Work();
         work.setName(request.name());
+        work.setDescription(request.description());
         work.setBidNumber(request.bidNumber());
         work.setOrderNumber(request.orderNumber());
         work.setOrderDate(request.orderDate());
@@ -192,6 +193,9 @@ public class WorkService implements IWorkService {
         // PATCH logic: update only non-null fields
         if (request.name() != null) {
             work.setName(request.name());
+        }
+        if (request.description() != null) {
+            work.setDescription(request.description());
         }
         if (request.bidNumber() != null) {
             work.setBidNumber(request.bidNumber());
@@ -341,6 +345,7 @@ public class WorkService implements IWorkService {
         return new WorkDetailResponse(
                 work.getId(),
                 work.getName(),
+                work.getDescription(),
                 work.getBidNumber(),
                 work.getSeller() != null ? toUserSummaryDTO(work.getSeller()) : null,
                 work.getOrderNumber(),
@@ -354,7 +359,7 @@ public class WorkService implements IWorkService {
                 work.isInvoiced(),
                 work.getInvoicedAt(),
                 work.getPlant() != null ? toPlantResponse(work.getPlant()) : null,
-                toClientResponse(work.getAtixClient()),
+                work.getAtixClient() != null ? toClientResponse(work.getAtixClient()) : null,
                 work.getFinalClient() != null ? toClientResponse(work.getFinalClient()) : null,
                 work.getWorksiteReferenceAssignments().stream()
                         .map(this::toWorksiteReferenceAssignmentResponse)

@@ -22,6 +22,9 @@ public class Work {
     @Column(nullable = false)
     private String name;
 
+    @Column(nullable = true)
+    private String description;
+
     @Column(nullable = false)
     private String bidNumber;
 
@@ -146,6 +149,13 @@ public class Work {
     }
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public String getBidNumber() {

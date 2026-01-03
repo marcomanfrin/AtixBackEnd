@@ -7,6 +7,7 @@ import marcomanfrin.atixbackend.ServiceInterfaces.IClientService;
 import marcomanfrin.atixbackend.entities.Client;
 import marcomanfrin.atixbackend.exceptions.NotFoundException;
 import marcomanfrin.atixbackend.repositories.ClientRepository;
+import marcomanfrin.atixbackend.repositories.WorkRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -17,9 +18,11 @@ import java.util.UUID;
 @Service
 public class ClientService implements IClientService {
     private final ClientRepository clientRepository;
+    private final WorkRepository workRepository;
 
-    public ClientService(ClientRepository clientRepository) {
+    public ClientService(ClientRepository clientRepository, WorkRepository workRepository) {
         this.clientRepository = clientRepository;
+        this.workRepository = workRepository;
     }
 
     @Override
@@ -67,6 +70,23 @@ public class ClientService implements IClientService {
         if (!clientRepository.existsById(id)) {
             throw new NotFoundException("Client not found with id: " + id);
         }
+
+        // Clear client references from Works (both atixClient and finalClient)
+        workRepository.findAll().forEach(work -> {
+            boolean needsSave = false;
+            if (work.getAtixClient() != null && work.getAtixClient().getId().equals(id)) {
+                work.setAtixClient(null);
+                needsSave = true;
+            }
+            if (work.getFinalClient() != null && work.getFinalClient().getId().equals(id)) {
+                work.setFinalClient(null);
+                needsSave = true;
+            }
+            if (needsSave) {
+                workRepository.save(work);
+            }
+        });
+
         clientRepository.deleteById(id);
     }
 
