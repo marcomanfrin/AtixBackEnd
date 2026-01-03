@@ -371,6 +371,7 @@ Crea un nuovo lavoro.
 {
   "id": "550e8400-e29b-41d4-a716-446655440000",
   "name": "Impianto Elettrico Ufficio A",
+  "description": "Descrizione dettagliata del lavoro",
   "bidNumber": "BID-2024-001",
   "seller": {
     "id": "550e8400-e29b-41d4-a716-446655440000",
@@ -387,6 +388,7 @@ Crea un nuovo lavoro.
   "expectedStartDate": "2024-02-01",
   "completed": false,
   "completedAt": null,
+  "createdAt": "2024-01-15T10:30:00",
   "invoiced": false,
   "invoicedAt": null,
   "plant": {
@@ -453,7 +455,29 @@ Ottiene la lista dei lavori con paginazione e filtri opzionali.
       "completed": false,
       "invoiced": false,
       "electricalSchemaProgression": 25,
-      "programmingProgression": 10
+      "programmingProgression": 10,
+      "nasSubDirectory": "/projects/office-a",
+      "relatedPlantNasDirectory": "/plants/centrale",
+      "expectedStartDate": "2024-02-01",
+      "plant": {
+        "id": "660e8400-e29b-41d4-a716-446655440000",
+        "name": "Impianto Centrale"
+      },
+      "finalClient": {
+        "id": "880e8400-e29b-41d4-a716-446655440000",
+        "name": "Final Client Name",
+        "type": "FINAL"
+      },
+      "assignedTechnicians": [
+        {
+          "id": "990e8400-e29b-41d4-a716-446655440000",
+          "technicianId": "550e8400-e29b-41d4-a716-446655440000",
+          "technicianFirstName": "Mario",
+          "technicianLastName": "Rossi",
+          "technicianEmail": "mario.rossi@example.com",
+          "assignedAt": "2024-01-15T10:30:00"
+        }
+      ]
     }
   ],
   "pageable": {
@@ -814,11 +838,7 @@ Crea un nuovo ticket.
 {
   "id": "550e8400-e29b-41d4-a716-446655440000",
   "senderEmail": "customer@example.com",
-  "orderNumber": {
-    "id": "660e8400-e29b-41d4-a716-446655440000",
-    "name": "Lavoro Associato",
-    "orderNumber": "ORD-2024-001"
-  },
+  "orderNumberId": "660e8400-e29b-41d4-a716-446655440000",
   "name": "Problema con impianto",
   "description": "Descrizione dettagliata del problema",
   "status": "OPEN",
@@ -1173,6 +1193,7 @@ Elimina un allegato.
 {
   id: string (UUID)
   name: string
+  description?: string
   bidNumber: string
   seller?: UserSummary
   orderNumber: string
@@ -1182,6 +1203,7 @@ Elimina un allegato.
   expectedStartDate?: string (ISO date)
   completed: boolean
   completedAt?: string (ISO datetime)
+  createdAt: string (ISO datetime)
   invoiced: boolean
   invoicedAt?: string (ISO datetime)
   plant?: Plant
@@ -1193,6 +1215,27 @@ Elimina un allegato.
   expectedOfficeHours?: number
   expectedPlantHours?: number
   ticket?: Ticket
+}
+```
+
+### Work (Sommario)
+```typescript
+{
+  id: string (UUID)
+  name: string
+  bidNumber: string
+  orderNumber: string
+  orderDate: string (ISO date)
+  completed: boolean
+  invoiced: boolean
+  electricalSchemaProgression: number (0-100)
+  programmingProgression: number (0-100)
+  nasSubDirectory: string
+  relatedPlantNasDirectory?: string
+  expectedStartDate?: string (ISO date)
+  plant?: Plant
+  finalClient?: Client
+  assignedTechnicians: WorkAssignment[]
 }
 ```
 
@@ -1223,7 +1266,7 @@ Elimina un allegato.
 {
   id: string (UUID)
   senderEmail?: string
-  orderNumber?: Work
+  orderNumberId?: string (UUID)
   name: string
   description: string
   status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "CLOSED"
@@ -1391,5 +1434,5 @@ I messaggi di errore di validazione sono in italiano e provengono direttamente d
 
 ---
 
-**Ultima modifica:** 2024-01-15
+**Ultima modifica:** 2026-01-03
 **Versione API:** 1.0

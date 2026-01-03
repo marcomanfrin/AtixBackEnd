@@ -595,6 +595,10 @@ SQL queries are logged in development mode (`spring.jpa.show-sql = true`). Disab
 
 CORS origins are configured via `CORS_ALLOWED_ORIGINS` environment variable. Add your frontend URLs (comma-separated).
 
+### Deletion Handling
+
+When deleting resources that have relationships with other entities, the application automatically sets those references to null before performing the deletion. This prevents foreign key constraint violations and ensures data integrity.
+
 ---
 
 ## Contact & Support
