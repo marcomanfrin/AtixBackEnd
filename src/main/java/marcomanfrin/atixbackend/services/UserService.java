@@ -238,6 +238,7 @@ public class UserService implements IUserService {
                 user.getFirstName(),
                 user.getLastName(),
                 user.getEmail(),
+                user.getProfileImageUrl(),
                 user.getRole().name(),
                 user.getUserType().name()
         );

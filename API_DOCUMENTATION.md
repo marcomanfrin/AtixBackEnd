@@ -175,6 +175,7 @@ Ottiene la lista di tutti gli utenti.
     "firstName": "Mario",
     "lastName": "Rossi",
     "email": "mario.rossi@example.com",
+    "profileImageUrl": "https://ui-avatars.com/api/?name=Mario+Rossi",
     "role": "USER",
     "type": "TECHNICIAN"
   }
@@ -199,6 +200,7 @@ Ottiene gli utenti filtrati per tipo.
     "firstName": "Mario",
     "lastName": "Rossi",
     "email": "mario.rossi@example.com",
+    "profileImageUrl": "https://ui-avatars.com/api/?name=Mario+Rossi",
     "role": "USER",
     "type": "TECHNICIAN"
   }
@@ -378,6 +380,7 @@ Crea un nuovo lavoro.
     "firstName": "Mario",
     "lastName": "Rossi",
     "email": "mario.rossi@example.com",
+    "profileImageUrl": "https://ui-avatars.com/api/?name=Mario+Rossi",
     "role": "USER",
     "type": "SELLER"
   },
