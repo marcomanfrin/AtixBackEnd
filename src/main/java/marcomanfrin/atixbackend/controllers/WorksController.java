@@ -121,4 +121,29 @@ public class WorksController {
         workService.addWorksiteReference(id, request.worksiteReferenceId(), request.role());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('OWNER')")
+    public ResponseEntity<Void> deleteWork(@PathVariable UUID id) {
+        workService.deleteWork(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{workId}/references/{referenceAssignmentId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    public ResponseEntity<Void> removeWorksiteReference(
+            @PathVariable UUID workId,
+            @PathVariable UUID referenceAssignmentId) {
+        workService.removeWorksiteReference(workId, referenceAssignmentId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{workId}/technicians/{technicianId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    public ResponseEntity<Void> removeTechnician(
+            @PathVariable UUID workId,
+            @PathVariable UUID technicianId) {
+        workService.removeTechnician(workId, technicianId);
+        return ResponseEntity.noContent().build();
+    }
 }

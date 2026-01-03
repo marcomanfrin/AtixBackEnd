@@ -327,6 +327,56 @@ public class WorkService implements IWorkService {
         worksiteReferenceAssignmentRepository.save(assignment);
     }
 
+    @Override
+    @Transactional
+    public void deleteWork(UUID id) {
+        Work work = workRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Work not found with id: " + id));
+
+        // Remove associations before deleting the work
+        work.getAssignments().clear();
+        work.getWorksiteReferenceAssignments().clear();
+
+        if (work.getTicket() != null) {
+            work.getTicket().setOrderNumber(null);
+            ticketRepository.save(work.getTicket());
+        }
+
+        workRepository.delete(work);
+    }
+
+    @Override
+    @Transactional
+    public void removeWorksiteReference(UUID workId, UUID worksiteReferenceAssignmentId) {
+        Work work = workRepository.findById(workId)
+                .orElseThrow(() -> new NotFoundException("Work not found with id: " + workId));
+
+        WorksiteReferenceAssignment assignment = worksiteReferenceAssignmentRepository.findById(worksiteReferenceAssignmentId)
+                .orElseThrow(() -> new NotFoundException("Worksite reference assignment not found with id: " + worksiteReferenceAssignmentId));
+
+        if (!assignment.getWork().equals(work)) {
+            throw new IllegalArgumentException("Worksite reference assignment does not belong to the specified work");
+        }
+
+        work.getWorksiteReferenceAssignments().remove(assignment);
+        worksiteReferenceAssignmentRepository.delete(assignment);
+    }
+
+    @Override
+    @Transactional
+    public void removeTechnician(UUID workId, UUID technicianId) {
+        Work work = workRepository.findById(workId)
+                .orElseThrow(() -> new NotFoundException("Work not found with id: " + workId));
+        User technician = userRepository.findById(technicianId)
+                .orElseThrow(() -> new NotFoundException("Technician not found with id: ".concat(technicianId.toString())));
+
+        WorkAssignment assignment = workAssignmentRepository.findByWorkAndUser(work, technician)
+                .orElseThrow(() -> new NotFoundException("Technician not assigned to this work"));
+
+        work.getAssignments().remove(assignment);
+        workAssignmentRepository.delete(assignment);
+    }
+
     private WorkSummaryResponse toWorkSummaryResponse(Work work) {
         return new WorkSummaryResponse(
                 work.getId(),

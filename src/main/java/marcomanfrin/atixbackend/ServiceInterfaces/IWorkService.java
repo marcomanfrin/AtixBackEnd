@@ -39,4 +39,8 @@ public interface IWorkService {
     void invoiceWork(UUID id);
     void assignTechnician(UUID workId, UUID technicianId);
     void addWorksiteReference(UUID workId, UUID worksiteReferenceId, WorksiteReferenceRole role);
+
+    void deleteWork(UUID id);
+    void removeWorksiteReference(UUID workId, UUID worksiteReferenceId);
+    void removeTechnician(UUID workId, UUID technicianId);
 }

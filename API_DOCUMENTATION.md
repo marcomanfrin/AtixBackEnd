@@ -609,6 +609,44 @@ Aggiunge un riferimento cantiere al lavoro.
 
 ---
 
+#### DELETE `/works/{id}`
+Elimina un lavoro.
+
+**Autenticazione richiesta:** ✅ Sì (OWNER)
+
+**Parametri URL:**
+- `id`: UUID del lavoro
+
+**Response 204:** No Content
+
+---
+
+#### DELETE `/works/{workId}/references/{referenceAssignmentId}`
+Rimuove un riferimento cantiere da un lavoro.
+
+**Autenticazione richiesta:** ✅ Sì (ADMIN o OWNER)
+
+**Parametri URL:**
+- `workId`: UUID del lavoro
+- `referenceAssignmentId`: UUID dell'assegnazione del riferimento cantiere
+
+**Response 204:** No Content
+
+---
+
+#### DELETE `/works/{workId}/technicians/{technicianId}`
+Rimuove un tecnico assegnato da un lavoro.
+
+**Autenticazione richiesta:** ✅ Sì (ADMIN o OWNER)
+
+**Parametri URL:**
+- `workId`: UUID del lavoro
+- `technicianId`: UUID del tecnico
+
+**Response 204:** No Content
+
+---
+
 <a name="endpoint-clienti"></a>
 ### 🏢 Clienti
 
@@ -1029,7 +1067,8 @@ Crea un nuovo riferimento cantiere.
 **Request Body:**
 ```json
 {
-  "name": "Idraulico Rossi Mario"
+  "name": "Idraulico Rossi Mario",
+  "telephone": "+39 02 1234567"
 }
 ```
 
@@ -1037,7 +1076,8 @@ Crea un nuovo riferimento cantiere.
 ```json
 {
   "id": "550e8400-e29b-41d4-a716-446655440000",
-  "name": "Idraulico Rossi Mario"
+  "name": "Idraulico Rossi Mario",
+  "telephone": "+39 02 1234567"
 }
 ```
 
@@ -1053,7 +1093,8 @@ Ottiene la lista di tutti i riferimenti cantiere.
 [
   {
     "id": "550e8400-e29b-41d4-a716-446655440000",
-    "name": "Idraulico Rossi Mario"
+    "name": "Idraulico Rossi Mario",
+    "telephone": "+39 02 1234567"
   }
 ]
 ```
@@ -1083,7 +1124,8 @@ Aggiorna un riferimento cantiere.
 **Request Body:**
 ```json
 {
-  "name": "Nuovo nome"
+  "name": "Nuovo nome",
+  "telephone": "+39 02 7654321"
 }
 ```
 
@@ -1301,7 +1343,8 @@ Elimina un allegato.
 ```typescript
 {
   id: string (UUID)
-  name: string
+  name: string,
+  telephone: string
 }
 ```
 
