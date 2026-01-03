@@ -2,6 +2,7 @@ package marcomanfrin.atixbackend.DTO.tickets;
 
 import marcomanfrin.atixbackend.enums.TicketStatus;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 public record TicketResponse(
@@ -10,6 +11,7 @@ public record TicketResponse(
         UUID orderNumberId,
         String name,
         String description,
-        TicketStatus status
+        TicketStatus status,
+        LocalDateTime createdAt
 ) {
 }

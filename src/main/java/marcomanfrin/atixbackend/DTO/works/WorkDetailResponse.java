@@ -23,6 +23,7 @@ public record WorkDetailResponse(
         LocalDate expectedStartDate,
         boolean completed,
         LocalDateTime completedAt,
+        LocalDateTime createdAt,
         boolean invoiced,
         LocalDateTime invoicedAt,
         PlantResponse plant,

@@ -135,7 +135,8 @@ public class TicketService implements ITicketService {
                 ticket.getOrderNumber() != null ? ticket.getOrderNumber().getId() : null,
                 ticket.getName(),
                 ticket.getDescription(),
-                ticket.getStatus()
+                ticket.getStatus(),
+                ticket.getCreatedAt()
         );
     }
 }

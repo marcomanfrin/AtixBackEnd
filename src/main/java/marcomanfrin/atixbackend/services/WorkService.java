@@ -350,6 +350,7 @@ public class WorkService implements IWorkService {
                 work.getExpectedStartDate(),
                 work.isCompleted(),
                 work.getCompletedAt(),
+                work.getCreatedAt(),
                 work.isInvoiced(),
                 work.getInvoicedAt(),
                 work.getPlant() != null ? toPlantResponse(work.getPlant()) : null,
@@ -434,7 +435,8 @@ public class WorkService implements IWorkService {
                 ticket.getOrderNumber() != null ? ticket.getOrderNumber().getId() : null,
                 ticket.getName(),
                 ticket.getDescription(),
-                ticket.getStatus()
+                ticket.getStatus(),
+                ticket.getCreatedAt()
         );
     }
 }
