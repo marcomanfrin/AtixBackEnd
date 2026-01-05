@@ -1,10 +1,9 @@
 package marcomanfrin.atixbackend.DTO.workReports;
 
 import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.UUID;
 
 public record WorkReportEntryUpdateRequest(
@@ -13,6 +12,8 @@ public record WorkReportEntryUpdateRequest(
         String description,
 
         @DecimalMin(value = "0.0", inclusive = false, message = "Hours must be greater than 0")
-        BigDecimal hours
+        BigDecimal hours,
+
+        LocalDate date
 ) {
 }

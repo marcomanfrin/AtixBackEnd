@@ -96,7 +96,8 @@ AtixBackEnd is an enterprise-grade backend system designed to manage technical o
 
 ### 5. Work Report Management
 - Automatic work report creation for each work order
-- Add time-tracking entries with descriptions
+- Add time-tracking entries with descriptions and dates
+- Date field (optional on creation, defaults to today if not provided)
 - Update and delete report entries
 - Technician-specific access controls
 
