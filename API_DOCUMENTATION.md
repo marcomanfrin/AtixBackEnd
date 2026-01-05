@@ -354,19 +354,20 @@ Crea un nuovo lavoro.
 - `bidNumber`: stringa
 - `orderNumber`: stringa
 - `orderDate`: data (formato ISO: YYYY-MM-DD)
-- `atixClientId`: UUID
-- `nasSubDirectory`: stringa
 
 **Campi opzionali:**
-- `sellerId`: UUID
-- `electricalSchemaProgression`: 0-100
-- `programmingProgression`: 0-100
-- `expectedStartDate`: data
-- `plantId`: UUID
-- `finalClientId`: UUID
-- `expectedOfficeHours`: numero
-- `expectedPlantHours`: numero
-- `ticketId`: UUID
+- `description`: stringa - Descrizione del lavoro
+- `sellerId`: UUID - ID del venditore
+- `electricalSchemaProgression`: 0-100 - Progressione schema elettrico
+- `programmingProgression`: 0-100 - Progressione programmazione
+- `expectedStartDate`: data - Data inizio prevista
+- `plantId`: UUID - ID dell'impianto
+- `atixClientId`: UUID - ID cliente Atix
+- `finalClientId`: UUID - ID cliente finale
+- `nasSubDirectory`: stringa - Sottocartella NAS
+- `expectedOfficeHours`: numero - Ore ufficio previste
+- `expectedPlantHours`: numero - Ore impianto previste
+- `ticketId`: UUID - ID ticket associato
 
 **Response 201:**
 ```json
@@ -1273,26 +1274,26 @@ Elimina un allegato.
 ```typescript
 {
   id: string (UUID)
-  name: string
+  name: string                                    // Obbligatorio
   description?: string
-  bidNumber: string
+  bidNumber: string                               // Obbligatorio
   seller?: UserSummary
-  orderNumber: string
-  orderDate: string (ISO date)
-  electricalSchemaProgression: number (0-100)
-  programmingProgression: number (0-100)
+  orderNumber: string                             // Obbligatorio
+  orderDate: string (ISO date)                    // Obbligatorio
+  electricalSchemaProgression?: number (0-100)    // Opzionale
+  programmingProgression?: number (0-100)         // Opzionale
   expectedStartDate?: string (ISO date)
-  completed: boolean
+  completed?: boolean                             // Opzionale
   completedAt?: string (ISO datetime)
-  createdAt: string (ISO datetime)
-  invoiced: boolean
+  createdAt?: string (ISO datetime)               // Opzionale
+  invoiced?: boolean                              // Opzionale
   invoicedAt?: string (ISO datetime)
   plant?: Plant
-  atixClient: Client
+  atixClient?: Client                             // Opzionale
   finalClient?: Client
   worksiteReferenceAssignments: WorksiteReferenceAssignment[]
   assignedTechnicians: WorkAssignment[]
-  nasSubDirectory: string
+  nasSubDirectory?: string                        // Opzionale
   expectedOfficeHours?: number
   expectedPlantHours?: number
   ticket?: Ticket
@@ -1303,15 +1304,15 @@ Elimina un allegato.
 ```typescript
 {
   id: string (UUID)
-  name: string
-  bidNumber: string
-  orderNumber: string
-  orderDate: string (ISO date)
-  completed: boolean
-  invoiced: boolean
-  electricalSchemaProgression: number (0-100)
-  programmingProgression: number (0-100)
-  nasSubDirectory: string
+  name: string                                    // Obbligatorio
+  bidNumber: string                               // Obbligatorio
+  orderNumber: string                             // Obbligatorio
+  orderDate: string (ISO date)                    // Obbligatorio
+  completed?: boolean                             // Opzionale
+  invoiced?: boolean                              // Opzionale
+  electricalSchemaProgression?: number (0-100)    // Opzionale
+  programmingProgression?: number (0-100)         // Opzionale
+  nasSubDirectory?: string                        // Opzionale
   relatedPlantNasDirectory?: string
   expectedStartDate?: string (ISO date)
   plant?: Plant
@@ -1519,5 +1520,11 @@ I messaggi di errore di validazione sono in italiano e provengono direttamente d
 
 ---
 
-**Ultima modifica:** 2026-01-03
+**Ultima modifica:** 2026-01-05
 **Versione API:** 1.0
+
+## Changelog
+
+### 2026-01-05
+- **Lavori (Works)**: Modificati i campi obbligatori. Solo `name`, `orderNumber`, `bidNumber` e `orderDate` sono ora obbligatori
+- Resi opzionali: `atixClientId`, `nasSubDirectory`, `electricalSchemaProgression`, `programmingProgression`, `completed`, `invoiced`

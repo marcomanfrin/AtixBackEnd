@@ -35,12 +35,10 @@ public record WorkRequest(
 
         UUID plantId,
 
-        @NotNull(message = "Atix client ID is required")
         UUID atixClientId,
 
         UUID finalClientId,
 
-        @NotBlank(message = "NAS subdirectory is required")
         String nasSubDirectory,
 
         Integer expectedOfficeHours,
