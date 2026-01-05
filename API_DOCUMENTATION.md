@@ -973,6 +973,7 @@ Ottiene il report di un lavoro specifico.
       "reportId": "550e8400-e29b-41d4-a716-446655440000",
       "description": "Installazione quadro elettrico",
       "hours": 8.00,
+      "date": "2024-01-15",
       "technicianId": "123e4567-e89b-12d3-a456-426614174000",
       "technicianName": "Mario Rossi"
     }
@@ -992,9 +993,16 @@ Crea una nuova voce nel report di lavoro.
 {
   "workId": "550e8400-e29b-41d4-a716-446655440000",
   "description": "Installazione quadro elettrico",
-  "hours": 8.0
+  "hours": 8.0,
+  "date": "2024-01-15"
 }
 ```
+
+**Validazioni:**
+- `workId`: UUID, obbligatorio
+- `description`: stringa, obbligatorio
+- `hours`: numero decimale > 0, obbligatorio
+- `date`: data (formato ISO: YYYY-MM-DD), opzionale - se non fornita, viene usata la data odierna
 
 **Response 201:**
 ```json
@@ -1003,6 +1011,7 @@ Crea una nuova voce nel report di lavoro.
   "reportId": "550e8400-e29b-41d4-a716-446655440000",
   "description": "Installazione quadro elettrico",
   "hours": 8.0,
+  "date": "2024-01-15",
   "technicianId": "123e4567-e89b-12d3-a456-426614174000",
   "technicianName": "Mario Rossi"
 }
@@ -1022,7 +1031,8 @@ Aggiorna una voce del report.
 ```json
 {
   "description": "Descrizione aggiornata",
-  "hours": 10.5
+  "hours": 10.5,
+  "date": "2024-01-16"
 }
 ```
 
@@ -1033,6 +1043,7 @@ Aggiorna una voce del report.
   "reportId": "550e8400-e29b-41d4-a716-446655440000",
   "description": "Descrizione aggiornata",
   "hours": 10.5,
+  "date": "2024-01-16",
   "technicianId": "123e4567-e89b-12d3-a456-426614174000",
   "technicianName": "Mario Rossi"
 }
@@ -1056,6 +1067,7 @@ Ottiene tutte le voci del report per un lavoro.
     "reportId": "550e8400-e29b-41d4-a716-446655440000",
     "description": "Installazione quadro elettrico",
     "hours": 8.0,
+    "date": "2024-01-15",
     "technicianId": "123e4567-e89b-12d3-a456-426614174000",
     "technicianName": "Mario Rossi"
   }
@@ -1373,6 +1385,7 @@ Elimina un allegato.
   id: string (UUID),
   description: string,
   hours: number (decimal),
+  date: string (ISO date),      // Obbligatorio - default: today
   technicianId: string (UUID),
   technicianName: string
 }
@@ -1528,3 +1541,4 @@ I messaggi di errore di validazione sono in italiano e provengono direttamente d
 ### 2026-01-05
 - **Lavori (Works)**: Modificati i campi obbligatori. Solo `name`, `orderNumber`, `bidNumber` e `orderDate` sono ora obbligatori
 - Resi opzionali: `atixClientId`, `nasSubDirectory`, `electricalSchemaProgression`, `programmingProgression`, `completed`, `invoiced`
+- **Report Lavori (WorkReportEntry)**: Aggiunto campo `date` obbligatorio nell'entità, opzionale nel DTO di creazione (default: data odierna se non fornita)

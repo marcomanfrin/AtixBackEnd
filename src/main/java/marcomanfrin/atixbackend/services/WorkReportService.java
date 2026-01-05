@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -63,11 +64,13 @@ public class WorkReportService implements IWorkReportService {
                     return workReportRepository.save(newReport);
                 });
 
-        // Create entry
+        // Create entry - use provided date or default to today
+        LocalDate entryDate = (request.date() != null) ? request.date() : LocalDate.now();
         WorkReportEntry entry = new WorkReportEntry(
                 workReport,
                 request.description(),
                 request.hours(),
+                entryDate,
                 technicianUser
         );
 
@@ -91,6 +94,9 @@ public class WorkReportService implements IWorkReportService {
         }
         if (request.hours() != null) {
             entry.setHours(request.hours());
+        }
+        if (request.date() != null) {
+            entry.setDate(request.date());
         }
 
         WorkReportEntry updatedEntry = workReportEntryRepository.save(entry);
@@ -165,6 +171,7 @@ public class WorkReportService implements IWorkReportService {
                 entry.getReport().getId(),
                 entry.getDescription(),
                 entry.getHours(),
+                entry.getDate(),
                 entry.getTechnician() != null ? entry.getTechnician().getId() : null,
                 entry.getTechnician() != null ? entry.getTechnician().getFirstName() + " " + entry.getTechnician().getLastName() : null
         );
