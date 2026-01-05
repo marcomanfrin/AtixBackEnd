@@ -382,6 +382,14 @@ A complete Postman collection is included in the repository:
 - `POST /works/{id}/assign-technician` - Assign technician
 - `POST /works/{id}/add-reference` - Add worksite reference
 
+**Required Fields for Work Creation:**
+- `name` - Work order name (2-100 characters)
+- `orderNumber` - Order number
+- `bidNumber` - Bid/tender number
+- `orderDate` - Order date
+
+All other fields are optional including: description, seller, electrical/programming progression, expected dates, plant, clients, NAS subdirectory, and expected hours.
+
 **Work Filters:**
 - `atixClientId`, `finalClientId`, `anyClientId`
 - `sellerId`, `plantId`, `assignedTechnicianId`

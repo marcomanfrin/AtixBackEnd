@@ -38,29 +38,29 @@ public class Work {
     @Column(nullable = false)
     private LocalDate orderDate;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     @Min(0)
     @Max(100)
-    private int electricalSchemaProgression = 0;
+    private Integer electricalSchemaProgression = 0;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     @Min(0)
     @Max(100)
-    private int programmingProgression = 0;
+    private Integer programmingProgression = 0;
 
     @Column(nullable = true)
     private LocalDate expectedStartDate;
 
-    @Column(nullable = false)
-    private boolean completed = false;
+    @Column(nullable = true)
+    private Boolean completed = false;
     @Column(nullable = true)
     private LocalDateTime completedAt;
 
-    @Column(nullable = false, updatable = false)
+    @Column(nullable = true, updatable = false)
     private LocalDateTime createdAt;
 
     @Column(nullable = true)
-    private boolean invoiced = false;
+    private Boolean invoiced = false;
     @Column(nullable = true)
     private LocalDateTime invoicedAt;
 
@@ -79,7 +79,7 @@ public class Work {
     @OneToMany(mappedBy = "work", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<WorksiteReferenceAssignment> worksiteReferenceAssignments = new ArrayList<>();
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String nasSubDirectory;
 
     private int expectedOfficeHours;

@@ -93,10 +93,12 @@ public class WorkService implements IWorkService {
             work.setPlant(plant);
         }
 
-        // Set Atix client (required)
-        Client atixClient = clientRepository.findById(request.atixClientId())
-                .orElseThrow(() -> new NotFoundException("Atix client not found"));
-        work.setAtixClient(atixClient);
+        // Set Atix client (optional)
+        if (request.atixClientId() != null) {
+            Client atixClient = clientRepository.findById(request.atixClientId())
+                    .orElseThrow(() -> new NotFoundException("Atix client not found"));
+            work.setAtixClient(atixClient);
+        }
 
         // Set final client (optional)
         if (request.finalClientId() != null) {
@@ -383,8 +385,8 @@ public class WorkService implements IWorkService {
                 work.getBidNumber(),
                 work.getOrderNumber(),
                 work.getOrderDate(),
-                work.isCompleted(),
-                work.isInvoiced(),
+                Boolean.TRUE.equals(work.isCompleted()),
+                Boolean.TRUE.equals(work.isInvoiced()),
                 work.getElectricalSchemaProgression(),
                 work.getProgrammingProgression(),
                 work.getNasSubDirectory(),
@@ -410,10 +412,10 @@ public class WorkService implements IWorkService {
                 work.getElectricalSchemaProgression(),
                 work.getProgrammingProgression(),
                 work.getExpectedStartDate(),
-                work.isCompleted(),
+                Boolean.TRUE.equals(work.isCompleted()),
                 work.getCompletedAt(),
                 work.getCreatedAt(),
-                work.isInvoiced(),
+                Boolean.TRUE.equals(work.isInvoiced()),
                 work.getInvoicedAt(),
                 work.getPlant() != null ? toPlantResponse(work.getPlant()) : null,
                 work.getAtixClient() != null ? toClientResponse(work.getAtixClient()) : null,
