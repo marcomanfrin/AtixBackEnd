@@ -141,7 +141,7 @@ AtixBackEnd is an enterprise-grade backend system designed to manage technical o
 
 ## Database Schema
 
-The application uses **15 entities** mapped to **14-15 database tables**:
+The application uses **12 entities** mapped to **12 database tables**:
 
 ### Core Entities
 1. **User** (users) - Base entity with SINGLE_TABLE inheritance
