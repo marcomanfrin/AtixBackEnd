@@ -1,5 +1,6 @@
 package marcomanfrin.atixbackend.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import marcomanfrin.atixbackend.enums.AttachmentType;
 import org.hibernate.validator.constraints.URL;
@@ -35,6 +36,7 @@ public class Attachment {
     private LocalDateTime uploadedAt;
 
     @OneToMany(mappedBy = "attachment", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<AttachmentLink> links = new ArrayList<>();
 
     public Attachment() {}
