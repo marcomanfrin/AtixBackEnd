@@ -31,7 +31,7 @@ public class WorkReportEntry {
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal hours = BigDecimal.ZERO;
 
-    @Column(nullable = true) // TODO: set to false
+    @Column(nullable = false) // TODO: set to false
     private LocalDate date;
 
     public WorkReportEntry() {}
