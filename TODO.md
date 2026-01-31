@@ -80,15 +80,6 @@ Opzione A: Aggiungere INVOICED all'enum WorkStatus → workflow lineare semplice
 Opzione B: Mantenere invoiced come boolean separato → permette "CLOSED ma non fatturato"
 
 Backward compatibility: elimina i booleani e non lasciare il vecchio codicre
-Lavori esistenti hanno solo completed e invoiced booleani
-Serve migrazione dati o logica di conversione:
-completed=false, invoiced=false → SCHEDULED o IN_PROGRESS?
-completed=true, invoiced=false → CLOSED
-completed=true, invoiced=true → INVOICED
-Sincronizzazione Ticket:
-Verificare se un ticket può essere associato a più lavori -> NO
-Gestire caso in cui ticket viene aggiornato manualmente (bypass del workflow automatico)
-
 Stati Workflow Lavoro
 
 SCHEDULED - Lavoro programmato (stato iniziale)
@@ -172,7 +163,6 @@ Autorizzazioni per Endpoint
 EndpointAutorizzazione Richiesta/startUSER, ADMIN, OWNER/closeTECHNICIAN, OWNER/invoiceADMINISTRATION, OWNER/reopenADMIN, OWNER/force-statusOWNER only
 Note Importanti
 
-⚠️ INVOICED è uno stato finale PERMANENTE - neanche OWNER può fare rollback
 ✅ OWNER può forzare qualsiasi altra transizione
 ✅ Permissive mode consente edge cases (es: SCHEDULED → CLOSED)
 
