@@ -77,6 +77,19 @@ ATIX, FINAL
 WORK, PLANT, TICKET, REPORT
 ```
 
+### WorkStatus
+```
+SCHEDULED, IN_PROGRESS, CLOSED, INVOICED
+```
+
+**Transizioni consentite (standard):**
+- `SCHEDULED` → `IN_PROGRESS`
+- `IN_PROGRESS` → `CLOSED`, `SCHEDULED` (rollback)
+- `CLOSED` → `INVOICED`, `IN_PROGRESS` (rollback)
+- `INVOICED` → (nessuna, stato finale)
+
+**Nota:** Gli utenti con ruolo `OWNER` possono forzare qualsiasi transizione tranne quelle che partono da `INVOICED`.
+
 ### WorksiteReferenceRole
 ```
 PLUMBER, ELECTRICIAN
@@ -390,11 +403,9 @@ Crea un nuovo lavoro.
   "electricalSchemaProgression": 0,
   "programmingProgression": 0,
   "expectedStartDate": "2024-02-01",
-  "completed": false,
-  "completedAt": null,
+  "status": "SCHEDULED",
+  "statusChangedAt": "2024-01-15T10:30:00",
   "createdAt": "2024-01-15T10:30:00",
-  "invoiced": false,
-  "invoicedAt": null,
   "plant": {
     "id": "660e8400-e29b-41d4-a716-446655440000",
     "name": "Impianto Centrale"
@@ -433,8 +444,8 @@ Ottiene la lista dei lavori con paginazione e filtri opzionali.
 - `plantId`: UUID - Filtra per impianto
 - `ticketId`: UUID - Filtra per ticket
 - `technicianId`: UUID - Filtra per tecnico assegnato
-- `completed`: boolean - Filtra per stato completamento
-- `invoiced`: boolean - Filtra per stato fatturazione
+- `status`: WorkStatus - Filtra per stato singolo (SCHEDULED, IN_PROGRESS, CLOSED, INVOICED)
+- `statuses`: WorkStatus[] - Filtra per stati multipli (es: `statuses=SCHEDULED&statuses=IN_PROGRESS`)
 - `orderDateFrom`: date (YYYY-MM-DD) - Data ordine da
 - `orderDateTo`: date (YYYY-MM-DD) - Data ordine a
 - `expectedStartDateFrom`: date (YYYY-MM-DD) - Data inizio prevista da
@@ -456,8 +467,7 @@ Ottiene la lista dei lavori con paginazione e filtri opzionali.
       "bidNumber": "BID-2024-001",
       "orderNumber": "ORD-2024-001",
       "orderDate": "2024-01-15",
-      "completed": false,
-      "invoiced": false,
+      "status": "SCHEDULED",
       "electricalSchemaProgression": 25,
       "programmingProgression": 10,
       "nasSubDirectory": "/projects/office-a",
@@ -547,27 +557,100 @@ Aggiorna un lavoro esistente.
 
 ---
 
-#### PATCH `/works/{id}/close`
-Chiude un lavoro (marca come completato).
+#### PATCH `/works/{id}/start`
+Avvia un lavoro (transizione SCHEDULED → IN_PROGRESS).
 
-**Autenticazione richiesta:** ✅ Sì (TECHNICIAN)
+**Autenticazione richiesta:** ✅ Sì (USER, ADMIN o OWNER)
 
 **Parametri URL:**
 - `id`: UUID del lavoro
 
 **Response 204:** No Content
+
+**Errori:**
+- `404 Not Found`: Lavoro non trovato
+- `409 Conflict`: Transizione di stato non valida
+
+**Nota:** Se il lavoro ha un ticket associato, il ticket verrà automaticamente impostato su IN_PROGRESS.
+
+---
+
+#### PATCH `/works/{id}/close`
+Chiude un lavoro (transizione → CLOSED).
+
+**Autenticazione richiesta:** ✅ Sì (USER, ADMIN o OWNER)
+
+**Parametri URL:**
+- `id`: UUID del lavoro
+
+**Response 204:** No Content
+
+**Errori:**
+- `404 Not Found`: Lavoro non trovato
+- `409 Conflict`: Transizione di stato non valida
+
+**Nota:** Se il lavoro ha un ticket associato, il ticket verrà automaticamente impostato su RESOLVED.
 
 ---
 
 #### PATCH `/works/{id}/invoice`
-Marca un lavoro come fatturato.
+Marca un lavoro come fatturato (transizione CLOSED → INVOICED).
 
-**Autenticazione richiesta:** ✅ Sì (ADMINISTRATION)
+**Autenticazione richiesta:** ✅ Sì (ADMIN o OWNER)
 
 **Parametri URL:**
 - `id`: UUID del lavoro
 
 **Response 204:** No Content
+
+**Errori:**
+- `404 Not Found`: Lavoro non trovato
+- `409 Conflict`: Transizione di stato non valida
+
+**Nota:** Se il lavoro ha un ticket associato, il ticket verrà automaticamente impostato su CLOSED.
+
+---
+
+#### PATCH `/works/{id}/reopen`
+Riapre un lavoro (transizione → IN_PROGRESS).
+
+**Autenticazione richiesta:** ✅ Sì (ADMIN o OWNER)
+
+**Parametri URL:**
+- `id`: UUID del lavoro
+
+**Response 204:** No Content
+
+**Errori:**
+- `404 Not Found`: Lavoro non trovato
+- `409 Conflict`: Transizione di stato non valida
+
+**Nota:** Se il lavoro ha un ticket associato, il ticket verrà automaticamente impostato su IN_PROGRESS.
+
+---
+
+#### PATCH `/works/{id}/force-status`
+Forza il cambio di stato di un lavoro (solo OWNER). Può effettuare qualsiasi transizione tranne quelle che partono da INVOICED.
+
+**Autenticazione richiesta:** ✅ Sì (OWNER)
+
+**Parametri URL:**
+- `id`: UUID del lavoro
+
+**Request Body:**
+```json
+{
+  "status": "IN_PROGRESS"
+}
+```
+
+**Response 204:** No Content
+
+**Errori:**
+- `404 Not Found`: Lavoro non trovato
+- `409 Conflict`: Transizione di stato non valida (es. da INVOICED)
+
+**Nota:** Il ticket associato verrà sincronizzato automaticamente in base al nuovo stato del lavoro.
 
 ---
 
@@ -1295,11 +1378,9 @@ Elimina un allegato.
   electricalSchemaProgression?: number (0-100)    // Opzionale
   programmingProgression?: number (0-100)         // Opzionale
   expectedStartDate?: string (ISO date)
-  completed?: boolean                             // Opzionale
-  completedAt?: string (ISO datetime)
+  status: "SCHEDULED" | "IN_PROGRESS" | "CLOSED" | "INVOICED"
+  statusChangedAt?: string (ISO datetime)
   createdAt?: string (ISO datetime)               // Opzionale
-  invoiced?: boolean                              // Opzionale
-  invoicedAt?: string (ISO datetime)
   plant?: Plant
   atixClient?: Client                             // Opzionale
   finalClient?: Client
@@ -1320,8 +1401,7 @@ Elimina un allegato.
   bidNumber: string                               // Obbligatorio
   orderNumber: string                             // Obbligatorio
   orderDate: string (ISO date)                    // Obbligatorio
-  completed?: boolean                             // Opzionale
-  invoiced?: boolean                              // Opzionale
+  status: "SCHEDULED" | "IN_PROGRESS" | "CLOSED" | "INVOICED"
   electricalSchemaProgression?: number (0-100)    // Opzionale
   programmingProgression?: number (0-100)         // Opzionale
   nasSubDirectory?: string                        // Opzionale
@@ -1436,6 +1516,7 @@ Elimina un allegato.
 - **401 Unauthorized**: Non autenticato
 - **403 Forbidden**: Non autorizzato (ruolo insufficiente)
 - **404 Not Found**: Risorsa non trovata
+- **409 Conflict**: Transizione di stato non valida / Vincolo dati violato
 - **500 Internal Server Error**: Errore del server
 
 ---
@@ -1533,10 +1614,22 @@ I messaggi di errore di validazione sono in italiano e provengono direttamente d
 
 ---
 
-**Ultima modifica:** 2026-01-05
-**Versione API:** 1.0
+**Ultima modifica:** 2026-01-31
+**Versione API:** 1.1
 
 ## Changelog
+
+### 2026-01-31
+- **Lavori (Works)**: Implementato workflow con stati (SCHEDULED → IN_PROGRESS → CLOSED → INVOICED)
+  - Rimossi campi `completed`, `completedAt`, `invoiced`, `invoicedAt`
+  - Aggiunti campi `status` (WorkStatus) e `statusChangedAt`
+  - Nuovo endpoint `PATCH /works/{id}/start` - Avvia un lavoro
+  - Nuovo endpoint `PATCH /works/{id}/reopen` - Riapre un lavoro
+  - Nuovo endpoint `PATCH /works/{id}/force-status` - Forza cambio stato (solo OWNER)
+  - Aggiornati endpoint `/close` e `/invoice` con validazione transizioni di stato
+  - Sincronizzazione automatica stato ticket: Work→Ticket (SCHEDULED→OPEN, IN_PROGRESS→IN_PROGRESS, CLOSED→RESOLVED, INVOICED→CLOSED)
+  - Filtri aggiornati: `completed`/`invoiced` sostituiti con `status`/`statuses`
+  - Nuovo codice errore 409 Conflict per transizioni non valide
 
 ### 2026-01-05
 - **Lavori (Works)**: Modificati i campi obbligatori. Solo `name`, `orderNumber`, `bidNumber` e `orderDate` sono ora obbligatori

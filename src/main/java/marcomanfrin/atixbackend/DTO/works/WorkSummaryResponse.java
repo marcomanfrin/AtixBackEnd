@@ -2,6 +2,7 @@ package marcomanfrin.atixbackend.DTO.works;
 
 import marcomanfrin.atixbackend.DTO.clients.ClientResponse;
 import marcomanfrin.atixbackend.DTO.plants.PlantResponse;
+import marcomanfrin.atixbackend.enums.WorkStatus;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -13,8 +14,7 @@ public record WorkSummaryResponse(
         String bidNumber,
         String orderNumber,
         LocalDate orderDate,
-        Boolean completed,
-        Boolean invoiced,
+        WorkStatus status,
         Integer electricalSchemaProgression,
         Integer programmingProgression,
         String nasSubDirectory,

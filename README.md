@@ -81,11 +81,13 @@ AtixBackEnd is an enterprise-grade backend system designed to manage technical o
 - Create and manage work orders
 - Link works to clients (both Atix client and final client)
 - Assign plants to work orders
-- Work order statuses (pending, in progress, completed)
-- Invoice tracking
+- Work status workflow: SCHEDULED → IN_PROGRESS → CLOSED → INVOICED
+- State machine validation with rollback support (IN_PROGRESS→SCHEDULED, CLOSED→IN_PROGRESS)
+- OWNER can force any status transition (except from INVOICED)
+- Automatic ticket status synchronization when work status changes
 - Assign multiple technicians to work orders
 - Add worksite references to work orders
-- Advanced filtering (by client, seller, plant, technician, date ranges, completion status, etc.)
+- Advanced filtering (by client, seller, plant, technician, date ranges, status, etc.)
 
 ### 4. Ticketing System
 - Create support tickets
@@ -378,8 +380,11 @@ A complete Postman collection is included in the repository:
 - `GET /works` - Get all works (paginated, with filters)
 - `GET /works/{id}` - Get work details
 - `PATCH /works/{id}` - Update work
-- `PATCH /works/{id}/close` - Mark work as completed
-- `PATCH /works/{id}/invoice` - Mark work as invoiced
+- `PATCH /works/{id}/start` - Start work (SCHEDULED → IN_PROGRESS)
+- `PATCH /works/{id}/close` - Close work (→ CLOSED)
+- `PATCH /works/{id}/invoice` - Invoice work (CLOSED → INVOICED)
+- `PATCH /works/{id}/reopen` - Reopen work (→ IN_PROGRESS)
+- `PATCH /works/{id}/force-status` - Force status change (OWNER only)
 - `POST /works/{id}/assign-technician` - Assign technician
 - `POST /works/{id}/add-reference` - Add worksite reference
 
@@ -392,10 +397,10 @@ A complete Postman collection is included in the repository:
 All other fields are optional including: description, seller, electrical/programming progression, expected dates, plant, clients, NAS subdirectory, and expected hours.
 
 **Work Filters:**
-- `atixClientId`, `finalClientId`, `anyClientId`
-- `sellerId`, `plantId`, `assignedTechnicianId`
-- `completed`, `invoiced`
-- `orderDateAfter`, `orderDateBefore`
+- `atixClientId`, `finalClientId`, `clientId` (searches both)
+- `sellerId`, `plantId`, `technicianId`
+- `status` (single), `statuses` (multiple)
+- `orderDateFrom`, `orderDateTo`, `expectedStartDateFrom`, `expectedStartDateTo`
 - `name`, `bidNumber`, `orderNumber`
 
 #### Tickets
@@ -490,8 +495,9 @@ Independent from roles, users have **3 types** based on their job function:
 - Only **ADMIN** and **OWNER** can create users
 - Only **OWNER** can delete resources
 - Users can only update their own profile/password
-- Only **Technicians** can close work orders
-- Only **Administrative** users can mark works as invoiced
+- **USER**, **ADMIN**, and **OWNER** can start and close work orders
+- Only **ADMIN** and **OWNER** can invoice and reopen work orders
+- Only **OWNER** can force status transitions on work orders
 
 ---
 
@@ -510,25 +516,27 @@ Independent from roles, users have **3 types** based on their job function:
 ```graphql
 query {
   dashboardSummary(limit: 5) {
-    clientCount
-    plantCount
-    completedWorkCount
-    pendingWorkCount
-    ticketStatusCounts {
+    clientsCount
+    plantsCount
+    completedWorksCount
+    pendingWorksCount
+    worksByStatus {
       status
       count
     }
-    recentWorks {
-      id
-      name
-      orderDate
-      completed
-      invoiced
+    ticketsByStatus {
+      status
+      count
     }
-    recentTickets {
+    lastWorks {
       id
       name
-      senderEmail
+      status
+      createdAt
+    }
+    lastTickets {
+      id
+      name
       status
       createdAt
     }

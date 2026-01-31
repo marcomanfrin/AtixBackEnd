@@ -3,6 +3,7 @@ package marcomanfrin.atixbackend.services;
 import marcomanfrin.atixbackend.DTO.dashboard.*;
 import marcomanfrin.atixbackend.ServiceInterfaces.IDashboardService;
 import marcomanfrin.atixbackend.enums.TicketStatus;
+import marcomanfrin.atixbackend.enums.WorkStatus;
 import marcomanfrin.atixbackend.repositories.ClientRepository;
 import marcomanfrin.atixbackend.repositories.PlantRepository;
 import marcomanfrin.atixbackend.repositories.TicketRepository;
@@ -38,8 +39,12 @@ public class DashboardService implements IDashboardService {
         int clientsCount = (int) clientRepository.count();
         int plantsCount = (int) plantRepository.count();
 
-        int completedWorksCount = (int) workRepository.countByCompleted(true);
-        int pendingWorksCount = (int) workRepository.countByCompleted(false);
+        int completedWorksCount = (int) workRepository.countCompleted();
+        int pendingWorksCount = (int) workRepository.countPending();
+
+        List<WorkStatusCountDTO> worksByStatus = Arrays.stream(WorkStatus.values())
+                .map(s -> new WorkStatusCountDTO(s, (int) workRepository.countByStatus(s)))
+                .toList();
 
         List<TicketStatusCountDTO> ticketsByStatus = Arrays.stream(TicketStatus.values())
                 .map(s -> new TicketStatusCountDTO(s, (int) ticketRepository.countByStatus(s)))
@@ -48,7 +53,7 @@ public class DashboardService implements IDashboardService {
         var page = PageRequest.of(0, limit);
 
         List<WorkPreviewDTO> lastWorks = workRepository.findAllByOrderByCreatedAtDesc(page).stream()
-                .map(w -> new WorkPreviewDTO(w.getId(), w.getName(), w.isCompleted(), w.getCreatedAt()))
+                .map(w -> new WorkPreviewDTO(w.getId(), w.getName(), w.getStatus(), w.getCreatedAt()))
                 .toList();
 
         List<TicketPreviewDTO> lastTickets = ticketRepository.findAllByOrderByCreatedAtDesc(page).stream()
@@ -60,6 +65,7 @@ public class DashboardService implements IDashboardService {
                 plantsCount,
                 completedWorksCount,
                 pendingWorksCount,
+                worksByStatus,
                 ticketsByStatus,
                 lastWorks,
                 lastTickets

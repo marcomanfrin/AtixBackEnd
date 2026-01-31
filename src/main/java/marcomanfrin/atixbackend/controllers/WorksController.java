@@ -1,12 +1,9 @@
 package marcomanfrin.atixbackend.controllers;
 
 import jakarta.validation.Valid;
-import marcomanfrin.atixbackend.DTO.works.AddWorksiteReferenceRequest;
-import marcomanfrin.atixbackend.DTO.works.AssignTechnicianRequest;
-import marcomanfrin.atixbackend.DTO.works.WorkDetailResponse;
-import marcomanfrin.atixbackend.DTO.works.WorkRequest;
-import marcomanfrin.atixbackend.DTO.works.WorkSummaryResponse;
-import marcomanfrin.atixbackend.DTO.works.WorkUpdateRequest;
+import marcomanfrin.atixbackend.DTO.works.*;
+import marcomanfrin.atixbackend.entities.users.User;
+import marcomanfrin.atixbackend.enums.WorkStatus;
 import marcomanfrin.atixbackend.services.WorkService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,9 +11,11 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -43,8 +42,8 @@ public class WorksController {
             @RequestParam(required = false) UUID plantId,
             @RequestParam(required = false) UUID ticketId,
             @RequestParam(required = false) UUID technicianId,
-            @RequestParam(required = false) Boolean completed,
-            @RequestParam(required = false) Boolean invoiced,
+            @RequestParam(required = false) WorkStatus status,
+            @RequestParam(required = false) List<WorkStatus> statuses,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate orderDateFrom,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate orderDateTo,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate expectedStartDateFrom,
@@ -57,14 +56,14 @@ public class WorksController {
         // If any filter is provided, use filtered search
         if (clientId != null || atixClientId != null || finalClientId != null ||
             sellerId != null || plantId != null || ticketId != null || technicianId != null ||
-            completed != null || invoiced != null ||
+            status != null || (statuses != null && !statuses.isEmpty()) ||
             orderDateFrom != null || orderDateTo != null ||
             expectedStartDateFrom != null || expectedStartDateTo != null ||
             name != null || bidNumber != null || orderNumber != null) {
 
             Page<WorkSummaryResponse> works = workService.getFilteredWorks(
                     clientId, atixClientId, finalClientId, sellerId, plantId,
-                    ticketId, technicianId, completed, invoiced,
+                    ticketId, technicianId, status, statuses,
                     orderDateFrom, orderDateTo, expectedStartDateFrom, expectedStartDateTo,
                     name, bidNumber, orderNumber, pageable
             );
@@ -91,17 +90,46 @@ public class WorksController {
         return ResponseEntity.ok(work);
     }
 
+    @PatchMapping("/{id}/start")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'USER')")
+    public ResponseEntity<Void> startWork(@PathVariable UUID id, Authentication authentication) {
+        User user = (User) authentication.getPrincipal();
+        workService.startWork(id, user.getId(), user.getRole());
+        return ResponseEntity.noContent().build();
+    }
+
     @PatchMapping("/{id}/close")
-    // TODO: @PreAuthorize("@securityService.isTechnician(authentication)")
-    public ResponseEntity<Void> closeWork(@PathVariable UUID id) {
-        workService.closeWork(id);
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'USER')")
+    public ResponseEntity<Void> closeWork(@PathVariable UUID id, Authentication authentication) {
+        User user = (User) authentication.getPrincipal();
+        workService.closeWork(id, user.getId(), user.getRole());
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{id}/invoice")
-    // TODO: @PreAuthorize("@securityService.isAdministrative(authentication)")
-    public ResponseEntity<Void> invoiceWork(@PathVariable UUID id) {
-        workService.invoiceWork(id);
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    public ResponseEntity<Void> invoiceWork(@PathVariable UUID id, Authentication authentication) {
+        User user = (User) authentication.getPrincipal();
+        workService.invoiceWork(id, user.getId(), user.getRole());
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}/reopen")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    public ResponseEntity<Void> reopenWork(@PathVariable UUID id, Authentication authentication) {
+        User user = (User) authentication.getPrincipal();
+        workService.reopenWork(id, user.getId(), user.getRole());
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}/force-status")
+    @PreAuthorize("hasRole('OWNER')")
+    public ResponseEntity<Void> forceStatusChange(
+            @PathVariable UUID id,
+            @Valid @RequestBody ForceStatusRequest request,
+            Authentication authentication) {
+        User user = (User) authentication.getPrincipal();
+        workService.forceStatusChange(id, request.status(), user.getId(), user.getRole());
         return ResponseEntity.noContent().build();
     }
 

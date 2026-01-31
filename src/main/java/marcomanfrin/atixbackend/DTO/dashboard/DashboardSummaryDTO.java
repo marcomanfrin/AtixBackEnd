@@ -7,8 +7,8 @@ public record DashboardSummaryDTO(
         int plantsCount,
         int completedWorksCount,
         int pendingWorksCount,
+        List<WorkStatusCountDTO> worksByStatus,
         List<TicketStatusCountDTO> ticketsByStatus,
         List<WorkPreviewDTO> lastWorks,
         List<TicketPreviewDTO> lastTickets
 ) {}
-

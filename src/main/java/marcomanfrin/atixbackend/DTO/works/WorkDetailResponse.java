@@ -5,6 +5,7 @@ import marcomanfrin.atixbackend.DTO.plants.PlantResponse;
 import marcomanfrin.atixbackend.DTO.tickets.TicketResponse;
 import marcomanfrin.atixbackend.DTO.users.UserSummaryDTO;
 import marcomanfrin.atixbackend.DTO.worksiteReferences.WorksiteReferenceAssignmentResponse;
+import marcomanfrin.atixbackend.enums.WorkStatus;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -22,11 +23,9 @@ public record WorkDetailResponse(
         Integer electricalSchemaProgression,
         Integer programmingProgression,
         LocalDate expectedStartDate,
-        Boolean completed,
-        LocalDateTime completedAt,
+        WorkStatus status,
+        LocalDateTime statusChangedAt,
         LocalDateTime createdAt,
-        Boolean invoiced,
-        LocalDateTime invoicedAt,
         PlantResponse plant,
         ClientResponse atixClient,
         ClientResponse finalClient,

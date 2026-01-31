@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import marcomanfrin.atixbackend.entities.users.SellerUser;
+import marcomanfrin.atixbackend.enums.WorkStatus;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -51,18 +52,17 @@ public class Work {
     @Column(nullable = true)
     private LocalDate expectedStartDate;
 
-    @Column(nullable = true)
-    private Boolean completed = false;
-    @Column(nullable = true)
-    private LocalDateTime completedAt;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private WorkStatus status = WorkStatus.SCHEDULED;
+
+    private LocalDateTime statusChangedAt;
+
+    @Column(name = "status_changed_by")
+    private UUID statusChangedBy;
 
     @Column(nullable = true, updatable = false)
     private LocalDateTime createdAt;
-
-    @Column(nullable = true)
-    private Boolean invoiced = false;
-    @Column(nullable = true)
-    private LocalDateTime invoicedAt;
 
     @ManyToOne
     @JoinColumn(name = "plant_id")
@@ -100,46 +100,33 @@ public class Work {
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
+        if (this.statusChangedAt == null) {
+            this.statusChangedAt = LocalDateTime.now();
+        }
     }
 
-    private Work(String name,
-                 String bidNumber,
-                 SellerUser seller,
-                 String orderNumber,
-                 LocalDate orderDate,
-                 int electricalSchemaProgression,
-                 int programmingProgression,
-                 LocalDate expectedStartDate,
-                 boolean completed,
-                 LocalDateTime completedAt,
-                 boolean invoiced,
-                 LocalDateTime invoicedAt,
-                 Plant plant,
-                 Client atixClient,
-                 Client finalClient,
-                 String nasSubDirectory,
-                 int expectedOfficeHours,
-                 int expectedPlantHours) {
-        this.name = name;
-        this.bidNumber = bidNumber;
-        this.seller = seller;
-        this.orderNumber = orderNumber;
-        this.orderDate = orderDate;
-        this.electricalSchemaProgression = electricalSchemaProgression;
-        this.programmingProgression = programmingProgression;
-        this.expectedStartDate = expectedStartDate;
-        this.completed = completed;
-        this.completedAt = completedAt;
-        this.invoiced = invoiced;
-        this.invoicedAt = invoicedAt;
-        this.plant = plant;
-        this.atixClient = atixClient;
-        this.finalClient = finalClient;
-        this.nasSubDirectory = nasSubDirectory;
-        this.expectedOfficeHours = expectedOfficeHours;
-        this.expectedPlantHours = expectedPlantHours;
+    // Status helper methods
+    public boolean isScheduled() {
+        return this.status == WorkStatus.SCHEDULED;
     }
 
+    public boolean isInProgress() {
+        return this.status == WorkStatus.IN_PROGRESS;
+    }
+
+    public boolean isClosed() {
+        return this.status == WorkStatus.CLOSED;
+    }
+
+    public boolean isInvoiced() {
+        return this.status == WorkStatus.INVOICED;
+    }
+
+    public boolean isCompleted() {
+        return this.status == WorkStatus.CLOSED || this.status == WorkStatus.INVOICED;
+    }
+
+    // Getters and setters
     public UUID getId() {
         return id;
     }
@@ -207,36 +194,29 @@ public class Work {
         this.expectedStartDate = expectedStartDate;
     }
 
-    public boolean isCompleted() {
-        return completed;
+    public WorkStatus getStatus() {
+        return status;
     }
-    public void setCompleted(boolean completed) {
-        this.completed = completed;
+    public void setStatus(WorkStatus status) {
+        this.status = status;
     }
 
-    public LocalDateTime getCompletedAt() {
-        return completedAt;
+    public LocalDateTime getStatusChangedAt() {
+        return statusChangedAt;
     }
-    public void setCompletedAt(LocalDateTime completedAt) {
-        this.completedAt = completedAt;
+    public void setStatusChangedAt(LocalDateTime statusChangedAt) {
+        this.statusChangedAt = statusChangedAt;
+    }
+
+    public UUID getStatusChangedBy() {
+        return statusChangedBy;
+    }
+    public void setStatusChangedBy(UUID statusChangedBy) {
+        this.statusChangedBy = statusChangedBy;
     }
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
-    }
-
-    public boolean isInvoiced() {
-        return invoiced;
-    }
-    public void setInvoiced(boolean invoiced) {
-        this.invoiced = invoiced;
-    }
-
-    public LocalDateTime getInvoicedAt() {
-        return invoicedAt;
-    }
-    public void setInvoicedAt(LocalDateTime invoicedAt) {
-        this.invoicedAt = invoicedAt;
     }
 
     public Plant getPlant() {

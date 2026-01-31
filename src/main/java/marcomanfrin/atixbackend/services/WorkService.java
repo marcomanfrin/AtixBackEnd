@@ -16,6 +16,9 @@ import marcomanfrin.atixbackend.entities.*;
 import marcomanfrin.atixbackend.entities.users.SellerUser;
 import marcomanfrin.atixbackend.entities.users.TechnicianUser;
 import marcomanfrin.atixbackend.entities.users.User;
+import marcomanfrin.atixbackend.enums.TicketStatus;
+import marcomanfrin.atixbackend.enums.UserRole;
+import marcomanfrin.atixbackend.enums.WorkStatus;
 import marcomanfrin.atixbackend.enums.WorksiteReferenceRole;
 import marcomanfrin.atixbackend.exceptions.NotFoundException;
 import marcomanfrin.atixbackend.repositories.*;
@@ -28,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -41,6 +45,7 @@ public class WorkService implements IWorkService {
     private final WorksiteReferenceRepository worksiteReferenceRepository;
     private final WorkAssignmentRepository workAssignmentRepository;
     private final WorksiteReferenceAssignmentRepository worksiteReferenceAssignmentRepository;
+    private final WorkStateMachine stateMachine;
 
     public WorkService(WorkRepository workRepository,
                       UserRepository userRepository,
@@ -49,7 +54,8 @@ public class WorkService implements IWorkService {
                       TicketRepository ticketRepository,
                       WorksiteReferenceRepository worksiteReferenceRepository,
                       WorkAssignmentRepository workAssignmentRepository,
-                      WorksiteReferenceAssignmentRepository worksiteReferenceAssignmentRepository) {
+                      WorksiteReferenceAssignmentRepository worksiteReferenceAssignmentRepository,
+                      WorkStateMachine stateMachine) {
         this.workRepository = workRepository;
         this.userRepository = userRepository;
         this.clientRepository = clientRepository;
@@ -58,6 +64,7 @@ public class WorkService implements IWorkService {
         this.worksiteReferenceRepository = worksiteReferenceRepository;
         this.workAssignmentRepository = workAssignmentRepository;
         this.worksiteReferenceAssignmentRepository = worksiteReferenceAssignmentRepository;
+        this.stateMachine = stateMachine;
     }
 
     @Override
@@ -75,6 +82,8 @@ public class WorkService implements IWorkService {
         work.setNasSubDirectory(request.nasSubDirectory());
         work.setExpectedOfficeHours(request.expectedOfficeHours() != null ? request.expectedOfficeHours() : 0);
         work.setExpectedPlantHours(request.expectedPlantHours() != null ? request.expectedPlantHours() : 0);
+        work.setStatus(WorkStatus.SCHEDULED);
+        work.setStatusChangedAt(LocalDateTime.now());
 
         // Set seller
         if (request.sellerId() != null) {
@@ -133,8 +142,8 @@ public class WorkService implements IWorkService {
             UUID plantId,
             UUID ticketId,
             UUID technicianId,
-            Boolean completed,
-            Boolean invoiced,
+            WorkStatus status,
+            List<WorkStatus> statuses,
             LocalDate orderDateFrom,
             LocalDate orderDateTo,
             LocalDate expectedStartDateFrom,
@@ -164,8 +173,8 @@ public class WorkService implements IWorkService {
         spec = spec.and(WorkSpecification.hasPlant(plantId));
         spec = spec.and(WorkSpecification.hasTicket(ticketId));
         spec = spec.and(WorkSpecification.hasAssignedTechnician(technicianId));
-        spec = spec.and(WorkSpecification.isCompleted(completed));
-        spec = spec.and(WorkSpecification.isInvoiced(invoiced));
+        spec = spec.and(WorkSpecification.hasStatus(status));
+        spec = spec.and(WorkSpecification.hasStatusIn(statuses));
         spec = spec.and(WorkSpecification.hasOrderDateAfter(orderDateFrom));
         spec = spec.and(WorkSpecification.hasOrderDateBefore(orderDateTo));
         spec = spec.and(WorkSpecification.hasExpectedStartDateAfter(expectedStartDateFrom));
@@ -270,22 +279,114 @@ public class WorkService implements IWorkService {
 
     @Override
     @Transactional
-    public void closeWork(UUID id) {
+    public void startWork(UUID id, UUID userId, UserRole userRole) {
         Work work = workRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Work not found with id: " + id));
-        work.setCompleted(true);
-        work.setCompletedAt(LocalDateTime.now());
+
+        stateMachine.validateTransition(work.getStatus(), WorkStatus.IN_PROGRESS, userRole);
+
+        work.setStatus(WorkStatus.IN_PROGRESS);
+        work.setStatusChangedAt(LocalDateTime.now());
+        work.setStatusChangedBy(userId);
         workRepository.save(work);
+
+        // Sync ticket: OPEN → IN_PROGRESS
+        if (work.getTicket() != null) {
+            syncTicketStatus(work.getTicket(), TicketStatus.IN_PROGRESS, userId);
+        }
     }
 
     @Override
     @Transactional
-    public void invoiceWork(UUID id) {
+    public void closeWork(UUID id, UUID userId, UserRole userRole) {
         Work work = workRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Work not found with id: " + id));
-        work.setInvoiced(true);
-        work.setInvoicedAt(LocalDateTime.now());
+
+        stateMachine.validateTransition(work.getStatus(), WorkStatus.CLOSED, userRole);
+
+        work.setStatus(WorkStatus.CLOSED);
+        work.setStatusChangedAt(LocalDateTime.now());
+        work.setStatusChangedBy(userId);
         workRepository.save(work);
+
+        // Sync ticket: → RESOLVED
+        if (work.getTicket() != null) {
+            syncTicketStatus(work.getTicket(), TicketStatus.RESOLVED, userId);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void invoiceWork(UUID id, UUID userId, UserRole userRole) {
+        Work work = workRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Work not found with id: " + id));
+
+        stateMachine.validateTransition(work.getStatus(), WorkStatus.INVOICED, userRole);
+
+        work.setStatus(WorkStatus.INVOICED);
+        work.setStatusChangedAt(LocalDateTime.now());
+        work.setStatusChangedBy(userId);
+        workRepository.save(work);
+
+        // Sync ticket: → CLOSED
+        if (work.getTicket() != null) {
+            syncTicketStatus(work.getTicket(), TicketStatus.CLOSED, userId);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void reopenWork(UUID id, UUID userId, UserRole userRole) {
+        Work work = workRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Work not found with id: " + id));
+
+        stateMachine.validateTransition(work.getStatus(), WorkStatus.IN_PROGRESS, userRole);
+
+        work.setStatus(WorkStatus.IN_PROGRESS);
+        work.setStatusChangedAt(LocalDateTime.now());
+        work.setStatusChangedBy(userId);
+        workRepository.save(work);
+
+        // Sync ticket: → IN_PROGRESS
+        if (work.getTicket() != null) {
+            syncTicketStatus(work.getTicket(), TicketStatus.IN_PROGRESS, userId);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void forceStatusChange(UUID id, WorkStatus newStatus, UUID userId, UserRole userRole) {
+        Work work = workRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Work not found with id: " + id));
+
+        stateMachine.validateTransition(work.getStatus(), newStatus, userRole);
+
+        work.setStatus(newStatus);
+        work.setStatusChangedAt(LocalDateTime.now());
+        work.setStatusChangedBy(userId);
+        workRepository.save(work);
+
+        // Sync ticket based on new status
+        if (work.getTicket() != null) {
+            TicketStatus ticketStatus = mapWorkStatusToTicketStatus(newStatus);
+            syncTicketStatus(work.getTicket(), ticketStatus, userId);
+        }
+    }
+
+    private void syncTicketStatus(Ticket ticket, TicketStatus newStatus, UUID changedBy) {
+        ticket.setStatus(newStatus);
+        ticket.setStatusChangedAt(LocalDateTime.now());
+        ticket.setStatusChangedBy(changedBy);
+        ticketRepository.save(ticket);
+    }
+
+    private TicketStatus mapWorkStatusToTicketStatus(WorkStatus workStatus) {
+        return switch (workStatus) {
+            case SCHEDULED -> TicketStatus.OPEN;
+            case IN_PROGRESS -> TicketStatus.IN_PROGRESS;
+            case CLOSED -> TicketStatus.RESOLVED;
+            case INVOICED -> TicketStatus.CLOSED;
+        };
     }
 
     @Override
@@ -385,8 +486,7 @@ public class WorkService implements IWorkService {
                 work.getBidNumber(),
                 work.getOrderNumber(),
                 work.getOrderDate(),
-                Boolean.TRUE.equals(work.isCompleted()),
-                Boolean.TRUE.equals(work.isInvoiced()),
+                work.getStatus(),
                 work.getElectricalSchemaProgression(),
                 work.getProgrammingProgression(),
                 work.getNasSubDirectory(),
@@ -412,11 +512,9 @@ public class WorkService implements IWorkService {
                 work.getElectricalSchemaProgression(),
                 work.getProgrammingProgression(),
                 work.getExpectedStartDate(),
-                Boolean.TRUE.equals(work.isCompleted()),
-                work.getCompletedAt(),
+                work.getStatus(),
+                work.getStatusChangedAt(),
                 work.getCreatedAt(),
-                Boolean.TRUE.equals(work.isInvoiced()),
-                work.getInvoicedAt(),
                 work.getPlant() != null ? toPlantResponse(work.getPlant()) : null,
                 work.getAtixClient() != null ? toClientResponse(work.getAtixClient()) : null,
                 work.getFinalClient() != null ? toClientResponse(work.getFinalClient()) : null,

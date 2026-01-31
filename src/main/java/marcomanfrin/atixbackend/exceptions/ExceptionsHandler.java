@@ -103,6 +103,12 @@ public class ExceptionsHandler {
     }
 
 
+    @ExceptionHandler(InvalidWorkflowTransitionException.class)
+    @ResponseStatus(HttpStatus.CONFLICT) // 409
+    public ErrorDTO handleInvalidWorkflowTransition(InvalidWorkflowTransitionException ex) {
+        return new ErrorDTO(ex.getMessage(), LocalDateTime.now());
+    }
+
     @ExceptionHandler(DataIntegrityViolationException.class)
     @ResponseStatus(HttpStatus.CONFLICT) // 409 spesso è più giusto di 400
     public ErrorDTO handleDataIntegrity(DataIntegrityViolationException ex) {
