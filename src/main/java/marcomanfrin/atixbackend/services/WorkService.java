@@ -420,6 +420,18 @@ public class WorkService implements IWorkService {
 
         WorkAssignment assignment = new WorkAssignment(work, technician);
         workAssignmentRepository.save(assignment);
+
+        // Auto-transition to IN_PROGRESS when a technician is assigned to a SCHEDULED work
+        if (work.isScheduled()) {
+            work.setStatus(WorkStatus.IN_PROGRESS);
+            work.setStatusChangedAt(LocalDateTime.now());
+            work.setStatusChangedBy(technicianId);
+            workRepository.save(work);
+
+            if (work.getTicket() != null) {
+                syncTicketStatus(work.getTicket(), TicketStatus.IN_PROGRESS, technicianId);
+            }
+        }
     }
 
     @Override

@@ -8,7 +8,6 @@ public record PlantRequest(
         @Size(min = 2, max = 100, message = "Plant name must be between 2 and 100 characters")
         String name,
 
-        @NotBlank(message = "Notes are required")
         String notes,
 
         @NotBlank(message = "NAS directory is required")
