@@ -116,14 +116,16 @@ public class WorkService implements IWorkService {
             work.setFinalClient(finalClient);
         }
 
-        // Set ticket (optional)
+        Work savedWork = workRepository.save(work);
+
+        // Set ticket (optional) - must be done after saving work because Ticket is the owning side
         if (request.ticketId() != null) {
             Ticket ticket = ticketRepository.findById(request.ticketId())
                     .orElseThrow(() -> new NotFoundException("Ticket not found"));
-            work.setTicket(ticket);
+            ticket.setOrderNumber(savedWork);
+            ticketRepository.save(ticket);
+            savedWork.setTicket(ticket);
         }
-
-        Work savedWork = workRepository.save(work);
         return toWorkDetailResponse(savedWork);
     }
 
@@ -266,14 +268,24 @@ public class WorkService implements IWorkService {
             work.setFinalClient(finalClient);
         }
 
-        // Update ticket if provided
+        Work updatedWork = workRepository.save(work);
+
+        // Update ticket if provided - must be done after saving work because Ticket is the owning side
         if (request.ticketId() != null) {
+            // Remove old ticket association if exists
+            if (work.getTicket() != null && !work.getTicket().getId().equals(request.ticketId())) {
+                Ticket oldTicket = work.getTicket();
+                oldTicket.setOrderNumber(null);
+                ticketRepository.save(oldTicket);
+            }
+
             Ticket ticket = ticketRepository.findById(request.ticketId())
                     .orElseThrow(() -> new NotFoundException("Ticket not found"));
-            work.setTicket(ticket);
+            ticket.setOrderNumber(updatedWork);
+            ticketRepository.save(ticket);
+            updatedWork.setTicket(ticket);
         }
 
-        Work updatedWork = workRepository.save(work);
         return toWorkDetailResponse(updatedWork);
     }
 
