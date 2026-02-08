@@ -24,10 +24,10 @@ public class WorkStateMachine {
         }
 
         if (userRole == UserRole.OWNER) {
-            if (currentStatus == WorkStatus.INVOICED) {
-                throw new InvalidWorkflowTransitionException(
-                        "Cannot transition from INVOICED. Work is finalized.");
-            }
+            //if (currentStatus == WorkStatus.INVOICED) {
+            //    throw new InvalidWorkflowTransitionException(
+            //            "Cannot transition from INVOICED. Work is finalized.");
+            //}
             return;
         }
 
