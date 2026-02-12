@@ -151,7 +151,7 @@ public class WorksController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('OWNER')")
+    @PreAuthorize("hasRole('OWNER') or @securityService.isTechnician(authentication)")
     public ResponseEntity<Void> deleteWork(@PathVariable UUID id) {
         workService.deleteWork(id);
         return ResponseEntity.noContent().build();
