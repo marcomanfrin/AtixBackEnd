@@ -26,7 +26,8 @@ public class Work {
     @Column(nullable = true)
     private String description;
 
-    @Column(nullable = false)
+    // F7: bidNumber is now nullable (numero offerta is optional)
+    @Column(nullable = true)
     private String bidNumber;
 
     @ManyToOne

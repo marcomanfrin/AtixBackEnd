@@ -106,8 +106,9 @@ public class WorksController {
         return ResponseEntity.noContent().build();
     }
 
+    // B1: allow ADMINISTRATION users (not just ADMIN/OWNER roles) to mark works as invoiced
     @PatchMapping("/{id}/invoice")
-    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER') or @securityService.isAdministrative(authentication)")
     public ResponseEntity<Void> invoiceWork(@PathVariable UUID id, Authentication authentication) {
         User user = (User) authentication.getPrincipal();
         workService.invoiceWork(id, user.getId(), user.getRole());

@@ -12,7 +12,7 @@ public record WorkRequest(
 
         String description,
 
-        @NotBlank(message = "Bid number is required")
+        // F7: bid number (numero offerta) is now optional
         String bidNumber,
 
         UUID sellerId,

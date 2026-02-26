@@ -503,6 +503,7 @@ public class WorkService implements IWorkService {
         workAssignmentRepository.delete(assignment);
     }
 
+    // F3: include atixClient in summary so the work card shows it after the order number
     private WorkSummaryResponse toWorkSummaryResponse(Work work) {
         return new WorkSummaryResponse(
                 work.getId(),
@@ -517,6 +518,7 @@ public class WorkService implements IWorkService {
                 work.getPlant() != null ? work.getPlant().getNasDirectory() : null,
                 work.getExpectedStartDate(),
                 work.getPlant() != null ? toPlantResponse(work.getPlant()) : null,
+                work.getAtixClient() != null ? toClientResponse(work.getAtixClient()) : null,
                 work.getFinalClient() != null ? toClientResponse(work.getFinalClient()) : null,
                 work.getAssignments().stream()
                         .map(this::toWorkAssignmentResponse)

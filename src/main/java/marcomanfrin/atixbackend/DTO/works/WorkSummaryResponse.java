@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
+// F3: added atixClient field so the work card can display it after the order number
 public record WorkSummaryResponse(
         UUID id,
         String name,
@@ -21,6 +22,7 @@ public record WorkSummaryResponse(
         String relatedPlantNasDirectory,
         LocalDate expectedStartDate,
         PlantResponse plant,
+        ClientResponse atixClient,
         ClientResponse finalClient,
         List<WorkAssignmentResponse> assignedTechnicians
 ) {

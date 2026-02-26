@@ -11,7 +11,8 @@ public record WorkReportEntryUpdateRequest(
 
         String description,
 
-        @DecimalMin(value = "0.0", inclusive = false, message = "Hours must be greater than 0")
+        // F8: allow hours = 0 (inclusive = true)
+        @DecimalMin(value = "0.0", inclusive = true, message = "Hours must be 0 or greater")
         BigDecimal hours,
 
         LocalDate date
