@@ -124,7 +124,11 @@ public class WorkReportService implements IWorkReportService {
                 .orElseThrow(() -> new NotFoundException("Work report entry not found with id: " + entryId));
 
         WorkReport workReport = entry.getReport();
-        workReportEntryRepository.deleteById(entryId);
+
+        // Remove entry from parent collection BEFORE deleting to avoid Hibernate cascade issues
+        workReport.getEntries().remove(entry);
+
+        workReportEntryRepository.delete(entry);
 
         // Update total hours
         updateTotalHours(workReport);
