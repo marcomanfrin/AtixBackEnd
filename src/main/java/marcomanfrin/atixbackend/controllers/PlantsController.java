@@ -24,7 +24,7 @@ public class PlantsController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER') or @securityService.isTechnician(authentication)")
     public ResponseEntity<PlantResponse> createPlant(@Valid @RequestBody PlantRequest request) {
         PlantResponse plant = plantService.createPlant(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(plant);

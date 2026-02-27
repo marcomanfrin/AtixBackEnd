@@ -56,7 +56,7 @@ public class WorkReportsController {
 
     // B3: allow ADMIN and ADMINISTRATION users (not only OWNER) to delete report entries
     @DeleteMapping("/entries/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER') or @securityService.isAdministrative(authentication)")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER') or @securityService.isTechnician(authentication)")
     public ResponseEntity<Void> deleteWorkReportEntry(@PathVariable UUID id) {
         workReportService.deleteWorkReportEntry(id);
         return ResponseEntity.noContent().build();
