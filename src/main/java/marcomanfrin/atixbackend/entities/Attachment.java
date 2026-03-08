@@ -3,8 +3,6 @@ package marcomanfrin.atixbackend.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import marcomanfrin.atixbackend.enums.AttachmentType;
-import org.hibernate.validator.constraints.URL;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,11 +17,13 @@ public class Attachment {
     private UUID id;
 
     @Column(nullable = false)
-    @URL
     private String url;
 
     @Column(name = "public_id", nullable = false)
-    private String publicId; // Cloudinary public_id (to delete content from Cloudinary)
+    private String publicId;
+
+    @Column(name = "original_filename")
+    private String originalFilename;
 
     @Column(name = "resource_type", nullable = false)
     private String resourceType;
@@ -69,6 +69,13 @@ public class Attachment {
     }
     public void setPublicId(String publicId) {
         this.publicId = publicId;
+    }
+
+    public String getOriginalFilename() {
+        return originalFilename;
+    }
+    public void setOriginalFilename(String originalFilename) {
+        this.originalFilename = originalFilename;
     }
 
     public String getResourceType() {
