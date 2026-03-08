@@ -3,6 +3,7 @@ package marcomanfrin.atixbackend.services;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
 import io.minio.RemoveObjectArgs;
+import java.util.Map;
 import jakarta.transaction.Transactional;
 import marcomanfrin.atixbackend.ServiceInterfaces.IAttachmentService;
 import marcomanfrin.atixbackend.entities.Attachment;
@@ -63,22 +64,26 @@ public class AttachmentService implements IAttachmentService {
             String objectKey = "attachments/" + targetType.name().toLowerCase()
                     + "/" + UUID.randomUUID() + "_" + file.getOriginalFilename();
 
+            String originalFilename = file.getOriginalFilename();
+
             minioClient.putObject(PutObjectArgs.builder()
                     .bucket(bucket)
                     .object(objectKey)
                     .stream(file.getInputStream(), file.getSize(), -1)
                     .contentType(file.getContentType())
+                    .headers(Map.of("Content-Disposition",
+                            "inline; filename=\"" + originalFilename + "\""))
                     .build());
 
             String url = minioPublicUrl + "/" + bucket + "/" + objectKey;
-            String publicId = objectKey;
             String resourceTypeOut = file.getContentType();
 
             AttachmentType type = determineAttachmentType(file.getContentType());
 
             Attachment attachment = new Attachment();
             attachment.setUrl(url);
-            attachment.setPublicId(publicId);
+            attachment.setPublicId(objectKey);
+            attachment.setOriginalFilename(originalFilename);
             attachment.setResourceType(resourceTypeOut);
             attachment.setType(type);
             attachmentRepository.save(attachment);
