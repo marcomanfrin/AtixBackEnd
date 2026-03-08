@@ -168,7 +168,6 @@ public class WorksController {
     }
 
     @DeleteMapping("/{workId}/technicians/{technicianId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER') ")
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER') or @securityService.isTechnician(authentication)")
     public ResponseEntity<Void> removeTechnician(
             @PathVariable UUID workId,
