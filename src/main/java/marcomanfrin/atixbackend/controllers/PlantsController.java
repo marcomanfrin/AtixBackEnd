@@ -51,7 +51,7 @@ public class PlantsController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('OWNER')")
+    @PreAuthorize("hasRole('OWNER') or @securityService.isTechnician(authentication)")
     public ResponseEntity<Void> deletePlant(@PathVariable UUID id) {
         plantService.deletePlant(id);
         return ResponseEntity.noContent().build();

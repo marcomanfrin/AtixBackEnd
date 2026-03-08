@@ -77,7 +77,7 @@ public class TicketsController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('OWNER')")
+    @PreAuthorize("hasRole('OWNER') or @securityService.isTechnician(authentication)")
     public ResponseEntity<Void> deleteTicket(@PathVariable UUID id) {
         ticketService.deleteTicket(id);
         return ResponseEntity.noContent().build();

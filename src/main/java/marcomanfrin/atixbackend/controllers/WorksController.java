@@ -159,7 +159,7 @@ public class WorksController {
     }
 
     @DeleteMapping("/{workId}/references/{referenceAssignmentId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER') or @securityService.isTechnician(authentication)")
     public ResponseEntity<Void> removeWorksiteReference(
             @PathVariable UUID workId,
             @PathVariable UUID referenceAssignmentId) {
@@ -168,7 +168,8 @@ public class WorksController {
     }
 
     @DeleteMapping("/{workId}/technicians/{technicianId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER') ")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER') or @securityService.isTechnician(authentication)")
     public ResponseEntity<Void> removeTechnician(
             @PathVariable UUID workId,
             @PathVariable UUID technicianId) {
