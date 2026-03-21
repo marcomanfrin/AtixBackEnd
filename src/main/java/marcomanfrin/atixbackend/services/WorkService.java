@@ -580,7 +580,8 @@ public class WorkService implements IWorkService {
                 plant.getNasDirectory(),
                 plant.getPswPhrase(),
                 plant.getPswPlatform(),
-                plant.getPswStation()
+                plant.getPswStation(),
+                plant.getCreatedAt()
         );
     }
 

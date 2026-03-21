@@ -1,5 +1,6 @@
 package marcomanfrin.atixbackend.DTO.plants;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 public record PlantResponse(
@@ -9,6 +10,7 @@ public record PlantResponse(
         String nasDirectory,
         String pswPhrase,
         String pswPlatform,
-        String pswStation
+        String pswStation,
+        LocalDateTime createdAt
 ) {
 }

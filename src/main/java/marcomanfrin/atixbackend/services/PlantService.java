@@ -109,7 +109,8 @@ public class PlantService implements IPlantService {
                 plant.getNasDirectory(),
                 plant.getPswPhrase(),
                 plant.getPswPlatform(),
-                plant.getPswStation()
+                plant.getPswStation(),
+                plant.getCreatedAt()
         );
     }
 }

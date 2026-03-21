@@ -35,6 +35,14 @@ public class Plant {
     @Column(nullable = false)
     private String pswStation;
 
+    @Column(nullable = true, updatable = false)
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
+
     @OneToMany(mappedBy = "plant")
     private List<Work> works = new ArrayList<>();
 
@@ -99,6 +107,10 @@ public class Plant {
     }
     public void setPswStation(String pswStation) {
         this.pswStation = pswStation;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
     public List<Work> getWorks() {
