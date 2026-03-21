@@ -8,14 +8,19 @@ import marcomanfrin.atixbackend.ServiceInterfaces.IWorkReportService;
 import marcomanfrin.atixbackend.entities.Work;
 import marcomanfrin.atixbackend.entities.WorkReport;
 import marcomanfrin.atixbackend.entities.WorkReportEntry;
+import marcomanfrin.atixbackend.entities.users.TechnicianUser;
+import marcomanfrin.atixbackend.entities.users.User;
 import marcomanfrin.atixbackend.exceptions.NotFoundException;
 import marcomanfrin.atixbackend.repositories.WorkReportEntryRepository;
 import marcomanfrin.atixbackend.repositories.WorkReportRepository;
 import marcomanfrin.atixbackend.repositories.WorkRepository;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -47,6 +52,10 @@ public class WorkReportService implements IWorkReportService {
         Work work = workRepository.findById(request.workId())
                 .orElseThrow(() -> new NotFoundException("Work not found with id: " + request.workId()));
 
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User currentUser = (User) authentication.getPrincipal();
+        TechnicianUser technicianUser = currentUser instanceof TechnicianUser ? (TechnicianUser) currentUser : null;
+
         // Get or create work report
         WorkReport workReport = workReportRepository.findByWork(work)
                 .orElseGet(() -> {
@@ -55,11 +64,14 @@ public class WorkReportService implements IWorkReportService {
                     return workReportRepository.save(newReport);
                 });
 
-        // Create entry
+        // Create entry - use provided date or default to today
+        LocalDate entryDate = (request.date() != null) ? request.date() : LocalDate.now();
         WorkReportEntry entry = new WorkReportEntry(
                 workReport,
                 request.description(),
-                request.hours()
+                request.hours(),
+                entryDate,
+                technicianUser
         );
 
         WorkReportEntry savedEntry = workReportEntryRepository.save(entry);
@@ -82,6 +94,9 @@ public class WorkReportService implements IWorkReportService {
         }
         if (request.hours() != null) {
             entry.setHours(request.hours());
+        }
+        if (request.date() != null) {
+            entry.setDate(request.date());
         }
 
         WorkReportEntry updatedEntry = workReportEntryRepository.save(entry);
@@ -109,14 +124,18 @@ public class WorkReportService implements IWorkReportService {
                 .orElseThrow(() -> new NotFoundException("Work report entry not found with id: " + entryId));
 
         WorkReport workReport = entry.getReport();
-        workReportEntryRepository.deleteById(entryId);
+
+        // Remove entry from parent collection BEFORE deleting to avoid Hibernate cascade issues
+        workReport.getEntries().remove(entry);
+
+        workReportEntryRepository.delete(entry);
 
         // Update total hours
         updateTotalHours(workReport);
     }
 
     @Transactional
-    private WorkReport createWorkReportForWork(UUID workId) {
+    protected WorkReport createWorkReportForWork(UUID workId) {
         Work work = workRepository.findById(workId)
                 .orElseThrow(() -> new NotFoundException("Work not found with id: " + workId));
 
@@ -155,7 +174,10 @@ public class WorkReportService implements IWorkReportService {
                 entry.getId(),
                 entry.getReport().getId(),
                 entry.getDescription(),
-                entry.getHours()
+                entry.getHours(),
+                entry.getDate(),
+                entry.getTechnician() != null ? entry.getTechnician().getId() : null,
+                entry.getTechnician() != null ? entry.getTechnician().getFirstName() + " " + entry.getTechnician().getLastName() : null
         );
     }
 }

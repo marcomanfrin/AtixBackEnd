@@ -8,6 +8,7 @@ public record WorksiteReferenceAssignmentResponse(
         UUID id,
         UUID worksiteReferenceId,
         String worksiteReferenceName,
+        String worksiteReferenceTelephone,
         WorksiteReferenceRole role
 ) {
 }

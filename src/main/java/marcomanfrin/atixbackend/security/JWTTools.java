@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import marcomanfrin.atixbackend.entities.users.User;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.UUID;
 
@@ -17,10 +18,14 @@ public class JWTTools {
 		this.secret = secret;
 	}
 
+	public LocalDateTime getTokenExpiry() {
+		return LocalDateTime.now().plusWeeks(4);
+	}
+
 	public String createToken(User user) {
 		return Jwts.builder()
 				.issuedAt(new Date(System.currentTimeMillis())) // IAT (Issued At)
-				.expiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 7 * 4)) // Expiration Date (4 weeks)
+				.expiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 7)) // Expiration Date (1 week)
 				.subject(String.valueOf(user.getId()))
 				.signWith(Keys.hmacShaKeyFor(secret.getBytes()))
 				.compact();

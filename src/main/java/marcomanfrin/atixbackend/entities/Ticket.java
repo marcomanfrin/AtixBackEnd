@@ -33,6 +33,11 @@ public class Ticket {
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    private LocalDateTime statusChangedAt;
+
+    @Column(name = "status_changed_by")
+    private UUID statusChangedBy;
+
     public Ticket() {}
 
     @PrePersist
@@ -48,7 +53,22 @@ public class Ticket {
         this.status = status;
     }
 
+    // Status helper methods
+    public boolean isOpen() {
+        return this.status == TicketStatus.OPEN;
+    }
 
+    public boolean isInProgress() {
+        return this.status == TicketStatus.IN_PROGRESS;
+    }
+
+    public boolean isResolved() {
+        return this.status == TicketStatus.RESOLVED;
+    }
+
+    public boolean isClosed() {
+        return this.status == TicketStatus.CLOSED;
+    }
 
     public TicketStatus getStatus() {
         return status;
@@ -91,5 +111,19 @@ public class Ticket {
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
+    }
+
+    public LocalDateTime getStatusChangedAt() {
+        return statusChangedAt;
+    }
+    public void setStatusChangedAt(LocalDateTime statusChangedAt) {
+        this.statusChangedAt = statusChangedAt;
+    }
+
+    public UUID getStatusChangedBy() {
+        return statusChangedBy;
+    }
+    public void setStatusChangedBy(UUID statusChangedBy) {
+        this.statusChangedBy = statusChangedBy;
     }
 }

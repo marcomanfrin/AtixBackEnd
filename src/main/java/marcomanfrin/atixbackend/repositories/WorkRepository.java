@@ -2,6 +2,7 @@ package marcomanfrin.atixbackend.repositories;
 
 import marcomanfrin.atixbackend.entities.Work;
 import marcomanfrin.atixbackend.entities.users.SellerUser;
+import marcomanfrin.atixbackend.enums.WorkStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,17 +22,23 @@ public interface WorkRepository extends JpaRepository<Work, UUID>, JpaSpecificat
     Optional<Work> findByOrderNumber(String orderNumber);
 
     List<Work> findBySeller(SellerUser seller);
-    List<Work> findByCompleted(boolean completed);
-    List<Work> findByInvoiced(boolean invoiced);
+    List<Work> findByStatus(WorkStatus status);
 
-    Page<Work> findByCompleted(boolean completed, Pageable pageable);
+    Page<Work> findByStatus(WorkStatus status, Pageable pageable);
 
     @Query("SELECT w FROM Work w WHERE w.orderDate BETWEEN :startDate AND :endDate")
     List<Work> findByOrderDateBetween(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 
-    @Query("SELECT w FROM Work w WHERE w.completed = false AND w.expectedStartDate < :date")
+    @Query("SELECT w FROM Work w WHERE w.status IN ('SCHEDULED', 'IN_PROGRESS') AND w.expectedStartDate < :date")
     List<Work> findOverdueWorks(@Param("date") LocalDate date);
 
-    long countByCompleted(boolean completed);
+    long countByStatus(WorkStatus status);
+
+    @Query("SELECT COUNT(w) FROM Work w WHERE w.status IN ('CLOSED', 'INVOICED')")
+    long countCompleted();
+
+    @Query("SELECT COUNT(w) FROM Work w WHERE w.status IN ('SCHEDULED', 'IN_PROGRESS')")
+    long countPending();
+
     Page<Work> findAllByOrderByCreatedAtDesc(Pageable pageable);
 }

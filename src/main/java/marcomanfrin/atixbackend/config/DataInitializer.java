@@ -29,10 +29,10 @@ public class DataInitializer implements CommandLineRunner {
             logger.info("No users found in database. Creating default OWNER user...");
 
             RegisterRequest defaultOwner = new RegisterRequest(
-                "admin@atixbackend.com",
-                "Admin123!",
                 "Admin",
                 "User",
+                "admin@atixbackend.com",
+                "Admin123!",
                 UserRole.OWNER,
                 UserType.ADMINISTRATION
             );

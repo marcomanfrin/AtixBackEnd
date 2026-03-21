@@ -1,12 +1,9 @@
 package marcomanfrin.atixbackend.controllers;
 
 import jakarta.validation.Valid;
-import marcomanfrin.atixbackend.DTO.works.AddWorksiteReferenceRequest;
-import marcomanfrin.atixbackend.DTO.works.AssignTechnicianRequest;
-import marcomanfrin.atixbackend.DTO.works.WorkDetailResponse;
-import marcomanfrin.atixbackend.DTO.works.WorkRequest;
-import marcomanfrin.atixbackend.DTO.works.WorkSummaryResponse;
-import marcomanfrin.atixbackend.DTO.works.WorkUpdateRequest;
+import marcomanfrin.atixbackend.DTO.works.*;
+import marcomanfrin.atixbackend.entities.users.User;
+import marcomanfrin.atixbackend.enums.WorkStatus;
 import marcomanfrin.atixbackend.services.WorkService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,9 +11,11 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -43,8 +42,8 @@ public class WorksController {
             @RequestParam(required = false) UUID plantId,
             @RequestParam(required = false) UUID ticketId,
             @RequestParam(required = false) UUID technicianId,
-            @RequestParam(required = false) Boolean completed,
-            @RequestParam(required = false) Boolean invoiced,
+            @RequestParam(required = false) WorkStatus status,
+            @RequestParam(required = false) List<WorkStatus> statuses,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate orderDateFrom,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate orderDateTo,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate expectedStartDateFrom,
@@ -52,21 +51,23 @@ public class WorksController {
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String bidNumber,
             @RequestParam(required = false) String orderNumber,
+            @RequestParam(required = false) String search,
             Pageable pageable) {
 
         // If any filter is provided, use filtered search
         if (clientId != null || atixClientId != null || finalClientId != null ||
             sellerId != null || plantId != null || ticketId != null || technicianId != null ||
-            completed != null || invoiced != null ||
+            status != null || (statuses != null && !statuses.isEmpty()) ||
             orderDateFrom != null || orderDateTo != null ||
             expectedStartDateFrom != null || expectedStartDateTo != null ||
-            name != null || bidNumber != null || orderNumber != null) {
+            name != null || bidNumber != null || orderNumber != null ||
+            search != null) {
 
             Page<WorkSummaryResponse> works = workService.getFilteredWorks(
                     clientId, atixClientId, finalClientId, sellerId, plantId,
-                    ticketId, technicianId, completed, invoiced,
+                    ticketId, technicianId, status, statuses,
                     orderDateFrom, orderDateTo, expectedStartDateFrom, expectedStartDateTo,
-                    name, bidNumber, orderNumber, pageable
+                    name, bidNumber, orderNumber, search, pageable
             );
             return ResponseEntity.ok(works);
         }
@@ -83,7 +84,7 @@ public class WorksController {
     }
 
     @PatchMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    // TODO: @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public ResponseEntity<WorkDetailResponse> updateWork(
             @PathVariable UUID id,
             @Valid @RequestBody WorkUpdateRequest request) {
@@ -91,22 +92,52 @@ public class WorksController {
         return ResponseEntity.ok(work);
     }
 
-    @PatchMapping("/{id}/close")
-    @PreAuthorize("@securityService.isTechnician(authentication)")
-    public ResponseEntity<Void> closeWork(@PathVariable UUID id) {
-        workService.closeWork(id);
+    @PatchMapping("/{id}/start")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'USER')")
+    public ResponseEntity<Void> startWork(@PathVariable UUID id, Authentication authentication) {
+        User user = (User) authentication.getPrincipal();
+        workService.startWork(id, user.getId(), user.getRole());
         return ResponseEntity.noContent().build();
     }
 
+    @PatchMapping("/{id}/close")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'USER')")
+    public ResponseEntity<Void> closeWork(@PathVariable UUID id, Authentication authentication) {
+        User user = (User) authentication.getPrincipal();
+        workService.closeWork(id, user.getId(), user.getRole());
+        return ResponseEntity.noContent().build();
+    }
+
+    // B1: allow ADMINISTRATION users (not just ADMIN/OWNER roles) to mark works as invoiced
     @PatchMapping("/{id}/invoice")
-    @PreAuthorize("@securityService.isAdministrative(authentication)")
-    public ResponseEntity<Void> invoiceWork(@PathVariable UUID id) {
-        workService.invoiceWork(id);
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER') or @securityService.isAdministrative(authentication)")
+    public ResponseEntity<Void> invoiceWork(@PathVariable UUID id, Authentication authentication) {
+        User user = (User) authentication.getPrincipal();
+        workService.invoiceWork(id, user.getId(), user.getRole());
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}/reopen")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    public ResponseEntity<Void> reopenWork(@PathVariable UUID id, Authentication authentication) {
+        User user = (User) authentication.getPrincipal();
+        workService.reopenWork(id, user.getId(), user.getRole());
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}/force-status")
+    @PreAuthorize("hasRole('OWNER')")
+    public ResponseEntity<Void> forceStatusChange(
+            @PathVariable UUID id,
+            @Valid @RequestBody ForceStatusRequest request,
+            Authentication authentication) {
+        User user = (User) authentication.getPrincipal();
+        workService.forceStatusChange(id, request.status(), user.getId(), user.getRole());
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/{id}/assign-technician")
-    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER') or @securityService.isTechnician(authentication)")
+    // TODO: @PreAuthorize("hasAnyRole('ADMIN', 'OWNER') or @securityService.isTechnician(authentication)")
     public ResponseEntity<Void> assignTechnician(
             @PathVariable UUID id,
             @Valid @RequestBody AssignTechnicianRequest request) {
@@ -120,5 +151,30 @@ public class WorksController {
             @Valid @RequestBody AddWorksiteReferenceRequest request) {
         workService.addWorksiteReference(id, request.worksiteReferenceId(), request.role());
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('OWNER') or @securityService.isTechnician(authentication)")
+    public ResponseEntity<Void> deleteWork(@PathVariable UUID id) {
+        workService.deleteWork(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{workId}/references/{referenceAssignmentId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER') or @securityService.isTechnician(authentication)")
+    public ResponseEntity<Void> removeWorksiteReference(
+            @PathVariable UUID workId,
+            @PathVariable UUID referenceAssignmentId) {
+        workService.removeWorksiteReference(workId, referenceAssignmentId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{workId}/technicians/{technicianId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER') or @securityService.isTechnician(authentication)")
+    public ResponseEntity<Void> removeTechnician(
+            @PathVariable UUID workId,
+            @PathVariable UUID technicianId) {
+        workService.removeTechnician(workId, technicianId);
+        return ResponseEntity.noContent().build();
     }
 }

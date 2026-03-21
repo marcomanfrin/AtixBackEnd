@@ -1,10 +1,7 @@
 package marcomanfrin.atixbackend.entities;
 
 import jakarta.persistence.*;
-import marcomanfrin.atixbackend.enums.WorksiteReferenceRole;
-
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -18,6 +15,8 @@ public class WorksiteReference {
 
     @Column(nullable = false)
     private String name;
+    private String telephone;
+    private String notes;
 
     @OneToMany(mappedBy = "worksiteReference", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<WorksiteReferenceAssignment> assignments = new ArrayList<>();
@@ -25,8 +24,10 @@ public class WorksiteReference {
     public WorksiteReference() {
     }
 
-    public WorksiteReference(String name) {
+    public WorksiteReference(String name, String telephone, String notes) {
         this.name = name;
+        this.telephone = telephone;
+        this.notes = notes;
     }
 
     public UUID getId() {
@@ -39,11 +40,18 @@ public class WorksiteReference {
     public void setName(String name) {
         this.name = name;
     }
+    public String getTelephone() {
+        return telephone;
+    }
+    public void setTelephone(String telephone) {
+        this.telephone = telephone;
+    }
 
-    public List<WorksiteReferenceAssignment> getAssignments() {
-        return assignments;
+    public String getNotes() {
+        return notes;
     }
-    public void setAssignments(List<WorksiteReferenceAssignment> assignments) {
-        this.assignments = assignments;
+    public void setNotes(String notes) {
+        this.notes = notes;
     }
+
 }

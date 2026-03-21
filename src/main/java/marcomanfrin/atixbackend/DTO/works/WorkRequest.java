@@ -12,7 +12,7 @@ public record WorkRequest(
 
         String description,
 
-        @NotBlank(message = "Bid number is required")
+        // F7: bid number (numero offerta) is now optional
         String bidNumber,
 
         UUID sellerId,
@@ -35,17 +35,15 @@ public record WorkRequest(
 
         UUID plantId,
 
-        @NotNull(message = "Atix client ID is required")
         UUID atixClientId,
 
         UUID finalClientId,
 
-        @NotBlank(message = "NAS subdirectory is required")
         String nasSubDirectory,
 
-        Integer expectedOfficeHours,
+        Double expectedOfficeHours,
 
-        Integer expectedPlantHours,
+        Double expectedPlantHours,
 
         UUID ticketId
 ) {

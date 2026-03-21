@@ -50,7 +50,7 @@ public class WorksiteReferencesController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('OWNER')")
+    @PreAuthorize("hasRole('OWNER') or @securityService.isTechnician(authentication)")
     public ResponseEntity<Void> deleteWorksiteReference(@PathVariable UUID id) {
         worksiteReferenceService.deleteWorksiteReference(id);
         return ResponseEntity.noContent().build();

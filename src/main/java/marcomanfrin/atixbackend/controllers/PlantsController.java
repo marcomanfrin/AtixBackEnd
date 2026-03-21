@@ -24,7 +24,7 @@ public class PlantsController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER') or @securityService.isTechnician(authentication)")
     public ResponseEntity<PlantResponse> createPlant(@Valid @RequestBody PlantRequest request) {
         PlantResponse plant = plantService.createPlant(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(plant);
@@ -51,7 +51,7 @@ public class PlantsController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('OWNER')")
+    @PreAuthorize("hasRole('OWNER') or @securityService.isTechnician(authentication)")
     public ResponseEntity<Void> deletePlant(@PathVariable UUID id) {
         plantService.deletePlant(id);
         return ResponseEntity.noContent().build();

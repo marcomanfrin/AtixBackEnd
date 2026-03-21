@@ -5,9 +5,11 @@ import jakarta.persistence.criteria.JoinType;
 import marcomanfrin.atixbackend.entities.*;
 import marcomanfrin.atixbackend.entities.users.SellerUser;
 import marcomanfrin.atixbackend.entities.users.User;
+import marcomanfrin.atixbackend.enums.WorkStatus;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 public class WorkSpecification {
@@ -69,21 +71,21 @@ public class WorkSpecification {
         };
     }
 
-    public static Specification<Work> isCompleted(Boolean completed) {
+    public static Specification<Work> hasStatus(WorkStatus status) {
         return (root, query, criteriaBuilder) -> {
-            if (completed == null) {
+            if (status == null) {
                 return criteriaBuilder.conjunction();
             }
-            return criteriaBuilder.equal(root.get("completed"), completed);
+            return criteriaBuilder.equal(root.get("status"), status);
         };
     }
 
-    public static Specification<Work> isInvoiced(Boolean invoiced) {
+    public static Specification<Work> hasStatusIn(List<WorkStatus> statuses) {
         return (root, query, criteriaBuilder) -> {
-            if (invoiced == null) {
+            if (statuses == null || statuses.isEmpty()) {
                 return criteriaBuilder.conjunction();
             }
-            return criteriaBuilder.equal(root.get("invoiced"), invoiced);
+            return root.get("status").in(statuses);
         };
     }
 
@@ -167,6 +169,25 @@ public class WorkSpecification {
                 return criteriaBuilder.conjunction();
             }
             return criteriaBuilder.equal(root.get("orderNumber"), orderNumber);
+        };
+    }
+
+    public static Specification<Work> searchByKeyword(String keyword) {
+        return (root, query, criteriaBuilder) -> {
+            if (keyword == null || keyword.trim().isEmpty()) {
+                return criteriaBuilder.conjunction();
+            }
+            String pattern = "%" + keyword.toLowerCase() + "%";
+            Join<Work, Client> atixClientJoin = root.join("atixClient", JoinType.LEFT);
+            Join<Work, Client> finalClientJoin = root.join("finalClient", JoinType.LEFT);
+            Join<Work, Plant> plantJoin = root.join("plant", JoinType.LEFT);
+
+            return criteriaBuilder.or(
+                    criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), pattern),
+                    criteriaBuilder.like(criteriaBuilder.lower(atixClientJoin.get("name")), pattern),
+                    criteriaBuilder.like(criteriaBuilder.lower(finalClientJoin.get("name")), pattern),
+                    criteriaBuilder.like(criteriaBuilder.lower(plantJoin.get("name")), pattern)
+            );
         };
     }
 }

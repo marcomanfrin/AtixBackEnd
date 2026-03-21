@@ -1,7 +1,9 @@
 package marcomanfrin.atixbackend.services;
 
-import com.cloudinary.Cloudinary;
-import com.cloudinary.utils.ObjectUtils;
+import io.minio.MinioClient;
+import io.minio.PutObjectArgs;
+import io.minio.RemoveObjectArgs;
+import java.util.Map;
 import jakarta.transaction.Transactional;
 import marcomanfrin.atixbackend.ServiceInterfaces.IAttachmentService;
 import marcomanfrin.atixbackend.entities.Attachment;
@@ -10,20 +12,24 @@ import marcomanfrin.atixbackend.enums.AttachmentTargetType;
 import marcomanfrin.atixbackend.enums.AttachmentType;
 import marcomanfrin.atixbackend.exceptions.NotFoundException;
 import marcomanfrin.atixbackend.repositories.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 
 @Service
 public class AttachmentService implements IAttachmentService {
     private final AttachmentRepository attachmentRepository;
     private final AttachmentLinkRepository attachmentLinkRepository;
-    private final Cloudinary cloudinary;
+    private final MinioClient minioClient;
+
+    @Value("${minio.public-url}")
+    private String minioPublicUrl;
+
+    @Value("${minio.bucket}")
+    private String bucket;
 
     private final WorkRepository workRepository;
     private final PlantRepository plantRepository;
@@ -32,13 +38,14 @@ public class AttachmentService implements IAttachmentService {
 
     public AttachmentService(AttachmentRepository attachmentRepository,
                              AttachmentLinkRepository attachmentLinkRepository,
-                             Cloudinary cloudinary, WorkRepository workRepository,
+                             MinioClient minioClient,
+                             WorkRepository workRepository,
                              PlantRepository plantRepository,
                              TicketRepository ticketRepository,
                              WorkReportRepository workReportRepository) {
         this.attachmentRepository = attachmentRepository;
         this.attachmentLinkRepository = attachmentLinkRepository;
-        this.cloudinary = cloudinary;
+        this.minioClient = minioClient;
         this.workRepository = workRepository;
         this.plantRepository = plantRepository;
         this.ticketRepository = ticketRepository;
@@ -53,27 +60,30 @@ public class AttachmentService implements IAttachmentService {
         }
         assertTargetExists(targetType, targetId);
 
-        try
-        {
-            String resourceTypeIn = Objects.requireNonNull(file.getContentType()).startsWith("image/")
-                    ? "image"
-                    : "raw";
+        try {
+            String objectKey = "attachments/" + targetType.name().toLowerCase()
+                    + "/" + UUID.randomUUID() + "_" + file.getOriginalFilename();
 
-            var options = ObjectUtils.asMap(
-                    "folder", "AtixBackEnd/attachments/" + targetType.name().toLowerCase(),
-                    "resource_type", resourceTypeIn
-            );
+            String originalFilename = file.getOriginalFilename();
 
-            Map<?, ?> result = cloudinary.uploader().upload(file.getBytes(), options);
-            String url = result.get("secure_url").toString();
-            String publicId = result.get("public_id").toString();
-            String resourceTypeOut = result.get("resource_type").toString();
+            minioClient.putObject(PutObjectArgs.builder()
+                    .bucket(bucket)
+                    .object(objectKey)
+                    .stream(file.getInputStream(), file.getSize(), -1)
+                    .contentType(file.getContentType())
+                    .headers(Map.of("Content-Disposition",
+                            "inline; filename=\"" + originalFilename + "\""))
+                    .build());
+
+            String url = minioPublicUrl + "/" + bucket + "/" + objectKey;
+            String resourceTypeOut = file.getContentType();
 
             AttachmentType type = determineAttachmentType(file.getContentType());
 
             Attachment attachment = new Attachment();
             attachment.setUrl(url);
-            attachment.setPublicId(publicId);
+            attachment.setPublicId(objectKey);
+            attachment.setOriginalFilename(originalFilename);
             attachment.setResourceType(resourceTypeOut);
             attachment.setType(type);
             attachmentRepository.save(attachment);
@@ -84,11 +94,10 @@ public class AttachmentService implements IAttachmentService {
             link.setTargetId(targetId);
             return attachmentLinkRepository.save(link);
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new RuntimeException("Error uploading file", e);
         }
     }
-
 
     @Override
     public List<Attachment> getAttachments(AttachmentTargetType targetType, UUID targetId) {
@@ -118,16 +127,12 @@ public class AttachmentService implements IAttachmentService {
 
         if (attachment.getPublicId() != null && !attachment.getPublicId().isBlank()) {
             try {
-                String rt = (attachment.getResourceType() == null || attachment.getResourceType().isBlank())
-                        ? "auto"
-                        : attachment.getResourceType();
-
-                cloudinary.uploader().destroy(
-                        attachment.getPublicId(),
-                        ObjectUtils.asMap("resource_type", rt)
-                );
+                minioClient.removeObject(RemoveObjectArgs.builder()
+                        .bucket(bucket)
+                        .object(attachment.getPublicId())
+                        .build());
             } catch (Exception e) {
-                throw new RuntimeException("Error deleting file from Cloudinary", e);
+                throw new RuntimeException("Error deleting file from MinIO", e);
             }
         }
 

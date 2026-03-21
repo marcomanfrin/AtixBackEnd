@@ -77,6 +77,19 @@ ATIX, FINAL
 WORK, PLANT, TICKET, REPORT
 ```
 
+### WorkStatus
+```
+SCHEDULED, IN_PROGRESS, CLOSED, INVOICED
+```
+
+**Transizioni consentite (standard):**
+- `SCHEDULED` → `IN_PROGRESS`
+- `IN_PROGRESS` → `CLOSED`, `SCHEDULED` (rollback)
+- `CLOSED` → `INVOICED`, `IN_PROGRESS` (rollback)
+- `INVOICED` → (nessuna, stato finale)
+
+**Nota:** Gli utenti con ruolo `OWNER` possono forzare qualsiasi transizione tranne quelle che partono da `INVOICED`.
+
 ### WorksiteReferenceRole
 ```
 PLUMBER, ELECTRICIAN
@@ -354,19 +367,20 @@ Crea un nuovo lavoro.
 - `bidNumber`: stringa
 - `orderNumber`: stringa
 - `orderDate`: data (formato ISO: YYYY-MM-DD)
-- `atixClientId`: UUID
-- `nasSubDirectory`: stringa
 
 **Campi opzionali:**
-- `sellerId`: UUID
-- `electricalSchemaProgression`: 0-100
-- `programmingProgression`: 0-100
-- `expectedStartDate`: data
-- `plantId`: UUID
-- `finalClientId`: UUID
-- `expectedOfficeHours`: numero
-- `expectedPlantHours`: numero
-- `ticketId`: UUID
+- `description`: stringa - Descrizione del lavoro
+- `sellerId`: UUID - ID del venditore
+- `electricalSchemaProgression`: 0-100 - Progressione schema elettrico
+- `programmingProgression`: 0-100 - Progressione programmazione
+- `expectedStartDate`: data - Data inizio prevista
+- `plantId`: UUID - ID dell'impianto
+- `atixClientId`: UUID - ID cliente Atix
+- `finalClientId`: UUID - ID cliente finale
+- `nasSubDirectory`: stringa - Sottocartella NAS
+- `expectedOfficeHours`: numero - Ore ufficio previste
+- `expectedPlantHours`: numero - Ore impianto previste
+- `ticketId`: UUID - ID ticket associato
 
 **Response 201:**
 ```json
@@ -389,11 +403,9 @@ Crea un nuovo lavoro.
   "electricalSchemaProgression": 0,
   "programmingProgression": 0,
   "expectedStartDate": "2024-02-01",
-  "completed": false,
-  "completedAt": null,
+  "status": "SCHEDULED",
+  "statusChangedAt": "2024-01-15T10:30:00",
   "createdAt": "2024-01-15T10:30:00",
-  "invoiced": false,
-  "invoicedAt": null,
   "plant": {
     "id": "660e8400-e29b-41d4-a716-446655440000",
     "name": "Impianto Centrale"
@@ -432,8 +444,8 @@ Ottiene la lista dei lavori con paginazione e filtri opzionali.
 - `plantId`: UUID - Filtra per impianto
 - `ticketId`: UUID - Filtra per ticket
 - `technicianId`: UUID - Filtra per tecnico assegnato
-- `completed`: boolean - Filtra per stato completamento
-- `invoiced`: boolean - Filtra per stato fatturazione
+- `status`: WorkStatus - Filtra per stato singolo (SCHEDULED, IN_PROGRESS, CLOSED, INVOICED)
+- `statuses`: WorkStatus[] - Filtra per stati multipli (es: `statuses=SCHEDULED&statuses=IN_PROGRESS`)
 - `orderDateFrom`: date (YYYY-MM-DD) - Data ordine da
 - `orderDateTo`: date (YYYY-MM-DD) - Data ordine a
 - `expectedStartDateFrom`: date (YYYY-MM-DD) - Data inizio prevista da
@@ -455,8 +467,7 @@ Ottiene la lista dei lavori con paginazione e filtri opzionali.
       "bidNumber": "BID-2024-001",
       "orderNumber": "ORD-2024-001",
       "orderDate": "2024-01-15",
-      "completed": false,
-      "invoiced": false,
+      "status": "SCHEDULED",
       "electricalSchemaProgression": 25,
       "programmingProgression": 10,
       "nasSubDirectory": "/projects/office-a",
@@ -546,27 +557,100 @@ Aggiorna un lavoro esistente.
 
 ---
 
-#### PATCH `/works/{id}/close`
-Chiude un lavoro (marca come completato).
+#### PATCH `/works/{id}/start`
+Avvia un lavoro (transizione SCHEDULED → IN_PROGRESS).
 
-**Autenticazione richiesta:** ✅ Sì (TECHNICIAN)
+**Autenticazione richiesta:** ✅ Sì (USER, ADMIN o OWNER)
 
 **Parametri URL:**
 - `id`: UUID del lavoro
 
 **Response 204:** No Content
+
+**Errori:**
+- `404 Not Found`: Lavoro non trovato
+- `409 Conflict`: Transizione di stato non valida
+
+**Nota:** Se il lavoro ha un ticket associato, il ticket verrà automaticamente impostato su IN_PROGRESS.
+
+---
+
+#### PATCH `/works/{id}/close`
+Chiude un lavoro (transizione → CLOSED).
+
+**Autenticazione richiesta:** ✅ Sì (USER, ADMIN o OWNER)
+
+**Parametri URL:**
+- `id`: UUID del lavoro
+
+**Response 204:** No Content
+
+**Errori:**
+- `404 Not Found`: Lavoro non trovato
+- `409 Conflict`: Transizione di stato non valida
+
+**Nota:** Se il lavoro ha un ticket associato, il ticket verrà automaticamente impostato su RESOLVED.
 
 ---
 
 #### PATCH `/works/{id}/invoice`
-Marca un lavoro come fatturato.
+Marca un lavoro come fatturato (transizione CLOSED → INVOICED).
 
-**Autenticazione richiesta:** ✅ Sì (ADMINISTRATION)
+**Autenticazione richiesta:** ✅ Sì (ADMIN o OWNER)
 
 **Parametri URL:**
 - `id`: UUID del lavoro
 
 **Response 204:** No Content
+
+**Errori:**
+- `404 Not Found`: Lavoro non trovato
+- `409 Conflict`: Transizione di stato non valida
+
+**Nota:** Se il lavoro ha un ticket associato, il ticket verrà automaticamente impostato su CLOSED.
+
+---
+
+#### PATCH `/works/{id}/reopen`
+Riapre un lavoro (transizione → IN_PROGRESS).
+
+**Autenticazione richiesta:** ✅ Sì (ADMIN o OWNER)
+
+**Parametri URL:**
+- `id`: UUID del lavoro
+
+**Response 204:** No Content
+
+**Errori:**
+- `404 Not Found`: Lavoro non trovato
+- `409 Conflict`: Transizione di stato non valida
+
+**Nota:** Se il lavoro ha un ticket associato, il ticket verrà automaticamente impostato su IN_PROGRESS.
+
+---
+
+#### PATCH `/works/{id}/force-status`
+Forza il cambio di stato di un lavoro (solo OWNER). Può effettuare qualsiasi transizione tranne quelle che partono da INVOICED.
+
+**Autenticazione richiesta:** ✅ Sì (OWNER)
+
+**Parametri URL:**
+- `id`: UUID del lavoro
+
+**Request Body:**
+```json
+{
+  "status": "IN_PROGRESS"
+}
+```
+
+**Response 204:** No Content
+
+**Errori:**
+- `404 Not Found`: Lavoro non trovato
+- `409 Conflict`: Transizione di stato non valida (es. da INVOICED)
+
+**Nota:** Il ticket associato verrà sincronizzato automaticamente in base al nuovo stato del lavoro.
 
 ---
 
@@ -606,6 +690,44 @@ Aggiunge un riferimento cantiere al lavoro.
 ```
 
 **Response 201:** Created
+
+---
+
+#### DELETE `/works/{id}`
+Elimina un lavoro.
+
+**Autenticazione richiesta:** ✅ Sì (OWNER)
+
+**Parametri URL:**
+- `id`: UUID del lavoro
+
+**Response 204:** No Content
+
+---
+
+#### DELETE `/works/{workId}/references/{referenceAssignmentId}`
+Rimuove un riferimento cantiere da un lavoro.
+
+**Autenticazione richiesta:** ✅ Sì (ADMIN o OWNER)
+
+**Parametri URL:**
+- `workId`: UUID del lavoro
+- `referenceAssignmentId`: UUID dell'assegnazione del riferimento cantiere
+
+**Response 204:** No Content
+
+---
+
+#### DELETE `/works/{workId}/technicians/{technicianId}`
+Rimuove un tecnico assegnato da un lavoro.
+
+**Autenticazione richiesta:** ✅ Sì (ADMIN o OWNER)
+
+**Parametri URL:**
+- `workId`: UUID del lavoro
+- `technicianId`: UUID del tecnico
+
+**Response 204:** No Content
 
 ---
 
@@ -931,8 +1053,12 @@ Ottiene il report di un lavoro specifico.
   "entries": [
     {
       "id": "770e8400-e29b-41d4-a716-446655440000",
+      "reportId": "550e8400-e29b-41d4-a716-446655440000",
       "description": "Installazione quadro elettrico",
-      "hours": 8.00
+      "hours": 8.00,
+      "date": "2024-01-15",
+      "technicianId": "123e4567-e89b-12d3-a456-426614174000",
+      "technicianName": "Mario Rossi"
     }
   ]
 }
@@ -950,16 +1076,27 @@ Crea una nuova voce nel report di lavoro.
 {
   "workId": "550e8400-e29b-41d4-a716-446655440000",
   "description": "Installazione quadro elettrico",
-  "hours": 8.0
+  "hours": 8.0,
+  "date": "2024-01-15"
 }
 ```
+
+**Validazioni:**
+- `workId`: UUID, obbligatorio
+- `description`: stringa, obbligatorio
+- `hours`: numero decimale > 0, obbligatorio
+- `date`: data (formato ISO: YYYY-MM-DD), opzionale - se non fornita, viene usata la data odierna
 
 **Response 201:**
 ```json
 {
   "id": "770e8400-e29b-41d4-a716-446655440000",
+  "reportId": "550e8400-e29b-41d4-a716-446655440000",
   "description": "Installazione quadro elettrico",
-  "hours": 8.0
+  "hours": 8.0,
+  "date": "2024-01-15",
+  "technicianId": "123e4567-e89b-12d3-a456-426614174000",
+  "technicianName": "Mario Rossi"
 }
 ```
 
@@ -977,11 +1114,23 @@ Aggiorna una voce del report.
 ```json
 {
   "description": "Descrizione aggiornata",
-  "hours": 10.5
+  "hours": 10.5,
+  "date": "2024-01-16"
 }
 ```
 
-**Response 200:** Dettagli della voce aggiornata
+**Response 200:**
+```json
+{
+  "id": "770e8400-e29b-41d4-a716-446655440000",
+  "reportId": "550e8400-e29b-41d4-a716-446655440000",
+  "description": "Descrizione aggiornata",
+  "hours": 10.5,
+  "date": "2024-01-16",
+  "technicianId": "123e4567-e89b-12d3-a456-426614174000",
+  "technicianName": "Mario Rossi"
+}
+```
 
 ---
 
@@ -998,8 +1147,12 @@ Ottiene tutte le voci del report per un lavoro.
 [
   {
     "id": "770e8400-e29b-41d4-a716-446655440000",
+    "reportId": "550e8400-e29b-41d4-a716-446655440000",
     "description": "Installazione quadro elettrico",
-    "hours": 8.0
+    "hours": 8.0,
+    "date": "2024-01-15",
+    "technicianId": "123e4567-e89b-12d3-a456-426614174000",
+    "technicianName": "Mario Rossi"
   }
 ]
 ```
@@ -1029,7 +1182,9 @@ Crea un nuovo riferimento cantiere.
 **Request Body:**
 ```json
 {
-  "name": "Idraulico Rossi Mario"
+  "name": "Idraulico Rossi Mario",
+  "telephone": "+39 02 1234567",
+  "notes": "Note aggiuntive sul riferimento cantiere"
 }
 ```
 
@@ -1037,7 +1192,9 @@ Crea un nuovo riferimento cantiere.
 ```json
 {
   "id": "550e8400-e29b-41d4-a716-446655440000",
-  "name": "Idraulico Rossi Mario"
+  "name": "Idraulico Rossi Mario",
+  "telephone": "+39 02 1234567",
+  "notes": "Note aggiuntive sul riferimento cantiere"
 }
 ```
 
@@ -1053,7 +1210,9 @@ Ottiene la lista di tutti i riferimenti cantiere.
 [
   {
     "id": "550e8400-e29b-41d4-a716-446655440000",
-    "name": "Idraulico Rossi Mario"
+    "name": "Idraulico Rossi Mario",
+    "telephone": "+39 02 1234567",
+    "notes": "Note aggiuntive sul riferimento cantiere"
   }
 ]
 ```
@@ -1065,10 +1224,15 @@ Ottiene i dettagli di un riferimento cantiere.
 
 **Autenticazione richiesta:** ✅ Sì
 
-**Parametri URL:**
-- `id`: UUID del riferimento
-
-**Response 200:** Dettagli completi
+**Response 200:**
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "name": "Idraulico Rossi Mario",
+  "telephone": "+39 02 1234567",
+  "notes": "Note aggiuntive sul riferimento cantiere"
+}
+```
 
 ---
 
@@ -1083,11 +1247,21 @@ Aggiorna un riferimento cantiere.
 **Request Body:**
 ```json
 {
-  "name": "Nuovo nome"
+  "name": "Nuovo nome",
+  "telephone": "+39 02 7654321",
+  "notes": "Note aggiornate"
 }
 ```
 
-**Response 200:** Dettagli aggiornati
+**Response 200:**
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "name": "Nuovo nome",
+  "telephone": "+39 02 7654321",
+  "notes": "Note aggiornate"
+}
+```
 
 ---
 
@@ -1195,26 +1369,24 @@ Elimina un allegato.
 ```typescript
 {
   id: string (UUID)
-  name: string
+  name: string                                    // Obbligatorio
   description?: string
-  bidNumber: string
+  bidNumber: string                               // Obbligatorio
   seller?: UserSummary
-  orderNumber: string
-  orderDate: string (ISO date)
-  electricalSchemaProgression: number (0-100)
-  programmingProgression: number (0-100)
+  orderNumber: string                             // Obbligatorio
+  orderDate: string (ISO date)                    // Obbligatorio
+  electricalSchemaProgression?: number (0-100)    // Opzionale
+  programmingProgression?: number (0-100)         // Opzionale
   expectedStartDate?: string (ISO date)
-  completed: boolean
-  completedAt?: string (ISO datetime)
-  createdAt: string (ISO datetime)
-  invoiced: boolean
-  invoicedAt?: string (ISO datetime)
+  status: "SCHEDULED" | "IN_PROGRESS" | "CLOSED" | "INVOICED"
+  statusChangedAt?: string (ISO datetime)
+  createdAt?: string (ISO datetime)               // Opzionale
   plant?: Plant
-  atixClient: Client
+  atixClient?: Client                             // Opzionale
   finalClient?: Client
   worksiteReferenceAssignments: WorksiteReferenceAssignment[]
   assignedTechnicians: WorkAssignment[]
-  nasSubDirectory: string
+  nasSubDirectory?: string                        // Opzionale
   expectedOfficeHours?: number
   expectedPlantHours?: number
   ticket?: Ticket
@@ -1225,15 +1397,14 @@ Elimina un allegato.
 ```typescript
 {
   id: string (UUID)
-  name: string
-  bidNumber: string
-  orderNumber: string
-  orderDate: string (ISO date)
-  completed: boolean
-  invoiced: boolean
-  electricalSchemaProgression: number (0-100)
-  programmingProgression: number (0-100)
-  nasSubDirectory: string
+  name: string                                    // Obbligatorio
+  bidNumber: string                               // Obbligatorio
+  orderNumber: string                             // Obbligatorio
+  orderDate: string (ISO date)                    // Obbligatorio
+  status: "SCHEDULED" | "IN_PROGRESS" | "CLOSED" | "INVOICED"
+  electricalSchemaProgression?: number (0-100)    // Opzionale
+  programmingProgression?: number (0-100)         // Opzionale
+  nasSubDirectory?: string                        // Opzionale
   relatedPlantNasDirectory?: string
   expectedStartDate?: string (ISO date)
   plant?: Plant
@@ -1291,17 +1462,22 @@ Elimina un allegato.
 ### WorkReportEntry
 ```typescript
 {
-  id: string (UUID)
-  description: string
-  hours: number (decimal)
+  id: string (UUID),
+  description: string,
+  hours: number (decimal),
+  date: string (ISO date),      // Obbligatorio - default: today
+  technicianId: string (UUID),
+  technicianName: string
 }
 ```
 
 ### WorksiteReference
 ```typescript
 {
-  id: string (UUID)
-  name: string
+  id: string (UUID),
+  name: string,
+  telephone: string,
+  notes: string
 }
 ```
 
@@ -1340,6 +1516,7 @@ Elimina un allegato.
 - **401 Unauthorized**: Non autenticato
 - **403 Forbidden**: Non autorizzato (ruolo insufficiente)
 - **404 Not Found**: Risorsa non trovata
+- **409 Conflict**: Transizione di stato non valida / Vincolo dati violato
 - **500 Internal Server Error**: Errore del server
 
 ---
@@ -1437,5 +1614,24 @@ I messaggi di errore di validazione sono in italiano e provengono direttamente d
 
 ---
 
-**Ultima modifica:** 2026-01-03
-**Versione API:** 1.0
+**Ultima modifica:** 2026-01-31
+**Versione API:** 1.1
+
+## Changelog
+
+### 2026-01-31
+- **Lavori (Works)**: Implementato workflow con stati (SCHEDULED → IN_PROGRESS → CLOSED → INVOICED)
+  - Rimossi campi `completed`, `completedAt`, `invoiced`, `invoicedAt`
+  - Aggiunti campi `status` (WorkStatus) e `statusChangedAt`
+  - Nuovo endpoint `PATCH /works/{id}/start` - Avvia un lavoro
+  - Nuovo endpoint `PATCH /works/{id}/reopen` - Riapre un lavoro
+  - Nuovo endpoint `PATCH /works/{id}/force-status` - Forza cambio stato (solo OWNER)
+  - Aggiornati endpoint `/close` e `/invoice` con validazione transizioni di stato
+  - Sincronizzazione automatica stato ticket: Work→Ticket (SCHEDULED→OPEN, IN_PROGRESS→IN_PROGRESS, CLOSED→RESOLVED, INVOICED→CLOSED)
+  - Filtri aggiornati: `completed`/`invoiced` sostituiti con `status`/`statuses`
+  - Nuovo codice errore 409 Conflict per transizioni non valide
+
+### 2026-01-05
+- **Lavori (Works)**: Modificati i campi obbligatori. Solo `name`, `orderNumber`, `bidNumber` e `orderDate` sono ora obbligatori
+- Resi opzionali: `atixClientId`, `nasSubDirectory`, `electricalSchemaProgression`, `programmingProgression`, `completed`, `invoiced`
+- **Report Lavori (WorkReportEntry)**: Aggiunto campo `date` obbligatorio nell'entità, opzionale nel DTO di creazione (default: data odierna se non fornita)

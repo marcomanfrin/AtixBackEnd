@@ -5,6 +5,7 @@ import marcomanfrin.atixbackend.DTO.plants.PlantResponse;
 import marcomanfrin.atixbackend.DTO.tickets.TicketResponse;
 import marcomanfrin.atixbackend.DTO.users.UserSummaryDTO;
 import marcomanfrin.atixbackend.DTO.worksiteReferences.WorksiteReferenceAssignmentResponse;
+import marcomanfrin.atixbackend.enums.WorkStatus;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -22,19 +23,17 @@ public record WorkDetailResponse(
         Integer electricalSchemaProgression,
         Integer programmingProgression,
         LocalDate expectedStartDate,
-        boolean completed,
-        LocalDateTime completedAt,
+        WorkStatus status,
+        LocalDateTime statusChangedAt,
         LocalDateTime createdAt,
-        boolean invoiced,
-        LocalDateTime invoicedAt,
         PlantResponse plant,
         ClientResponse atixClient,
         ClientResponse finalClient,
         List<WorksiteReferenceAssignmentResponse> worksiteReferenceAssignments,
         List<WorkAssignmentResponse> assignedTechnicians,
         String nasSubDirectory,
-        Integer expectedOfficeHours,
-        Integer expectedPlantHours,
+        Double expectedOfficeHours,
+        Double expectedPlantHours,
         TicketResponse ticket
 ) {
 }

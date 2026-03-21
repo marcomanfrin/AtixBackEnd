@@ -4,11 +4,14 @@ import marcomanfrin.atixbackend.DTO.works.WorkDetailResponse;
 import marcomanfrin.atixbackend.DTO.works.WorkRequest;
 import marcomanfrin.atixbackend.DTO.works.WorkSummaryResponse;
 import marcomanfrin.atixbackend.DTO.works.WorkUpdateRequest;
+import marcomanfrin.atixbackend.enums.UserRole;
+import marcomanfrin.atixbackend.enums.WorkStatus;
 import marcomanfrin.atixbackend.enums.WorksiteReferenceRole;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 public interface IWorkService {
@@ -22,8 +25,8 @@ public interface IWorkService {
             UUID plantId,
             UUID ticketId,
             UUID technicianId,
-            Boolean completed,
-            Boolean invoiced,
+            WorkStatus status,
+            List<WorkStatus> statuses,
             LocalDate orderDateFrom,
             LocalDate orderDateTo,
             LocalDate expectedStartDateFrom,
@@ -31,12 +34,22 @@ public interface IWorkService {
             String name,
             String bidNumber,
             String orderNumber,
+            String search,
             Pageable pageable
     );
     WorkDetailResponse getWorkById(UUID id);
     WorkDetailResponse updateWork(UUID id, WorkUpdateRequest request);
-    void closeWork(UUID id);
-    void invoiceWork(UUID id);
+
+    void startWork(UUID id, UUID userId, UserRole userRole);
+    void closeWork(UUID id, UUID userId, UserRole userRole);
+    void invoiceWork(UUID id, UUID userId, UserRole userRole);
+    void reopenWork(UUID id, UUID userId, UserRole userRole);
+    void forceStatusChange(UUID id, WorkStatus newStatus, UUID userId, UserRole userRole);
+
     void assignTechnician(UUID workId, UUID technicianId);
     void addWorksiteReference(UUID workId, UUID worksiteReferenceId, WorksiteReferenceRole role);
+
+    void deleteWork(UUID id);
+    void removeWorksiteReference(UUID workId, UUID worksiteReferenceId);
+    void removeTechnician(UUID workId, UUID technicianId);
 }

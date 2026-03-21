@@ -4,13 +4,22 @@ type DashboardSummary {
 
     completedWorksCount: Int!
     pendingWorksCount: Int!
+    worksByStatus: [WorkStatusCount!]!
     ticketsByStatus: [TicketStatusCount!]!
 
     lastWorks: [WorkPreview!]!
     lastTickets: [TicketPreview!]!
 }
 
+type WorkStatusCount { status: WorkStatus! count: Int! }
 type TicketStatusCount { status: TicketStatus! count: Int! }
+
+enum WorkStatus {
+    SCHEDULED
+    IN_PROGRESS
+    CLOSED
+    INVOICED
+}
 
 enum TicketStatus {
     OPEN
@@ -22,7 +31,7 @@ enum TicketStatus {
 type WorkPreview {
     id: ID!
     name: String!
-    completed: Boolean!
+    status: WorkStatus!
     createdAt: String!
 }
 

@@ -17,8 +17,18 @@ import org.springframework.security.access.AccessDeniedException;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import io.sentry.Sentry;
+import io.sentry.SentryLevel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import marcomanfrin.atixbackend.entities.users.User;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.Authentication;
+
 @RestControllerAdvice
 public class ExceptionsHandler {
+
+    private static final Logger logger = LoggerFactory.getLogger(ExceptionsHandler.class);
 
     @ExceptionHandler(ValidationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST) // 400
@@ -93,6 +103,12 @@ public class ExceptionsHandler {
     }
 
 
+    @ExceptionHandler(InvalidWorkflowTransitionException.class)
+    @ResponseStatus(HttpStatus.CONFLICT) // 409
+    public ErrorDTO handleInvalidWorkflowTransition(InvalidWorkflowTransitionException ex) {
+        return new ErrorDTO(ex.getMessage(), LocalDateTime.now());
+    }
+
     @ExceptionHandler(DataIntegrityViolationException.class)
     @ResponseStatus(HttpStatus.CONFLICT) // 409 spesso è più giusto di 400
     public ErrorDTO handleDataIntegrity(DataIntegrityViolationException ex) {
@@ -108,7 +124,47 @@ public class ExceptionsHandler {
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR) // 500
     public ErrorDTO handleGenericError(Exception ex) {
-        ex.printStackTrace();
+        // Capture exception in Sentry with user context
+        Sentry.withScope(scope -> {
+            enrichSentryScope(scope);
+            scope.setTag("exception_handler", "generic");
+            scope.setLevel(SentryLevel.ERROR);
+            Sentry.captureException(ex);
+        });
+
+        // Log for local debugging
+        logger.error("Unhandled exception occurred", ex);
+
         return new ErrorDTO("C'è stato un errore lato server, lo risolveremo presto", LocalDateTime.now());
+    }
+
+    /**
+     * Enriches Sentry scope with authenticated user information
+     */
+    private void enrichSentryScope(io.sentry.IScope scope) {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+            if (authentication != null && authentication.isAuthenticated()
+                && authentication.getPrincipal() instanceof User) {
+
+                User user = (User) authentication.getPrincipal();
+
+                // Set Sentry user context
+                io.sentry.protocol.User sentryUser = new io.sentry.protocol.User();
+                sentryUser.setId(user.getId().toString());
+                sentryUser.setEmail(user.getEmail());
+                sentryUser.setUsername(user.getEmail());
+                scope.setUser(sentryUser);
+
+                // Add custom tags for filtering/grouping
+                scope.setTag("user_role", user.getRole().name());
+                scope.setTag("user_type", user.getUserType().name());
+                scope.setTag("user_id", user.getId().toString());
+            }
+        } catch (Exception e) {
+            // Don't let context enrichment break error handling
+            logger.warn("Failed to enrich Sentry context with user info", e);
+        }
     }
 }

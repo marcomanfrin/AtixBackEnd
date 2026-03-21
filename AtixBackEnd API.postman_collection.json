@@ -76,7 +76,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"query\": \"query { dashboardSummary(limit: 10) { clientsCount plantsCount completedWorksCount pendingWorksCount ticketsByStatus { status count } lastWorks { id name completed createdAt } lastTickets { id name status createdAt } } }\"\n}"
+							"raw": "{\n  \"query\": \"query { dashboardSummary(limit: 10) { clientsCount plantsCount completedWorksCount pendingWorksCount worksByStatus { status count } ticketsByStatus { status count } lastWorks { id name status createdAt } lastTickets { id name status createdAt } } }\"\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/graphql",
@@ -106,7 +106,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"query\": \"query DashboardSummary($limit: Int) {\\n  dashboardSummary(limit: $limit) {\\n    clientsCount\\n    plantsCount\\n    completedWorksCount\\n    pendingWorksCount\\n    ticketsByStatus {\\n      status\\n      count\\n    }\\n    lastWorks {\\n      id\\n      name\\n      completed\\n      createdAt\\n    }\\n    lastTickets {\\n      id\\n      name\\n      status\\n      createdAt\\n    }\\n  }\\n}\",\n  \"variables\": {\n    \"limit\": 5\n  }\n}"
+							"raw": "{\n  \"query\": \"query DashboardSummary($limit: Int) {\\n  dashboardSummary(limit: $limit) {\\n    clientsCount\\n    plantsCount\\n    completedWorksCount\\n    pendingWorksCount\\n    worksByStatus {\\n      status\\n      count\\n    }\\n    ticketsByStatus {\\n      status\\n      count\\n    }\\n    lastWorks {\\n      id\\n      name\\n      status\\n      createdAt\\n    }\\n    lastTickets {\\n      id\\n      name\\n      status\\n      createdAt\\n    }\\n  }\\n}\",\n  \"variables\": {\n    \"limit\": 5\n  }\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/graphql",
@@ -773,7 +773,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"name\": \"Giovanni Bianchi\"\n}"
+							"raw": "{\n  \"name\": \"Giovanni Bianchi\",\n  \"telephone\": \"+39 02 1234567\"\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/worksite-references",
@@ -855,7 +855,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"name\": \"Giovanni Bianchi - Aggiornato\"\n}"
+							"raw": "{\n  \"name\": \"Giovanni Bianchi - Aggiornato\",\n  \"telephone\": \"+39 02 7654321\"\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/worksite-references/:id",
@@ -954,7 +954,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{baseUrl}}/works?ticket=null",
+							"raw": "{{baseUrl}}/works",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -979,12 +979,20 @@
 								},
 								{
 									"key": "status",
-									"value": "OPEN",
+									"value": "SCHEDULED",
+									"description": "Single status filter: SCHEDULED, IN_PROGRESS, CLOSED, INVOICED",
 									"disabled": true
 								},
 								{
-									"key": "ticket",
-									"value": "null"
+									"key": "statuses",
+									"value": "SCHEDULED",
+									"description": "Multi-status filter (repeat param)",
+									"disabled": true
+								},
+								{
+									"key": "statuses",
+									"value": "IN_PROGRESS",
+									"disabled": true
 								}
 							]
 						}
@@ -1058,6 +1066,38 @@
 					"response": []
 				},
 				{
+					"name": "Start Work",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/works/:id/start",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"works",
+								":id",
+								"start"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "0425f7fa-b27f-4eb9-9c5a-94b5118b0562",
+									"description": "Work UUID"
+								}
+							]
+						},
+						"description": "Transitions work from SCHEDULED to IN_PROGRESS. Requires USER, ADMIN or OWNER role. Auto-syncs ticket to IN_PROGRESS."
+					},
+					"response": []
+				},
+				{
 					"name": "Close Work",
 					"request": {
 						"method": "PATCH",
@@ -1084,12 +1124,13 @@
 									"description": "Work UUID"
 								}
 							]
-						}
+						},
+						"description": "Transitions work to CLOSED. Requires USER, ADMIN or OWNER role. Auto-syncs ticket to RESOLVED."
 					},
 					"response": []
 				},
 				{
-					"name": "Invoice work",
+					"name": "Invoice Work",
 					"request": {
 						"method": "PATCH",
 						"header": [
@@ -1115,7 +1156,80 @@
 									"description": "Work UUID"
 								}
 							]
-						}
+						},
+						"description": "Transitions work from CLOSED to INVOICED. Requires ADMIN or OWNER role. Auto-syncs ticket to CLOSED."
+					},
+					"response": []
+				},
+				{
+					"name": "Reopen Work",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/works/:id/reopen",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"works",
+								":id",
+								"reopen"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "0425f7fa-b27f-4eb9-9c5a-94b5118b0562",
+									"description": "Work UUID"
+								}
+							]
+						},
+						"description": "Transitions work back to IN_PROGRESS (rollback). Requires ADMIN or OWNER role. Auto-syncs ticket to IN_PROGRESS."
+					},
+					"response": []
+				},
+				{
+					"name": "Force Status Change",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": \"IN_PROGRESS\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/works/:id/force-status",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"works",
+								":id",
+								"force-status"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "0425f7fa-b27f-4eb9-9c5a-94b5118b0562",
+									"description": "Work UUID"
+								}
+							]
+						},
+						"description": "Forces any status transition (except from INVOICED). OWNER role only. Status values: SCHEDULED, IN_PROGRESS, CLOSED, INVOICED."
 					},
 					"response": []
 				},
@@ -1189,6 +1303,105 @@
 								{
 									"key": "workId",
 									"value": "7fbe684d-f95e-4767-a28e-dae6f554da60"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Work",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/works/:workId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"works",
+								":workId"
+							],
+							"variable": [
+								{
+									"key": "workId",
+									"value": "7fbe684d-f95e-4767-a28e-dae6f554da60"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Remove Worksite Reference from Work",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/works/:workId/references/:referenceAssignmentId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"works",
+								":workId",
+								"references",
+								":referenceAssignmentId"
+							],
+							"variable": [
+								{
+									"key": "workId",
+									"value": "7fbe684d-f95e-4767-a28e-dae6f554da60"
+								},
+								{
+									"key": "referenceAssignmentId",
+									"value": "{{worksiteReferenceAssignmentId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Remove Technician from Work",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/works/:workId/technicians/:technicianId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"works",
+								":workId",
+								"technicians",
+								":technicianId"
+							],
+							"variable": [
+								{
+									"key": "workId",
+									"value": "7fbe684d-f95e-4767-a28e-dae6f554da60"
+								},
+								{
+									"key": "technicianId",
+									"value": "{{technicianId}}"
 								}
 							]
 						}
