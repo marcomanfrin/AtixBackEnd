@@ -10,7 +10,7 @@ public record WorkReportEntryResponse(
         String description,
         BigDecimal hours,
         LocalDate date,
-        UUID technicianId,
-        String technicianName
+        UUID userId,
+        String userName
 ) {
 }

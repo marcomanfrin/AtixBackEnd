@@ -8,7 +8,6 @@ import marcomanfrin.atixbackend.ServiceInterfaces.IWorkReportService;
 import marcomanfrin.atixbackend.entities.Work;
 import marcomanfrin.atixbackend.entities.WorkReport;
 import marcomanfrin.atixbackend.entities.WorkReportEntry;
-import marcomanfrin.atixbackend.entities.users.TechnicianUser;
 import marcomanfrin.atixbackend.entities.users.User;
 import marcomanfrin.atixbackend.exceptions.NotFoundException;
 import marcomanfrin.atixbackend.repositories.WorkReportEntryRepository;
@@ -54,7 +53,6 @@ public class WorkReportService implements IWorkReportService {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User currentUser = (User) authentication.getPrincipal();
-        TechnicianUser technicianUser = currentUser instanceof TechnicianUser ? (TechnicianUser) currentUser : null;
 
         // Get or create work report
         WorkReport workReport = workReportRepository.findByWork(work)
@@ -71,7 +69,7 @@ public class WorkReportService implements IWorkReportService {
                 request.description(),
                 request.hours(),
                 entryDate,
-                technicianUser
+                currentUser
         );
 
         WorkReportEntry savedEntry = workReportEntryRepository.save(entry);
@@ -176,8 +174,8 @@ public class WorkReportService implements IWorkReportService {
                 entry.getDescription(),
                 entry.getHours(),
                 entry.getDate(),
-                entry.getTechnician() != null ? entry.getTechnician().getId() : null,
-                entry.getTechnician() != null ? entry.getTechnician().getFirstName() + " " + entry.getTechnician().getLastName() : null
+                entry.getCreatedBy() != null ? entry.getCreatedBy().getId() : null,
+                entry.getCreatedBy() != null ? entry.getCreatedBy().getFirstName() + " " + entry.getCreatedBy().getLastName() : null
         );
     }
 }
