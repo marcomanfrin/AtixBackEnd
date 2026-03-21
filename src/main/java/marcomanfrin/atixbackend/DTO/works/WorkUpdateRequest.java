@@ -37,9 +37,9 @@ public record WorkUpdateRequest(
 
         String nasSubDirectory,
 
-        Integer expectedOfficeHours,
+        Double expectedOfficeHours,
 
-        Integer expectedPlantHours,
+        Double expectedPlantHours,
 
         UUID ticketId
 ) {

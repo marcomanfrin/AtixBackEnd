@@ -51,6 +51,7 @@ public class WorksController {
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String bidNumber,
             @RequestParam(required = false) String orderNumber,
+            @RequestParam(required = false) String search,
             Pageable pageable) {
 
         // If any filter is provided, use filtered search
@@ -59,13 +60,14 @@ public class WorksController {
             status != null || (statuses != null && !statuses.isEmpty()) ||
             orderDateFrom != null || orderDateTo != null ||
             expectedStartDateFrom != null || expectedStartDateTo != null ||
-            name != null || bidNumber != null || orderNumber != null) {
+            name != null || bidNumber != null || orderNumber != null ||
+            search != null) {
 
             Page<WorkSummaryResponse> works = workService.getFilteredWorks(
                     clientId, atixClientId, finalClientId, sellerId, plantId,
                     ticketId, technicianId, status, statuses,
                     orderDateFrom, orderDateTo, expectedStartDateFrom, expectedStartDateTo,
-                    name, bidNumber, orderNumber, pageable
+                    name, bidNumber, orderNumber, search, pageable
             );
             return ResponseEntity.ok(works);
         }

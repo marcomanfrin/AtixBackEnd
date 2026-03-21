@@ -80,8 +80,8 @@ public class WorkService implements IWorkService {
         work.setProgrammingProgression(request.programmingProgression() != null ? request.programmingProgression() : 0);
         work.setExpectedStartDate(request.expectedStartDate());
         work.setNasSubDirectory(request.nasSubDirectory());
-        work.setExpectedOfficeHours(request.expectedOfficeHours() != null ? request.expectedOfficeHours() : 0);
-        work.setExpectedPlantHours(request.expectedPlantHours() != null ? request.expectedPlantHours() : 0);
+        work.setExpectedOfficeHours(request.expectedOfficeHours() != null ? request.expectedOfficeHours() : 0.0);
+        work.setExpectedPlantHours(request.expectedPlantHours() != null ? request.expectedPlantHours() : 0.0);
         work.setStatus(WorkStatus.SCHEDULED);
         work.setStatusChangedAt(LocalDateTime.now());
 
@@ -153,6 +153,7 @@ public class WorkService implements IWorkService {
             String name,
             String bidNumber,
             String orderNumber,
+            String search,
             Pageable pageable) {
 
         // Build specification by combining all filters
@@ -184,6 +185,7 @@ public class WorkService implements IWorkService {
         spec = spec.and(WorkSpecification.hasNameContaining(name));
         spec = spec.and(WorkSpecification.hasBidNumber(bidNumber));
         spec = spec.and(WorkSpecification.hasOrderNumber(orderNumber));
+        spec = spec.and(WorkSpecification.searchByKeyword(search));
 
         return workRepository.findAll(spec, pageable)
                 .map(this::toWorkSummaryResponse);
@@ -443,14 +445,15 @@ public class WorkService implements IWorkService {
         WorksiteReference worksiteReference = worksiteReferenceRepository.findById(worksiteReferenceId)
                 .orElseThrow(() -> new NotFoundException("Worksite reference not found with id: " + worksiteReferenceId));
 
-        // Check if already assigned
-        if (worksiteReferenceAssignmentRepository.existsByWorkAndWorksiteReference(work, worksiteReference)) {
-            throw new IllegalArgumentException("Worksite reference already assigned to this work");
+        // Upsert: if already assigned, update the role; otherwise create new assignment
+        var existing = worksiteReferenceAssignmentRepository.findByWorkAndWorksiteReference(work, worksiteReference);
+        if (existing.isPresent()) {
+            existing.get().setRole(role);
+            worksiteReferenceAssignmentRepository.save(existing.get());
+        } else {
+            WorksiteReferenceAssignment assignment = new WorksiteReferenceAssignment(work, worksiteReference, role);
+            worksiteReferenceAssignmentRepository.save(assignment);
         }
-
-        // Create assignment with role
-        WorksiteReferenceAssignment assignment = new WorksiteReferenceAssignment(work, worksiteReference, role);
-        worksiteReferenceAssignmentRepository.save(assignment);
     }
 
     @Override

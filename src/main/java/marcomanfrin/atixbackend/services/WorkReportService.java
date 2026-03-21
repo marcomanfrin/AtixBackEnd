@@ -54,7 +54,7 @@ public class WorkReportService implements IWorkReportService {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User currentUser = (User) authentication.getPrincipal();
-        TechnicianUser technicianUser = (TechnicianUser) currentUser;
+        TechnicianUser technicianUser = currentUser instanceof TechnicianUser ? (TechnicianUser) currentUser : null;
 
         // Get or create work report
         WorkReport workReport = workReportRepository.findByWork(work)

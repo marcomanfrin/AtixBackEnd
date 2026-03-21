@@ -171,4 +171,23 @@ public class WorkSpecification {
             return criteriaBuilder.equal(root.get("orderNumber"), orderNumber);
         };
     }
+
+    public static Specification<Work> searchByKeyword(String keyword) {
+        return (root, query, criteriaBuilder) -> {
+            if (keyword == null || keyword.trim().isEmpty()) {
+                return criteriaBuilder.conjunction();
+            }
+            String pattern = "%" + keyword.toLowerCase() + "%";
+            Join<Work, Client> atixClientJoin = root.join("atixClient", JoinType.LEFT);
+            Join<Work, Client> finalClientJoin = root.join("finalClient", JoinType.LEFT);
+            Join<Work, Plant> plantJoin = root.join("plant", JoinType.LEFT);
+
+            return criteriaBuilder.or(
+                    criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), pattern),
+                    criteriaBuilder.like(criteriaBuilder.lower(atixClientJoin.get("name")), pattern),
+                    criteriaBuilder.like(criteriaBuilder.lower(finalClientJoin.get("name")), pattern),
+                    criteriaBuilder.like(criteriaBuilder.lower(plantJoin.get("name")), pattern)
+            );
+        };
+    }
 }

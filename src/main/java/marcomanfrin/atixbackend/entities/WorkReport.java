@@ -29,6 +29,7 @@ public class WorkReport {
     private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "report", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("date ASC")
     private List<WorkReportEntry> entries = new ArrayList<>();
 
     public WorkReport() {}

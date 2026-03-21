@@ -34,6 +34,7 @@ public interface IWorkService {
             String name,
             String bidNumber,
             String orderNumber,
+            String search,
             Pageable pageable
     );
     WorkDetailResponse getWorkById(UUID id);

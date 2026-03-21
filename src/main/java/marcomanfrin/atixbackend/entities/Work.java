@@ -83,9 +83,9 @@ public class Work {
     @Column(nullable = true)
     private String nasSubDirectory;
 
-    private int expectedOfficeHours;
+    private double expectedOfficeHours;
 
-    private int expectedPlantHours;
+    private double expectedPlantHours;
 
     @OneToOne(mappedBy = "orderNumber")
     private Ticket ticket;
@@ -255,17 +255,17 @@ public class Work {
         this.nasSubDirectory = nasSubDirectory;
     }
 
-    public int getExpectedOfficeHours() {
+    public double getExpectedOfficeHours() {
         return expectedOfficeHours;
     }
-    public void setExpectedOfficeHours(int expectedOfficeHours) {
+    public void setExpectedOfficeHours(double expectedOfficeHours) {
         this.expectedOfficeHours = expectedOfficeHours;
     }
 
-    public int getExpectedPlantHours() {
+    public double getExpectedPlantHours() {
         return expectedPlantHours;
     }
-    public void setExpectedPlantHours(int expectedPlantHours) {
+    public void setExpectedPlantHours(double expectedPlantHours) {
         this.expectedPlantHours = expectedPlantHours;
     }
 

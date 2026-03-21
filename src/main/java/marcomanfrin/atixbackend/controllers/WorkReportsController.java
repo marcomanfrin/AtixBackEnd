@@ -32,7 +32,7 @@ public class WorkReportsController {
 
     // Work Report Entry endpoints
     @PostMapping("/entries")
-    @PreAuthorize("@securityService.isTechnician(authentication)")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER') or @securityService.isTechnician(authentication)")
     public ResponseEntity<WorkReportEntryResponse> createWorkReportEntry(
             @Valid @RequestBody WorkReportEntryRequest request) {
         WorkReportEntryResponse entry = workReportService.createWorkReportEntry(request);
@@ -40,7 +40,7 @@ public class WorkReportsController {
     }
 
     @PatchMapping("/entries/{id}")
-    @PreAuthorize("@securityService.isTechnician(authentication)")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER') or @securityService.isTechnician(authentication)")
     public ResponseEntity<WorkReportEntryResponse> updateWorkReportEntry(
             @PathVariable UUID id,
             @Valid @RequestBody WorkReportEntryUpdateRequest request) {

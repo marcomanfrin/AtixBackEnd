@@ -32,8 +32,8 @@ public record WorkDetailResponse(
         List<WorksiteReferenceAssignmentResponse> worksiteReferenceAssignments,
         List<WorkAssignmentResponse> assignedTechnicians,
         String nasSubDirectory,
-        Integer expectedOfficeHours,
-        Integer expectedPlantHours,
+        Double expectedOfficeHours,
+        Double expectedPlantHours,
         TicketResponse ticket
 ) {
 }
