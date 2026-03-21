@@ -22,7 +22,7 @@ public class WorkReportEntry {
     private WorkReport report;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "technician_id")
+    @JoinColumn(name = "created_by_id")
     private User createdBy;
 
     @Column(nullable = false)
