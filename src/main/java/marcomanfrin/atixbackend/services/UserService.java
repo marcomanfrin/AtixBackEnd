@@ -17,6 +17,7 @@ import marcomanfrin.atixbackend.enums.UserType;
 import marcomanfrin.atixbackend.exceptions.NotFoundException;
 import marcomanfrin.atixbackend.exceptions.UnauthorizedException;
 import marcomanfrin.atixbackend.exceptions.ValidationException;
+import marcomanfrin.atixbackend.repositories.AccessLogRepository;
 import marcomanfrin.atixbackend.repositories.UserRepository;
 import marcomanfrin.atixbackend.repositories.WorkRepository;
 import marcomanfrin.atixbackend.tools.MailgunSender;
@@ -37,13 +38,15 @@ import java.util.stream.Collectors;
 public class UserService implements IUserService {
     private final UserRepository userRepository;
     private final WorkRepository workRepository;
+    private final AccessLogRepository accessLogRepository;
     private final PasswordEncoder passwordEncoder;
     private final Cloudinary imageUploader;
     private final MailgunSender mailgunSender;
 
-    public UserService(UserRepository userRepository, WorkRepository workRepository, PasswordEncoder passwordEncoder, Cloudinary imageUploader, MailgunSender mailgunSender) {
+    public UserService(UserRepository userRepository, WorkRepository workRepository, AccessLogRepository accessLogRepository, PasswordEncoder passwordEncoder, Cloudinary imageUploader, MailgunSender mailgunSender) {
         this.userRepository = userRepository;
         this.workRepository = workRepository;
+        this.accessLogRepository = accessLogRepository;
         this.passwordEncoder = passwordEncoder;
         this.imageUploader = imageUploader;
         this.mailgunSender = mailgunSender;
@@ -172,6 +175,7 @@ public class UserService implements IUserService {
             });
         }
 
+        accessLogRepository.nullifyUserReferences(id);
         userRepository.delete(user);
     }
 
