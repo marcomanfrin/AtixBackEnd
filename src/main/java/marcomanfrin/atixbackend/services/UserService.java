@@ -17,9 +17,8 @@ import marcomanfrin.atixbackend.enums.UserType;
 import marcomanfrin.atixbackend.exceptions.NotFoundException;
 import marcomanfrin.atixbackend.exceptions.UnauthorizedException;
 import marcomanfrin.atixbackend.exceptions.ValidationException;
-import marcomanfrin.atixbackend.repositories.AccessLogRepository;
 import marcomanfrin.atixbackend.repositories.UserRepository;
-import marcomanfrin.atixbackend.repositories.WorkRepository;
+import java.time.LocalDateTime;
 import marcomanfrin.atixbackend.tools.MailgunSender;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -37,16 +36,12 @@ import java.util.stream.Collectors;
 @Service
 public class UserService implements IUserService {
     private final UserRepository userRepository;
-    private final WorkRepository workRepository;
-    private final AccessLogRepository accessLogRepository;
     private final PasswordEncoder passwordEncoder;
     private final Cloudinary imageUploader;
     private final MailgunSender mailgunSender;
 
-    public UserService(UserRepository userRepository, WorkRepository workRepository, AccessLogRepository accessLogRepository, PasswordEncoder passwordEncoder, Cloudinary imageUploader, MailgunSender mailgunSender) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, Cloudinary imageUploader, MailgunSender mailgunSender) {
         this.userRepository = userRepository;
-        this.workRepository = workRepository;
-        this.accessLogRepository = accessLogRepository;
         this.passwordEncoder = passwordEncoder;
         this.imageUploader = imageUploader;
         this.mailgunSender = mailgunSender;
@@ -103,14 +98,14 @@ public class UserService implements IUserService {
 
     @Override
     public List<UserSummaryDTO> getAllUsers() {
-        return userRepository.findAll().stream()
+        return userRepository.findByDeletedAtIsNull().stream()
                 .map(this::toUserSummaryDTO)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<UserSummaryDTO> getUsersByType(UserType type) {
-        return userRepository.findAll().stream()
+        return userRepository.findByDeletedAtIsNull().stream()
                 .filter(user -> user.getUserType() == type)
                 .map(this::toUserSummaryDTO)
                 .collect(Collectors.toList());
@@ -165,18 +160,8 @@ public class UserService implements IUserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("User not found with id: " + id));
 
-        // Clear seller references from Works if user is a seller
-        if (user instanceof SellerUser) {
-            workRepository.findAll().forEach(work -> {
-                if (work.getSeller() != null && work.getSeller().getId().equals(id)) {
-                    work.setSeller(null);
-                    workRepository.save(work);
-                }
-            });
-        }
-
-        accessLogRepository.nullifyUserReferences(id);
-        userRepository.delete(user);
+        user.setDeletedAt(LocalDateTime.now());
+        userRepository.save(user);
     }
 
     @Override
@@ -233,7 +218,7 @@ public class UserService implements IUserService {
 
     @Override
     public List<User> getUsersByRole(UserRole role) {
-        return userRepository.findByRole(role);
+        return userRepository.findByRoleAndDeletedAtIsNull(role);
     }
 
     private UserSummaryDTO toUserSummaryDTO(User user) {

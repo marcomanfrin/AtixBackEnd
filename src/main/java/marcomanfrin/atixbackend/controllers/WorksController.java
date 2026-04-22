@@ -118,7 +118,7 @@ public class WorksController {
     }
 
     @PatchMapping("/{id}/reopen")
-    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER') or @securityService.isTechnician(authentication)")
     public ResponseEntity<Void> reopenWork(@PathVariable UUID id, Authentication authentication) {
         User user = (User) authentication.getPrincipal();
         workService.reopenWork(id, user.getId(), user.getRole());
@@ -126,7 +126,7 @@ public class WorksController {
     }
 
     @PatchMapping("/{id}/force-status")
-    @PreAuthorize("hasRole('OWNER')")
+    @PreAuthorize("hasRole('OWNER') or @securityService.isTechnician(authentication)")
     public ResponseEntity<Void> forceStatusChange(
             @PathVariable UUID id,
             @Valid @RequestBody ForceStatusRequest request,

@@ -15,10 +15,12 @@ import java.util.UUID;
 public interface UserRepository extends JpaRepository<User, UUID> {
     boolean existsByEmailIgnoreCase(String email);
 
-    List<User> findByRole(UserRole role);
+    List<User> findByDeletedAtIsNull();
 
-    @Query("SELECT u FROM TechnicianUser u")
-    List<TechnicianUser> findAllTechnicians();
+    List<User> findByRoleAndDeletedAtIsNull(UserRole role);
+
+    @Query("SELECT u FROM TechnicianUser u WHERE u.deletedAt IS NULL")
+    List<TechnicianUser> findAllActiveTechnicians();
 
     Optional<User> findByEmail(String email);
 }

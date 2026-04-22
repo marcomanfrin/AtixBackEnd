@@ -7,6 +7,7 @@ import marcomanfrin.atixbackend.enums.UserType;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -48,6 +49,9 @@ public abstract class User implements UserDetails {
     @Column(nullable = false)
     private UserRole role;
 
+    @Column
+    private LocalDateTime deletedAt;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<WorkAssignment> workAssignments = new ArrayList<>();
 
@@ -62,6 +66,11 @@ public abstract class User implements UserDetails {
     }
 
     // UserDetails
+
+    @Override
+    public boolean isEnabled() {
+        return deletedAt == null;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -125,6 +134,13 @@ public abstract class User implements UserDetails {
     }
     public void setRole(UserRole role) {
         this.role = role;
+    }
+
+    public LocalDateTime getDeletedAt() {
+        return deletedAt;
+    }
+    public void setDeletedAt(LocalDateTime deletedAt) {
+        this.deletedAt = deletedAt;
     }
 
     public List<WorkAssignment> getWorkAssignments() {
