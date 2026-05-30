@@ -23,7 +23,7 @@ public class Work {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = true)
+    @Column(nullable = true, length = 1000)
     private String description;
 
     // F7: bidNumber is now nullable (numero offerta is optional)

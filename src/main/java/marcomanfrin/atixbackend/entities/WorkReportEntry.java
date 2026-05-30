@@ -25,7 +25,7 @@ public class WorkReportEntry {
     @JoinColumn(name = "created_by_id")
     private User createdBy;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 1000)
     private String description;
 
     @Column(nullable = false, precision = 10, scale = 2)
