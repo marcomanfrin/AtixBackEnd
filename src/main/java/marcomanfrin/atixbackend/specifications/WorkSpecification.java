@@ -131,14 +131,19 @@ public class WorkSpecification {
                 return criteriaBuilder.conjunction();
             }
 
-            // Join with WorkAssignment to filter by assigned technician
-            Join<Work, WorkAssignment> assignmentJoin = root.join("assignments", JoinType.INNER);
-            Join<WorkAssignment, User> userJoin = assignmentJoin.join("user", JoinType.INNER);
+            // Use an EXISTS subquery instead of a JOIN so we don't need query.distinct(true).
+            // SELECT DISTINCT combined with an ORDER BY on a joined column (e.g. plant.nasDirectory)
+            // is rejected by PostgreSQL ("ORDER BY expressions must appear in select list"),
+            // and EXISTS avoids both the duplicate rows and that constraint.
+            jakarta.persistence.criteria.Subquery<UUID> subquery = query.subquery(UUID.class);
+            jakarta.persistence.criteria.Root<WorkAssignment> assignmentRoot = subquery.from(WorkAssignment.class);
+            subquery.select(assignmentRoot.get("id"))
+                    .where(
+                            criteriaBuilder.equal(assignmentRoot.get("work"), root),
+                            criteriaBuilder.equal(assignmentRoot.get("user").get("id"), technicianId)
+                    );
 
-            // Add distinct to avoid duplicates if a work has multiple assignments
-            query.distinct(true);
-
-            return criteriaBuilder.equal(userJoin.get("id"), technicianId);
+            return criteriaBuilder.exists(subquery);
         };
     }
 
