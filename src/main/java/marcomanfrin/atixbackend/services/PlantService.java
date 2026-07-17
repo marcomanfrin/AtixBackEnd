@@ -13,7 +13,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class PlantService implements IPlantService {
@@ -44,6 +46,13 @@ public class PlantService implements IPlantService {
     public Page<PlantResponse> getAllPlants(Pageable pageable) {
         return plantRepository.findAll(pageable)
                 .map(this::toPlantResponse);
+    }
+
+    @Override
+    public List<PlantResponse> getAllPlantsAsList() {
+        return plantRepository.findAll().stream()
+                .map(this::toPlantResponse)
+                .collect(Collectors.toList());
     }
 
     @Override

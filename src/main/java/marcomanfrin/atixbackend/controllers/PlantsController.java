@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -33,6 +34,12 @@ public class PlantsController {
     @GetMapping
     public ResponseEntity<Page<PlantResponse>> getAllPlants(Pageable pageable) {
         Page<PlantResponse> plants = plantService.getAllPlants(pageable);
+        return ResponseEntity.ok(plants);
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<PlantResponse>> getAllPlantsList() {
+        List<PlantResponse> plants = plantService.getAllPlantsAsList();
         return ResponseEntity.ok(plants);
     }
 
