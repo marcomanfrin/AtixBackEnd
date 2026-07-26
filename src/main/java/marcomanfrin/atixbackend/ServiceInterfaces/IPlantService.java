@@ -11,7 +11,7 @@ import java.util.UUID;
 
 public interface IPlantService {
     PlantResponse createPlant(PlantRequest request);
-    Page<PlantResponse> getAllPlants(Pageable pageable);
+    Page<PlantResponse> getAllPlants(Pageable pageable, String search);
     List<PlantResponse> getAllPlantsAsList();
     PlantResponse getPlantById(UUID id);
     PlantResponse updatePlant(UUID id, PlantUpdateRequest request);

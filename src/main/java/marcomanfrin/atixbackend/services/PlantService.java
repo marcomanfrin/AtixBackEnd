@@ -8,8 +8,10 @@ import marcomanfrin.atixbackend.entities.Plant;
 import marcomanfrin.atixbackend.exceptions.NotFoundException;
 import marcomanfrin.atixbackend.repositories.PlantRepository;
 import marcomanfrin.atixbackend.repositories.WorkRepository;
+import marcomanfrin.atixbackend.specifications.PlantSpecification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,8 +45,9 @@ public class PlantService implements IPlantService {
     }
 
     @Override
-    public Page<PlantResponse> getAllPlants(Pageable pageable) {
-        return plantRepository.findAll(pageable)
+    public Page<PlantResponse> getAllPlants(Pageable pageable, String search) {
+        Specification<Plant> spec = Specification.where(PlantSpecification.searchByKeyword(search));
+        return plantRepository.findAll(spec, pageable)
                 .map(this::toPlantResponse);
     }
 
