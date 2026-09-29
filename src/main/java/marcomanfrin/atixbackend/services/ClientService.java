@@ -5,14 +5,18 @@ import marcomanfrin.atixbackend.DTO.clients.ClientResponse;
 import marcomanfrin.atixbackend.DTO.clients.ClientUpdateRequest;
 import marcomanfrin.atixbackend.ServiceInterfaces.IClientService;
 import marcomanfrin.atixbackend.entities.Client;
+import marcomanfrin.atixbackend.enums.ClientType;
 import marcomanfrin.atixbackend.exceptions.NotFoundException;
 import marcomanfrin.atixbackend.repositories.ClientRepository;
 import marcomanfrin.atixbackend.repositories.WorkRepository;
+import marcomanfrin.atixbackend.specifications.ClientSpecification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -34,9 +38,18 @@ public class ClientService implements IClientService {
     }
 
     @Override
-    public Page<ClientResponse> getAllClients(Pageable pageable) {
-        return clientRepository.findAll(pageable)
+    public Page<ClientResponse> getAllClients(Pageable pageable, String search, ClientType type) {
+        return clientRepository.findAll(
+                        ClientSpecification.searchByKeyword(search).and(ClientSpecification.hasType(type)),
+                        pageable)
                 .map(this::toClientResponse);
+    }
+
+    @Override
+    public List<ClientResponse> getAllClientsAsList() {
+        return clientRepository.findAll(Sort.by("name")).stream()
+                .map(this::toClientResponse)
+                .toList();
     }
 
     @Override

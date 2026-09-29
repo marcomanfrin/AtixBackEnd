@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import marcomanfrin.atixbackend.DTO.clients.ClientRequest;
 import marcomanfrin.atixbackend.DTO.clients.ClientResponse;
 import marcomanfrin.atixbackend.DTO.clients.ClientUpdateRequest;
+import marcomanfrin.atixbackend.enums.ClientType;
 import marcomanfrin.atixbackend.services.ClientService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -31,8 +33,17 @@ public class ClientsController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<ClientResponse>> getAllClients(Pageable pageable) {
-        Page<ClientResponse> clients = clientService.getAllClients(pageable);
+    public ResponseEntity<Page<ClientResponse>> getAllClients(
+            Pageable pageable,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) ClientType type) {
+        Page<ClientResponse> clients = clientService.getAllClients(pageable, search, type);
+        return ResponseEntity.ok(clients);
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<ClientResponse>> getAllClientsList() {
+        List<ClientResponse> clients = clientService.getAllClientsAsList();
         return ResponseEntity.ok(clients);
     }
 
