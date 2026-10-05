@@ -1868,6 +1868,417 @@
 				}
 			],
 			"description": "File attachment endpoints (Cloudinary integration)"
+		},
+		{
+			"name": "Rapportini",
+			"item": [
+				{
+					"name": "Create Rapportino",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/rapportini",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"rapportini"
+							]
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"workId\": \"{{workId}}\",\n  \"interventionDate\": \"2026-10-05\",\n  \"locale\": \"it\"\n}"
+						},
+						"description": "Crea un rapportino DRAFT per la commessa; cliente, impianto e referente sono precompilati dalla commessa."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Rapportini (filtered)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/rapportini?workId={{workId}}&status=DRAFT&dateFrom=2026-01-01&dateTo=2026-12-31&page=0&size=20",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"rapportini"
+							],
+							"query": [
+								{
+									"key": "workId",
+									"value": "{{workId}}"
+								},
+								{
+									"key": "status",
+									"value": "DRAFT"
+								},
+								{
+									"key": "dateFrom",
+									"value": "2026-01-01"
+								},
+								{
+									"key": "dateTo",
+									"value": "2026-12-31"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "20"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Checklist Template",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/rapportini/checklist-template",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"rapportini",
+								"checklist-template"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Rapportino by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/rapportini/{{rapportinoId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"rapportini",
+								"{{rapportinoId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Rapportino (DRAFT only)",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/rapportini/{{rapportinoId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"rapportini",
+								"{{rapportinoId}}"
+							]
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"interventionDate\": \"2026-10-05\",\n  \"clientId\": \"{{clientId}}\",\n  \"plantId\": \"{{plantId}}\",\n  \"worksiteReferenceId\": \"{{worksiteReferenceId}}\",\n  \"typeMaintenance\": true,\n  \"typeCallOut\": false,\n  \"typeQuote\": false,\n  \"typeWarranty\": false,\n  \"description\": \"Sostituito sensore di temperatura\",\n  \"workHours\": 4,\n  \"travelHours\": 2,\n  \"travelKm\": 35,\n  \"meal\": true,\n  \"parking\": false,\n  \"workState\": \"IN_PROGRESS\",\n  \"checklistAnswers\": [\n    {\n      \"templateItemId\": \"{{checklistItemId}}\",\n      \"checked\": true,\n      \"note\": \"OK\"\n    },\n    {\n      \"label\": \"Voce libera\",\n      \"checked\": true\n    }\n  ],\n  \"materials\": [\n    {\n      \"description\": \"Sensore temperatura\",\n      \"quantity\": 1\n    }\n  ]\n}"
+						},
+						"description": "PATCH: solo i campi non null; checklistAnswers e materials, se presenti, sostituiscono le liste. 409 se non DRAFT."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Rapportino (DRAFT only)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/rapportini/{{rapportinoId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"rapportini",
+								"{{rapportinoId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sign Rapportino (on-site)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/rapportini/{{rapportinoId}}/sign",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"rapportini",
+								"{{rapportinoId}}",
+								"sign"
+							]
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"signerName\": \"Mario Rossi\",\n  \"signatureImage\": \"data:image/png;base64,...\",\n  \"privacyAccepted\": true\n}"
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Download Rapportino PDF",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/rapportini/{{rapportinoId}}/pdf",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"rapportini",
+								"{{rapportinoId}}",
+								"pdf"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Signature Request (remote)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/rapportini/{{rapportinoId}}/signature-request",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"rapportini",
+								"{{rapportinoId}}",
+								"signature-request"
+							]
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"expiresInMinutes\": 60\n}"
+						},
+						"description": "Restituisce il token in chiaro una sola volta; link per il cliente: <frontend>/sign/{token}"
+					},
+					"response": []
+				},
+				{
+					"name": "Revoke Signature Request",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/rapportini/{{rapportinoId}}/signature-request/revoke",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"rapportini",
+								"{{rapportinoId}}",
+								"signature-request",
+								"revoke"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Void Rapportino (ADMIN/OWNER/ADMINISTRATION)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/rapportini/{{rapportinoId}}/void",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"rapportini",
+								"{{rapportinoId}}",
+								"void"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Public - Signing Preview",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/public/rapportini/sign/{{signToken}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"public",
+								"rapportini",
+								"sign",
+								"{{signToken}}"
+							]
+						},
+						"auth": {
+							"type": "noauth"
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Public - Sign",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/public/rapportini/sign/{{signToken}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"public",
+								"rapportini",
+								"sign",
+								"{{signToken}}"
+							]
+						},
+						"auth": {
+							"type": "noauth"
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"signerName\": \"Mario Rossi\",\n  \"signatureImage\": \"data:image/png;base64,...\",\n  \"privacyAccepted\": true\n}"
+						}
+					},
+					"response": []
+				}
+			]
 		}
 	],
 	"auth": {

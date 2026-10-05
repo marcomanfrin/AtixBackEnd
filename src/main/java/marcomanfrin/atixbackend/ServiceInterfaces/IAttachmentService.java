@@ -13,4 +13,8 @@ public interface IAttachmentService {
     List<Attachment> getAttachments(AttachmentTargetType targetType, UUID targetId);
     void unlink(UUID linkId);
     void deleteAttachment(UUID attachmentId);
+    AttachmentLink storeGenerated(byte[] content, String filename, String contentType,
+                                  String keyPrefix, AttachmentTargetType targetType, UUID targetId);
+    byte[] readContent(UUID attachmentId);
+    void removeObjectQuietly(String objectKey);
 }
