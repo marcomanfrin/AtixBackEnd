@@ -39,12 +39,14 @@ public class UserService implements IUserService {
     private final PasswordEncoder passwordEncoder;
     private final Cloudinary imageUploader;
     private final MailgunSender mailgunSender;
+    private final UserColorService userColorService;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, Cloudinary imageUploader, MailgunSender mailgunSender) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, Cloudinary imageUploader, MailgunSender mailgunSender, UserColorService userColorService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.imageUploader = imageUploader;
         this.mailgunSender = mailgunSender;
+        this.userColorService = userColorService;
     }
 
     @Override
@@ -87,6 +89,7 @@ public class UserService implements IUserService {
         user.setLastName(request.lastName());
         user.setRole(request.role());
         user.setProfileImageUrl("https://ui-avatars.com/api/?name=" + request.firstName() + "+" + request.lastName());
+        user.setCalendarColor(userColorService.pickColor());
 
         return user;
     }
@@ -217,6 +220,18 @@ public class UserService implements IUserService {
     }
 
     @Override
+    @Transactional
+    public UserDetailDTO updateCalendarColor(UUID userId, String calendarColor) {
+        if (!UserColorService.isValidColor(calendarColor)) {
+            throw new ValidationException("Il colore deve essere nel formato #RRGGBB");
+        }
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User not found with id: " + userId));
+        user.setCalendarColor(UserColorService.normalize(calendarColor));
+        return toUserDetailDTO(userRepository.save(user));
+    }
+
+    @Override
     public List<User> getUsersByRole(UserRole role) {
         return userRepository.findByRoleAndDeletedAtIsNull(role);
     }
@@ -229,7 +244,8 @@ public class UserService implements IUserService {
                 user.getEmail(),
                 user.getProfileImageUrl(),
                 user.getRole().name(),
-                user.getUserType().name()
+                user.getUserType().name(),
+                user.getCalendarColor()
         );
     }
 
@@ -241,7 +257,8 @@ public class UserService implements IUserService {
                 user.getEmail(),
                 user.getProfileImageUrl(),
                 user.getRole().name(),
-                user.getUserType().name()
+                user.getUserType().name(),
+                user.getCalendarColor()
         );
     }
 }

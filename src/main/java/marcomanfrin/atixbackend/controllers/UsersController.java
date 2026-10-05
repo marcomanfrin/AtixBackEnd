@@ -3,15 +3,18 @@ package marcomanfrin.atixbackend.controllers;
 import jakarta.validation.Valid;
 import marcomanfrin.atixbackend.DTO.auth.RegisterRequest;
 import marcomanfrin.atixbackend.DTO.auth.UpdatePasswordRequest;
+import marcomanfrin.atixbackend.DTO.users.CalendarColorRequest;
 import marcomanfrin.atixbackend.DTO.users.UpdatedImageResp;
 import marcomanfrin.atixbackend.DTO.users.UserDetailDTO;
 import marcomanfrin.atixbackend.DTO.users.UserSummaryDTO;
 import marcomanfrin.atixbackend.DTO.users.UserUpdateRequest;
+import marcomanfrin.atixbackend.entities.users.User;
 import marcomanfrin.atixbackend.enums.UserType;
 import marcomanfrin.atixbackend.services.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -86,5 +89,21 @@ public class UsersController {
             @Valid @RequestBody UpdatePasswordRequest request) {
         userService.updatePassword(id, request.currentPassword(), request.newPassword());
         return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/me/calendar-color")
+    public ResponseEntity<UserDetailDTO> updateMyCalendarColor(
+            @Valid @RequestBody CalendarColorRequest request,
+            Authentication authentication) {
+        User user = (User) authentication.getPrincipal();
+        return ResponseEntity.ok(userService.updateCalendarColor(user.getId(), request.calendarColor()));
+    }
+
+    @PatchMapping("/{id}/calendar-color")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER') or @securityService.isSelf(#id, authentication)")
+    public ResponseEntity<UserDetailDTO> updateCalendarColor(
+            @PathVariable UUID id,
+            @Valid @RequestBody CalendarColorRequest request) {
+        return ResponseEntity.ok(userService.updateCalendarColor(id, request.calendarColor()));
     }
 }

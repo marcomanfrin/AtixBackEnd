@@ -46,6 +46,7 @@ public class WorkService implements IWorkService {
     private final WorkAssignmentRepository workAssignmentRepository;
     private final WorksiteReferenceAssignmentRepository worksiteReferenceAssignmentRepository;
     private final WorkStateMachine stateMachine;
+    private final CalendarEventRepository calendarEventRepository;
 
     public WorkService(WorkRepository workRepository,
                       UserRepository userRepository,
@@ -55,7 +56,8 @@ public class WorkService implements IWorkService {
                       WorksiteReferenceRepository worksiteReferenceRepository,
                       WorkAssignmentRepository workAssignmentRepository,
                       WorksiteReferenceAssignmentRepository worksiteReferenceAssignmentRepository,
-                      WorkStateMachine stateMachine) {
+                      WorkStateMachine stateMachine,
+                      CalendarEventRepository calendarEventRepository) {
         this.workRepository = workRepository;
         this.userRepository = userRepository;
         this.clientRepository = clientRepository;
@@ -65,6 +67,7 @@ public class WorkService implements IWorkService {
         this.workAssignmentRepository = workAssignmentRepository;
         this.worksiteReferenceAssignmentRepository = worksiteReferenceAssignmentRepository;
         this.stateMachine = stateMachine;
+        this.calendarEventRepository = calendarEventRepository;
     }
 
     @Override
@@ -471,6 +474,9 @@ public class WorkService implements IWorkService {
             ticketRepository.save(work.getTicket());
         }
 
+        // Gli impegni a calendario collegati sopravvivono alla commessa: si rimuove solo il riferimento
+        calendarEventRepository.detachFromWork(work.getId());
+
         workRepository.delete(work);
     }
 
@@ -568,7 +574,8 @@ public class WorkService implements IWorkService {
                 user.getEmail(),
                 user.getProfileImageUrl(),
                 user.getRole().name(),
-                user.getUserType().name()
+                user.getUserType().name(),
+                user.getCalendarColor()
         );
     }
 

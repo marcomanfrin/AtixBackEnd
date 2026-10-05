@@ -334,6 +334,84 @@ Aggiorna la password dell'utente.
 ---
 
 <a name="endpoint-lavori"></a>
+### 📅 Calendario (Calendar Events)
+
+Impegni condivisi del team. Tutti gli utenti autenticati vedono tutti gli impegni; modifica ed eliminazione sono consentite al creatore e ai ruoli ADMIN/OWNER (altrimenti 403). Le date sono `LocalDateTime` senza fuso (Europe/Rome) e gli intervalli sono semiaperti `[startAt, endAt)`.
+
+#### GET `/calendar-events`
+Elenca gli impegni che si sovrappongono alla finestra `[from, to)` (`startAt < to AND endAt > from`), ordinati per inizio.
+
+**Query params:**
+- `from` (obbligatorio, ISO date-time, es. `2026-10-01T00:00:00`)
+- `to` (obbligatorio, successivo a `from`, finestra massima 100 giorni)
+- `mine` (opzionale, `true` → solo impegni in cui il chiamante è partecipante)
+- `participantIds` (opzionale, ripetibile → impegni con almeno uno di questi partecipanti)
+
+**Response (200):**
+```json
+[
+  {
+    "id": "uuid",
+    "title": "Sopralluogo impianto",
+    "description": null,
+    "location": "Pordenone",
+    "startAt": "2026-10-12T09:00:00",
+    "endAt": "2026-10-12T11:30:00",
+    "allDay": false,
+    "participants": [
+      { "id": "uuid", "firstName": "Luca", "lastName": "Rossi", "fullName": "Luca Rossi", "calendarColor": "#E53935" }
+    ],
+    "createdBy": { "id": "uuid", "firstName": "Anna", "lastName": "Bianchi", "fullName": "Anna Bianchi", "calendarColor": "#1E88E5" },
+    "work": { "id": "uuid", "label": "ORD-123 - Cliente Srl" },
+    "canEdit": true,
+    "createdAt": "2026-10-05T10:00:00",
+    "updatedAt": "2026-10-05T10:00:00"
+  }
+]
+```
+
+#### GET `/calendar-events/{id}`
+Dettaglio di un impegno (stesso formato).
+
+#### POST `/calendar-events`
+Crea un impegno. Il creatore NON è aggiunto automaticamente ai partecipanti.
+
+**Request Body:**
+```json
+{
+  "title": "Sopralluogo impianto",
+  "description": "opzionale",
+  "location": "opzionale",
+  "startAt": "2026-10-12T09:00:00",
+  "endAt": "2026-10-12T11:30:00",
+  "allDay": false,
+  "participantIds": ["uuid"],
+  "workId": "uuid opzionale"
+}
+```
+- `title` obbligatorio (max 200), `participantIds` almeno uno, utenti attivi (duplicati ignorati)
+- `endAt` non può precedere `startAt`
+- Con `allDay: true` la data di `endAt` è l'ultimo giorno incluso: il server salva `[mezzanotte del primo giorno, mezzanotte del giorno dopo l'ultimo)`
+- `workId` inesistente → 404
+
+**Response (201):** l'impegno creato.
+
+#### PUT `/calendar-events/{id}`
+Aggiorna un impegno (stesso body del POST; il set di partecipanti viene sostituito). Solo creatore o ADMIN/OWNER.
+
+#### DELETE `/calendar-events/{id}`
+Elimina l'impegno (204). Solo creatore o ADMIN/OWNER.
+
+#### PATCH `/users/me/calendar-color`
+Cambia il colore calendario dell'utente corrente. Body: `{ "calendarColor": "#1E88E5" }` (formato `#RRGGBB`). Risponde con l'utente aggiornato.
+
+#### PATCH `/users/{id}/calendar-color`
+Cambia il colore calendario di un utente. Consentito ad ADMIN/OWNER (o all'utente stesso). Altri → 403.
+
+> Tutti i payload utente (`/users`, `/users/{id}`, ...) includono ora il campo `calendarColor`. Il colore viene assegnato automaticamente dalla palette alla creazione e, per gli utenti esistenti, all'avvio dell'applicazione.
+
+---
+
 ### 🔨 Lavori (Works)
 
 #### POST `/works`
@@ -1618,6 +1696,10 @@ I messaggi di errore di validazione sono in italiano e provengono direttamente d
 **Versione API:** 1.1
 
 ## Changelog
+
+### 2026-10-05
+- **Calendario**: nuovi endpoint `/calendar-events` (CRUD + lista per finestra temporale con filtri `mine` e `participantIds`)
+- **Utenti**: nuovo campo `calendarColor` e endpoint `PATCH /users/me/calendar-color`, `PATCH /users/{id}/calendar-color`
 
 ### 2026-01-31
 - **Lavori (Works)**: Implementato workflow con stati (SCHEDULED → IN_PROGRESS → CLOSED → INVOICED)

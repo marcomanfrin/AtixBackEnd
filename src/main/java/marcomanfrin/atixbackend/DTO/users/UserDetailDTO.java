@@ -9,6 +9,7 @@ public record UserDetailDTO(
         String email,
         String profileImageUrl,
         String role,
-        String type
+        String type,
+        String calendarColor
 ) {
 }
