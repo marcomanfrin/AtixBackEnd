@@ -52,6 +52,9 @@ public abstract class User implements UserDetails {
     @Column
     private LocalDateTime deletedAt;
 
+    @Column(name = "calendar_color", length = 7)
+    private String calendarColor;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<WorkAssignment> workAssignments = new ArrayList<>();
 
@@ -141,6 +144,13 @@ public abstract class User implements UserDetails {
     }
     public void setDeletedAt(LocalDateTime deletedAt) {
         this.deletedAt = deletedAt;
+    }
+
+    public String getCalendarColor() {
+        return calendarColor;
+    }
+    public void setCalendarColor(String calendarColor) {
+        this.calendarColor = calendarColor;
     }
 
     public List<WorkAssignment> getWorkAssignments() {

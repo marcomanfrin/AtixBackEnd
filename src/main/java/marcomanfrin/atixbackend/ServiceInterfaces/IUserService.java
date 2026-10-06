@@ -25,4 +25,5 @@ public interface IUserService {
     void updatePassword(UUID userId, String currentPassword, String newPassword);
     String uploadProfileImage(UUID userId, MultipartFile file);
     List<User> getUsersByRole(UserRole role);
+    UserDetailDTO updateCalendarColor(UUID userId, String calendarColor);
 }
