@@ -37,10 +37,12 @@ public class MinioConfig {
         if (!exists) {
             minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucket).build());
         }
+        // Lettura anonima solo sotto attachments/ (allegati caricati dagli utenti).
+        // Gli altri prefissi (es. rapportini/ con i PDF firmati) restano privati e passano dal backend.
         String policy = """
                 {"Version":"2012-10-17","Statement":[{"Effect":"Allow",\
                 "Principal":{"AWS":["*"]},"Action":["s3:GetObject"],\
-                "Resource":["arn:aws:s3:::%s/*"]}]}
+                "Resource":["arn:aws:s3:::%s/attachments/*"]}]}
                 """.formatted(bucket);
         minioClient.setBucketPolicy(SetBucketPolicyArgs.builder()
                 .bucket(bucket).config(policy).build());

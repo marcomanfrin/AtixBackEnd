@@ -115,6 +115,19 @@ public class ExceptionsHandler {
         return new ErrorDTO("Vincolo dati violato (es. valore già esistente)", LocalDateTime.now());
     }
 
+    @ExceptionHandler(TooManyRequestsException.class)
+    @ResponseStatus(HttpStatus.TOO_MANY_REQUESTS) // 429
+    public ErrorDTO handleTooManyRequests(TooManyRequestsException ex) {
+        return new ErrorDTO(ex.getMessage(), LocalDateTime.now());
+    }
+
+    // Corpo fisso (niente timestamp): token sconosciuti, scaduti, usati o revocati sono indistinguibili
+    @ExceptionHandler(InvalidSigningTokenException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public java.util.Map<String, String> handleInvalidSigningToken(InvalidSigningTokenException ex) {
+        return java.util.Map.of("message", InvalidSigningTokenException.MESSAGE);
+    }
+
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND) // 404
     public ErrorDTO handleNotFound(NotFoundException ex) {

@@ -34,6 +34,12 @@ public class WorkReportEntry {
     @Column(nullable = false) // TODO: set to false
     private LocalDate date;
 
+    // Valorizzato solo per le righe generate dalla firma di un rapportino (sola lettura)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "rapportino_id")
+    @JsonIgnore
+    private Rapportino rapportino;
+
     public WorkReportEntry() {}
 
     public WorkReportEntry(WorkReport report, String description, BigDecimal hours, LocalDate date, User createdBy) {
@@ -85,5 +91,16 @@ public class WorkReportEntry {
     }
     public void setDate(LocalDate date) {
         this.date = date;
+    }
+
+    public Rapportino getRapportino() {
+        return rapportino;
+    }
+    public void setRapportino(Rapportino rapportino) {
+        this.rapportino = rapportino;
+    }
+
+    public boolean isGeneratedFromRapportino() {
+        return rapportino != null;
     }
 }

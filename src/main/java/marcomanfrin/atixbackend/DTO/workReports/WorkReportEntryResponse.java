@@ -11,6 +11,7 @@ public record WorkReportEntryResponse(
         BigDecimal hours,
         LocalDate date,
         UUID userId,
-        String userName
+        String userName,
+        UUID rapportinoId   // valorizzato per le righe generate da un rapportino firmato (sola lettura)
 ) {
 }
